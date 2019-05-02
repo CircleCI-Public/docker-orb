@@ -32,7 +32,8 @@ steps:
 
           while :
           do
-            INDEX_VERSION=$(curl https://api.github.com/repos/docker/cli/tags | \
+            INDEX_VERSION=$(curl --silent --show-error --location --fail --retry 3 \
+              https://api.github.com/repos/docker/cli/tags | \
               jq --argjson index "$INDEX" '.[$index].name')
 
             # filter out betas & release candidates
@@ -73,8 +74,6 @@ steps:
         fi
 
         DOCKER_BINARY_URL="https://download.docker.com/$PLATFORM/static/stable/x86_64/docker-$DOCKER_VERSION_NUMBER.tgz"
-
-        echo "$DOCKER_BINARY_URL"
 
         # download binary tarball
         curl --output docker.tgz \

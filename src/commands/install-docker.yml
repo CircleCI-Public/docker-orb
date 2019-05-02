@@ -39,4 +39,13 @@ steps:
           DOCKER_VERSION=<<parameters.version>>
         fi
 
-        echo "$DOCKER_VERSION"
+        # check if Docker needs to be installed
+        if command -v docker >> /dev/null 2>&1; then
+          if docker --version | grep $DOCKER_VERSION >> /dev/null 2>&1; then
+            echo docker "$DOCKER_VERSION is already installed"
+            exit 0
+          else
+            echo "A different version of Docker is installed: ($(docker --version)); removing it"
+            $SUDO rm -f $(command -v docker)
+          fi
+        fi

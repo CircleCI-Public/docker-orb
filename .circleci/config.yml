@@ -42,8 +42,9 @@ jobs:
 
     steps:
       - jq/install
-      - docker/install-docker
 
+      - docker/install-docker:
+          version: <<parameters.docker-version>>
 
 integration-dev_filters: &integration-dev_filters
   branches:
@@ -112,7 +113,7 @@ workflows:
             - run: apk add gnupg
 
       - test:
-          name: test-dev-docker-older-alpine
+          name: test-dev-older-alpine
           executor: ci-base
           docker-version: v18.09.4
           filters: *integration-dev_filters
@@ -122,14 +123,14 @@ workflows:
 
       # machine
       - test:
-          name: test-dev-docker-latest-machine
+          name: test-dev-latest-machine
           executor: machine
           filters: *integration-dev_filters
           pre-steps:
             - run: sudo rm -rf /usr/bin/jq /usr/bin/docker || true
 
       - test:
-          name: test-dev-docker-older-machine
+          name: test-dev-older-machine
           executor: machine
           docker-version: v18.09.6-rc1
           filters: *integration-dev_filters
@@ -138,14 +139,14 @@ workflows:
 
       # mac
       - test:
-          name: test-dev-docker-latest-mac
+          name: test-dev-latest-mac
           executor: macos
           filters: *integration-dev_filters
           pre-steps:
             - run: sudo rm -rf /usr/bin/jq /usr/bin/docker || true
 
       - test:
-          name: test-dev-docker-older-mac
+          name: test-dev-older-mac
           executor: macos
           docker-version: v19.03.0-beta3
           filters: *integration-dev_filters
@@ -154,14 +155,14 @@ workflows:
 
       # docker
       - test:
-          name: test-dev-docker-latest-docker
+          name: test-dev-latest-docker
           executor: docker
           filters: *integration-dev_filters
           pre-steps:
             - run: sudo rm -rf /usr/bin/jq /usr/bin/docker || true
 
       - test:
-          name: test-dev-docker-older-docker
+          name: test-dev-older-docker
           executor: docker
           docker-version: v18.09.3
           filters: *integration-dev_filters
@@ -170,14 +171,14 @@ workflows:
 
       # ci-docker
       - test:
-          name: test-dev-docker-latest-ci-docker
+          name: test-dev-latest-ci-docker
           executor: ci-docker
           filters: *integration-dev_filters
           pre-steps:
             - run: sudo rm -rf /usr/bin/jq /usr/bin/docker || true
 
       - test:
-          name: test-dev-docker-older-ci-docker
+          name: test-dev-older-ci-docker
           executor: ci-docker
           docker-version: v18.06.2-ce
           filters: *integration-dev_filters

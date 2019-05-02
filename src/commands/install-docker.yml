@@ -1,7 +1,7 @@
 description: >
- Install the Docker CLI. Supports stable versions `v17.06.0-ce` and
- newer, on all platforms (Linux, macOS). Requirements: curl, grep, jq,
- tar
+  Install the Docker CLI. Supports stable versions `v17.06.0-ce` and
+  newer, on all platforms (Linux, macOS). Requirements: curl, grep, jq,
+  tar
 
 parameters:
   version:
@@ -61,7 +61,7 @@ steps:
             echo "Docker $DOCKER_VERSION is already installed"
             exit 0
           else
-            echo "A different version of Docker is installed: ($(docker --version)); removing it"
+            echo "A different version of Docker is installed ($(docker --version)); removing it"
             $SUDO rm -f $(command -v docker)
           fi
         fi

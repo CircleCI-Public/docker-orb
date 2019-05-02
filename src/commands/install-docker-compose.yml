@@ -1,0 +1,53 @@
+description: >
+  Install the `docker-compose` CLI. Supports stable versions
+
+parameters:
+  version:
+    type: string
+    default: latest
+    description: >
+      Version of `docker-compose` to install, defaults to the latest stable release.
+      If specifying a version other than latest, provide a full release tag,
+      as listed at https://github.com/docker/compose/releases or
+      https://api.github.com/repos/docker/compose/releases, e.g., `1.23.1`.
+
+  install-dir:
+    type: string
+    default: /usr/local/bin
+    description: >
+      Directory in which to install `docker-compose`
+
+steps:
+  - run:
+      name: Install docker-compose
+      command: |
+        if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
+        # grab docker-compose version
+        if [[ <<parameters.version>> == "latest" ]]; then
+          # extract latest version from GitHub releases API
+          declare -i INDEX=0
+
+          while :
+          do
+            INDEX_VERSION=$(curl --silent --show-error --location --fail --retry 3 \
+              https://api.github.com/repos/docker/compose/releases | \
+              jq --argjson index "$INDEX" '.[$index].name')
+
+            # filter out betas & release candidates
+            if [[ $(echo "$INDEX_VERSION" | grep -v beta | grep -v rc) ]]; then
+
+              # strip leading/trailing quotes
+              # can't use substring expression < 0 on macOS
+              DOCKER_COMPOSE_VERSION="${INDEX_VERSION:1:$((${#INDEX_VERSION} - 1 - 1))}"
+
+              echo "Latest stable version of docker-compose is $DOCKER_COMPOSE_VERSION"
+              break
+            else
+              INDEX=INDEX+1
+            fi
+          done
+        else
+          DOCKER_COMPOSE_VERSION=<<parameters.version>>
+          echo "Selected version of docker-compose is $DOCKER_COMPOSE_VERSION"
+        fi

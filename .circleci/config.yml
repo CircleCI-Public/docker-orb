@@ -38,6 +38,10 @@ jobs:
         type: string
         default: latest
 
+      docker-compose-version:
+        type: string
+        default: latest
+
     executor: <<parameters.executor>>
 
     steps:
@@ -45,6 +49,9 @@ jobs:
 
       - docker/install-docker:
           version: <<parameters.docker-version>>
+
+      - docker/install-docker-compose:
+          version: <<parameters.docker-compose-version>>
 
 integration-dev_filters: &integration-dev_filters
   branches:
@@ -105,7 +112,7 @@ workflows:
       # triggered by non-master branch commits
       # alpine
       - test:
-          name: test-dev-docker-latest-alpine
+          name: test-dev-latest-alpine
           executor: ci-base
           filters: *integration-dev_filters
           pre-steps:
@@ -115,6 +122,7 @@ workflows:
           name: test-dev-older-alpine
           executor: ci-base
           docker-version: v18.09.4
+          docker-compose-version: 1.17.1
           filters: *integration-dev_filters
           pre-steps:
             - run: apk add gnupg
@@ -129,6 +137,7 @@ workflows:
           name: test-dev-older-machine
           executor: machine
           docker-version: v17.09.0-ce
+          docker-compose-version: 1.20.0
           filters: *integration-dev_filters
 
       # mac
@@ -141,6 +150,7 @@ workflows:
           name: test-dev-older-mac
           executor: macos
           docker-version: v17.12.1-ce
+          docker-compose-version: 1.21.2
           filters: *integration-dev_filters
 
       # docker
@@ -153,6 +163,7 @@ workflows:
           name: test-dev-older-docker
           executor: docker
           docker-version: v18.09.3
+          docker-compose-version: 1.22.0
           filters: *integration-dev_filters
 
       # ci-docker
@@ -165,6 +176,7 @@ workflows:
           name: test-dev-older-ci-docker
           executor: ci-docker
           docker-version: v18.06.2-ce
+          docker-compose-version: 1.23.1
           filters: *integration-dev_filters
 
       # triggered by master branch commits

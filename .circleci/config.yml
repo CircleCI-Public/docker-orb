@@ -128,7 +128,7 @@ workflows:
       - test:
           name: test-dev-older-machine
           executor: machine
-          docker-version: v18.09.6-rc1
+          docker-version: v17.09.0-ce
           filters: *integration-dev_filters
 
       # mac
@@ -140,7 +140,7 @@ workflows:
       - test:
           name: test-dev-older-mac
           executor: macos
-          docker-version: v19.03.0-beta3
+          docker-version: v17.12.1-ce
           filters: *integration-dev_filters
 
       # docker

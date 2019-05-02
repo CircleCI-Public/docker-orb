@@ -53,8 +53,9 @@ steps:
         fi
 
         # check if Docker needs to be installed
+        DOCKER_VERSION_NUMBER="${DOCKER_VERSION:1}"
+
         if command -v docker >> /dev/null 2>&1; then
-          DOCKER_VERSION_NUMBER="${DOCKER_VERSION:1}"
           if docker --version | grep "$DOCKER_VERSION_NUMBER" >> /dev/null 2>&1; then
             echo "Docker $DOCKER_VERSION is already installed"
             exit 0

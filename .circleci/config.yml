@@ -109,7 +109,7 @@ workflows:
           executor: ci-base
           filters: *integration-dev_filters
           pre-steps:
-            - run: apk add make
+            - run: apk add gnupg
 
       - test:
           name: test-dev-older-alpine
@@ -117,7 +117,7 @@ workflows:
           docker-version: v18.09.4
           filters: *integration-dev_filters
           pre-steps:
-            - run: apk add make
+            - run: apk add gnupg
 
       # machine
       - test:

@@ -65,13 +65,15 @@ steps:
         fi
 
         # get binary download URL for specified version
-        if uname -a | grep Darwin; then
+        if uname -a | grep Darwin >> /dev/null 2>&1; then
           PLATFORM=mac
         else
           PLATFORM=linux
         fi
 
         DOCKER_BINARY_URL="https://download.docker.com/$PLATFORM/static/stable/x86_64/docker-$DOCKER_VERSION_NUMBER.tgz"
+
+        echo "$DOCKER_BINARY_URL"
 
         # download binary tarball
         curl --output docker.tgz \
@@ -91,5 +93,4 @@ steps:
         done
 
         # verify version
-        echo "Docker has been installed to $(which docker)"
-        echo "Docker version: $(docker --version)"
+        echo "$(docker --version) has been installed to $(which docker)"

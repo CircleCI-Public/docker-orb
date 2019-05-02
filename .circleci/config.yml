@@ -109,7 +109,7 @@ workflows:
           executor: ci-base
           filters: *integration-dev_filters
           pre-steps:
-            - run: sudo rm -rf /usr/bin/jq /usr/bin/docker || true
+            - run: sudo rm -rf /usr/bin/jq || true
             - run: apk add gnupg
 
       - test:
@@ -118,7 +118,7 @@ workflows:
           docker-version: v18.09.4
           filters: *integration-dev_filters
           pre-steps:
-            - run: sudo rm -rf /usr/bin/jq /usr/bin/docker || true
+            - run: sudo rm -rf /usr/bin/jq || true
             - run: apk add gnupg
 
       # machine
@@ -127,7 +127,7 @@ workflows:
           executor: machine
           filters: *integration-dev_filters
           pre-steps:
-            - run: sudo rm -rf /usr/bin/jq /usr/bin/docker || true
+            - run: sudo rm -rf /usr/bin/jq || true
 
       - test:
           name: test-dev-older-machine
@@ -135,7 +135,7 @@ workflows:
           docker-version: v18.09.6-rc1
           filters: *integration-dev_filters
           pre-steps:
-            - run: sudo rm -rf /usr/bin/jq /usr/bin/docker || true
+            - run: sudo rm -rf /usr/bin/jq || true
 
       # mac
       - test:
@@ -143,7 +143,7 @@ workflows:
           executor: macos
           filters: *integration-dev_filters
           pre-steps:
-            - run: sudo rm -rf /usr/bin/jq /usr/bin/docker || true
+            - run: sudo rm -rf /usr/bin/jq || true
 
       - test:
           name: test-dev-older-mac
@@ -151,7 +151,7 @@ workflows:
           docker-version: v19.03.0-beta3
           filters: *integration-dev_filters
           pre-steps:
-            - run: sudo rm -rf /usr/bin/jq /usr/bin/docker || true
+            - run: sudo rm -rf /usr/bin/jq || true
 
       # docker
       - test:
@@ -159,7 +159,7 @@ workflows:
           executor: docker
           filters: *integration-dev_filters
           pre-steps:
-            - run: sudo rm -rf /usr/bin/jq /usr/bin/docker || true
+            - run: sudo rm -rf /usr/bin/jq || true
 
       - test:
           name: test-dev-older-docker
@@ -167,7 +167,7 @@ workflows:
           docker-version: v18.09.3
           filters: *integration-dev_filters
           pre-steps:
-            - run: sudo rm -rf /usr/bin/jq /usr/bin/docker || true
+            - run: sudo rm -rf /usr/bin/jq || true
 
       # ci-docker
       - test:
@@ -175,7 +175,7 @@ workflows:
           executor: ci-docker
           filters: *integration-dev_filters
           pre-steps:
-            - run: sudo rm -rf /usr/bin/jq /usr/bin/docker || true
+            - run: sudo rm -rf /usr/bin/jq || true
 
       - test:
           name: test-dev-older-ci-docker
@@ -183,7 +183,7 @@ workflows:
           docker-version: v18.06.2-ce
           filters: *integration-dev_filters
           pre-steps:
-            - run: sudo rm -rf /usr/bin/jq /usr/bin/docker || true
+            - run: sudo rm -rf /usr/bin/jq || true
 
       # triggered by master branch commits
       - test:
@@ -191,7 +191,7 @@ workflows:
           executor: ci-base
           filters: *integration-master_filters
           pre-steps:
-            - run: sudo rm -rf /usr/bin/jq /usr/bin/docker || true
+            - run: sudo rm -rf /usr/bin/jq || true
 
       # patch, minor, or major publishing
       - orb-tools/dev-promote-prod:

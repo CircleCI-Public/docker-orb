@@ -108,6 +108,7 @@ workflows:
           name: test-dev-docker-latest-alpine
           executor: ci-base
           filters: *integration-dev_filters
+          pre-steps:
             - run: apk add gnupg
 
       - test:
@@ -115,6 +116,7 @@ workflows:
           executor: ci-base
           docker-version: v18.09.4
           filters: *integration-dev_filters
+          pre-steps:
             - run: apk add gnupg
 
       # machine

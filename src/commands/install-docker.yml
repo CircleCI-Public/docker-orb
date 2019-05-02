@@ -1,5 +1,7 @@
 description: >
- Install the Docker CLI. Requirements: curl, grep, jq
+ Install the Docker CLI. Supports versions `v18.06.1-ce-rc1` and newer,
+ on all platforms/distros (Linux/Ubuntu/Debian, Linux/Alpine, macOS).
+ Requirements: curl, grep, jq, tar
 
 parameters:
   version:
@@ -48,10 +50,31 @@ steps:
         if command -v docker >> /dev/null 2>&1; then
           DOCKER_VERSION_NUMBER="${DOCKER_VERSION:1}"
           if docker --version | grep "$DOCKER_VERSION_NUMBER" >> /dev/null 2>&1; then
-            echo docker "$DOCKER_VERSION is already installed"
+            echo "Docker $DOCKER_VERSION is already installed"
             exit 0
           else
             echo "A different version of Docker is installed: ($(docker --version)); removing it"
             $SUDO rm -f $(command -v docker)
           fi
+        fi
+
+        # get source download URL for specified version
+        DOCKER_SOURCE_URL="https://codeload.github.com/docker/cli/legacy.tar.gz/$DOCKER_VERSION"
+
+        # download tarball
+        curl --output docker.tar.gz \
+          --silent --show-error --location --fail --retry 3 \
+          "$DOCKER_SOURCE_URL"
+
+        tar xf docker.tar.gz && rm -rf docker.tar.gz
+
+        # compile/install Docker
+        cd docker-cli*
+
+        # handle mac version
+        if uname -a | grep Darwin; then
+          make binary-osx
+        else
+          # linux version
+          make binary
         fi

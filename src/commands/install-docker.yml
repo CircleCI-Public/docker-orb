@@ -30,6 +30,7 @@ steps:
             # filter out betas & release candidates
             if [[ $(echo "$INDEX_VERSION" | grep -v beta | grep -v rc) ]]; then
               DOCKER_VERSION=$INDEX_VERSION
+              echo "Latest stable version of Docker is $DOCKER_VERSION"
               break
             else
               INDEX=INDEX+1
@@ -37,6 +38,7 @@ steps:
           done
         else
           DOCKER_VERSION=<<parameters.version>>
+          echo "Selected version of Docker is $DOCKER_VERSION"
         fi
 
         # check if Docker needs to be installed

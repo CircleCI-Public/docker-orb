@@ -51,3 +51,14 @@ steps:
           DOCKER_COMPOSE_VERSION=<<parameters.version>>
           echo "Selected version of docker-compose is $DOCKER_COMPOSE_VERSION"
         fi
+
+        # check if docker-compose needs to be installed
+        if command -v docker-compose >> /dev/null 2>&1; then
+          if docker-compose --version | grep "$DOCKER_COMPOSE_VERSION" >> /dev/null 2>&1; then
+            echo "$DOCKER_COMPOSE_VERSION is already installed"
+            exit 0
+          else
+            echo "A different version of docker-compose is installed ($(docker-compose --version)); removing it"
+            $SUDO rm -f $(command -v docker-compose)
+          fi
+        fi

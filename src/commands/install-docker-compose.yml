@@ -73,7 +73,7 @@ steps:
 
         DOCKER_COMPOSE_BINARY_URL="https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-$PLATFORM-x86_64"
 
-        DOCKER_COMPOSE_SHASUM_URL="$DOCKER_BINARY_URL.sha256"
+        DOCKER_COMPOSE_SHASUM_URL="$DOCKER_COMPOSE_BINARY_URL.sha256"
 
         # download binary and shasum
         curl -O \

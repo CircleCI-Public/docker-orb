@@ -1,0 +1,5 @@
+version: 2.1
+
+description: >
+  Quickly and easily install/configure/use Docker, `dockerize`, and
+  `docker-compose` in any CircleCI job

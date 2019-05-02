@@ -1,0 +1,42 @@
+description: >
+ Install the Docker CLI. Requirements: curl, grep, jq
+
+parameters:
+  version:
+    type: string
+    default: latest
+    description: >
+      Version of Docker to install, defaults to the latest stable release.
+      If specifying a version other than latest, provide a full release tag,
+      as listed at https://api.github.com/repos/docker/cli/tags, e.g.,
+      `v18.09.4`.
+
+steps:
+  - run:
+      name: Install Docker CLI
+      command: |
+        if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
+        # grab Docker version
+        if [[ <<parameters.version>> == "latest" ]]; then
+          # extract latest version from GitHub releases API
+          declare -i INDEX=0
+
+          while :
+          do
+            INDEX_VERSION=$(curl https://api.github.com/repos/docker/cli/tags | \
+              jq --argjson index "$INDEX" '.[$index].name')
+
+            # filter out betas & release candidates
+            if [[ $(echo "$INDEX_VERSION" | grep -v beta | grep -v rc) ]]; then
+              DOCKER_VERSION=$INDEX_VERSION
+              break
+            else
+              INDEX=INDEX+1
+            fi
+          done
+        else
+          DOCKER_VERSION=<<parameters.version>>
+        fi
+
+        echo "$DOCKER_VERSION"

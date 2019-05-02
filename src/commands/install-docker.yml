@@ -29,7 +29,7 @@ steps:
 
             # filter out betas & release candidates
             if [[ $(echo "$INDEX_VERSION" | grep -v beta | grep -v rc) ]]; then
-              DOCKER_VERSION=$INDEX_VERSION
+              DOCKER_VERSION="${INDEX_VERSION:1:-1}"
               echo "Latest stable version of Docker is $DOCKER_VERSION"
               break
             else

@@ -74,7 +74,18 @@ integration-master_filters: &integration-master_filters
 
 prod-deploy_requires: &prod-deploy_requires
   [
-    test-master
+    test-publish-machine-master,
+    test-publish-docker-master,
+    test-latest-alpine-master,
+    test-older-alpine-master,
+    test-latest-machine-master,
+    test-older-machine-master,
+    test-latest-mac-master,
+    test-older-mac-master,
+    test-latest-docker-master,
+    test-older-docker-master,
+    test-latest-ci-docker-master,
+    test-older-ci-docker-master
   ]
 
 workflows:
@@ -215,9 +226,101 @@ workflows:
           filters: *integration-dev_filters
 
       # triggered by master branch commits
+      # build/publish
+      - docker/publish:
+          name: test-publish-machine-master
+          context: orb-publishing
+          dockerfile: test.Dockerfile
+          image: circlecipublic/docker-orb-test
+          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          filters: *integration-master_filters
+
+      - docker/publish:
+          name: test-publish-docker-master
+          executor: docker/docker
+          context: orb-publishing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: circlecipublic/docker-orb-test
+          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          filters: *integration-master_filters
+
+      # alpine
       - test:
-          name: test-master
+          name: test-latest-alpine-master
           executor: ci-base
+          filters: *integration-master_filters
+          pre-steps:
+            - run: apk add gnupg
+
+      - test:
+          name: test-older-alpine-master
+          executor: ci-base
+          docker-version: v18.09.4
+          docker-compose-version: 1.17.1
+          dockerize-version: v0.4.0
+          filters: *integration-master_filters
+          pre-steps:
+            - run: apk add gnupg
+
+      # machine
+      - test:
+          name: test-latest-machine-master
+          executor: machine
+          filters: *integration-master_filters
+
+      - test:
+          name: test-older-machine-master
+          executor: machine
+          docker-version: v17.09.0-ce
+          docker-compose-version: 1.20.0
+          dockerize-version: v0.2.0
+          filters: *integration-master_filters
+
+      # mac
+      - test:
+          name: test-latest-mac-master
+          executor: macos
+          filters: *integration-master_filters
+
+      - test:
+          name: test-older-mac-master
+          executor: macos
+          docker-version: v17.12.1-ce
+          docker-compose-version: 1.21.2
+          dockerize-version: v0.5.0
+          filters: *integration-master_filters
+
+      # docker
+      - test:
+          name: test-latest-docker-master
+          executor: docker
+          filters: *integration-master_filters
+
+      - test:
+          name: test-older-docker-master
+          executor: docker
+          docker-version: v18.09.3
+          docker-compose-version: 1.22.0
+          dockerize-version: v0.6.0
+          filters: *integration-master_filters
+
+      # ci-docker
+      - test:
+          name: test-latest-ci-docker-master
+          executor: ci-docker
+          filters: *integration-master_filters
+
+      - test:
+          name: test-older-ci-docker-master
+          executor: ci-docker
+          docker-version: v18.06.2-ce
+          docker-compose-version: 1.23.1
+          dockerize-version: v0.3.0
           filters: *integration-master_filters
 
       # patch, minor, or major publishing

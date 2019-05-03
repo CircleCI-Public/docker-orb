@@ -1,0 +1,17 @@
+description: >
+  A standard Docker workflow, where you are building an image with a
+  Dockerfile in the root of your repository, naming the image to be the
+  same name as your repository, and then pushing to the default docker
+  registry (at docker.io)
+
+usage:
+  version: 2.1
+
+  orbs:
+    docker: circleci/docker@x.y.z
+
+  workflows:
+    build-and-publish-docker-image:
+      jobs:
+        - docker/publish:
+            image:  $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME

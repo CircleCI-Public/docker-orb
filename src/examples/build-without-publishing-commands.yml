@@ -1,0 +1,24 @@
+description: >
+  Build, but don't publish, an image using the check and build commands
+
+usage:
+  version: 2.1
+
+  orbs:
+    docker: circleci/docker@x.y.z
+
+  jobs:
+    check-and-build-only:
+      executor: docker-publish/machine
+      steps:
+        - checkout
+
+        - docker/check
+
+        - docker/build:
+            image:  $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+
+  workflows:
+    build-docker-image-only:
+      jobs:
+        - check-and-build-only

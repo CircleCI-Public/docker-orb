@@ -1,0 +1,96 @@
+description: >
+  Install the Docker CLI. Supports stable versions `v17.06.0-ce` and
+  newer, on all platforms (Linux, macOS). Requirements: curl, grep, jq,
+  tar
+
+parameters:
+  version:
+    type: string
+    default: latest
+    description: >
+      Version of Docker to install, defaults to the latest stable release.
+      If specifying a version other than latest, provide a full release tag,
+      as listed at https://api.github.com/repos/docker/cli/tags, e.g.,
+      `v18.09.4`.
+
+  install-dir:
+    type: string
+    default: /usr/local/bin
+    description: >
+      Directory in which to install Docker binaries
+
+steps:
+  - run:
+      name: Install Docker CLI
+      command: |
+        if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
+        # grab Docker version
+        if [[ <<parameters.version>> == "latest" ]]; then
+          # extract latest version from GitHub releases API
+          declare -i INDEX=0
+
+          while :
+          do
+            INDEX_VERSION=$(curl --silent --show-error --location --fail --retry 3 \
+              https://api.github.com/repos/docker/cli/tags | \
+              jq --argjson index "$INDEX" '.[$index].name')
+
+            # filter out betas & release candidates
+            if [[ $(echo "$INDEX_VERSION" | grep -v beta | grep -v rc) ]]; then
+
+              # can't use substring expression < 0 on macOS
+              DOCKER_VERSION="${INDEX_VERSION:1:$((${#INDEX_VERSION} - 1 - 1))}"
+
+              echo "Latest stable version of Docker is $DOCKER_VERSION"
+              break
+            else
+              INDEX=INDEX+1
+            fi
+          done
+        else
+          DOCKER_VERSION=<<parameters.version>>
+          echo "Selected version of Docker is $DOCKER_VERSION"
+        fi
+
+        # check if Docker needs to be installed
+        DOCKER_VERSION_NUMBER="${DOCKER_VERSION:1}"
+
+        if command -v docker >> /dev/null 2>&1; then
+          if docker --version | grep "$DOCKER_VERSION_NUMBER" >> /dev/null 2>&1; then
+            echo "Docker $DOCKER_VERSION is already installed"
+            exit 0
+          else
+            echo "A different version of Docker is installed ($(docker --version)); removing it"
+            $SUDO rm -f $(command -v docker)
+          fi
+        fi
+
+        # get binary download URL for specified version
+        if uname -a | grep Darwin >> /dev/null 2>&1; then
+          PLATFORM=mac
+        else
+          PLATFORM=linux
+        fi
+
+        DOCKER_BINARY_URL="https://download.docker.com/$PLATFORM/static/stable/x86_64/docker-$DOCKER_VERSION_NUMBER.tgz"
+
+        # download binary tarball
+        curl --output docker.tgz \
+          --silent --show-error --location --fail --retry 3 \
+          "$DOCKER_BINARY_URL"
+
+        tar xf docker.tgz && rm -f docker.tgz
+
+        # install Docker binaries
+        BINARIES=$(ls docker)
+        $SUDO mv docker/* <<parameters.install-dir>>
+        $SUDO rm -rf docker
+
+        for binary in $BINARIES
+        do
+          $SUDO chmod +x "<<parameters.install-dir>>/$binary"
+        done
+
+        # verify version
+        echo "$(docker --version) has been installed to $(which docker)"

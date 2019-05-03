@@ -1,0 +1,72 @@
+description: >
+  Install `dockerize`. Supports versions `v.0.4.0` and later. Requirements: curl, Docker
+
+parameters:
+  version:
+    type: string
+    default: latest
+    description: >
+      Version of `dockerize` to install, defaults to the latest release. If
+      specifying a version other than latest, provide a full release tag, as
+      listed at https://github.com/jwilder/dockerize/releases, e.g.,
+      `v0.5.0`. Supports versions `v.0.4.0` and later.
+
+  install-dir:
+    type: string
+    default: /usr/local/bin
+    description: >
+      Directory in which to install `dockerize`
+
+steps:
+  - run:
+      name: Install dockerize
+      command: |
+        if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
+        # grab dockerize version
+        if [[ <<parameters.version>> == "latest" ]]; then
+          # extract latest version from GitHub releases API
+          DOCKERIZE_VERSION=$(curl \
+            --silent --show-error --location --fail --retry 3 \
+            https://api.github.com/repos/jwilder/dockerize/releases/latest | \
+            jq '.tag_name' | sed -E 's/"//g')
+        else
+          DOCKERIZE_VERSION=<<parameters.version>>
+          echo "Selected version of dockerize is $DOCKERIZE_VERSION"
+        fi
+
+        # check if dockerize needs to be installed
+        if command -v dockerize >> /dev/null 2>&1; then
+          if dockerize --version | grep "$DOCKERIZE_VERSION" >> /dev/null 2>&1; then
+            echo "dockerize $DOCKERIZE_VERSION is already installed"
+            exit 0
+          else
+            echo "A different version of dockerize is installed ($(dockerize --version)); removing it"
+            $SUDO rm -f $(command -v dockerize)
+          fi
+        fi
+
+        # construct binary download URL
+        if uname -a | grep Darwin >> /dev/null 2>&1; then
+          PLATFORM=darwin-amd64
+        elif cat /etc/issue | grep Alpine >> /dev/null 2>&1; then
+          PLATFORM=alpine-linux-amd64
+          apk add --no-cache openssl
+        else
+          PLATFORM=linux-amd64
+        fi
+
+        DOCKERIZE_BINARY_URL="https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-$PLATFORM-$DOCKERIZE_VERSION.tar.gz"
+
+        # download & install binary
+        curl -O --silent --show-error --location --fail --retry 3 \
+        "$DOCKERIZE_BINARY_URL"
+
+        tar xf "dockerize-$PLATFORM-$DOCKERIZE_VERSION.tar.gz"
+        rm -f "dockerize-$PLATFORM-$DOCKERIZE_VERSION.tar.gz"
+
+        $SUDO mv dockerize <<parameters.install-dir>>
+        $SUDO chmod +x <<parameters.install-dir>>/dockerize
+
+        # verify version
+        echo "dockerize $(dockerize --version) has been installed to $(which dockerize)"

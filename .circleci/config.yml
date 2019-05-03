@@ -1,0 +1,360 @@
+version: 2.1
+
+orbs:
+  docker: circleci/docker@dev:alpha
+  jq: circleci/jq@1.6.1
+  orb-tools: circleci/orb-tools@8.5.0
+
+executors:
+  ci-base:
+    resource_class: small
+    docker:
+      - image: cibuilds/base
+
+  machine:
+    machine: true
+
+  macos:
+    macos:
+      xcode: "10.2.0"
+
+  docker:
+    resource_class: small
+    docker:
+      - image: node
+
+  ci-docker:
+    resource_class: small
+    docker:
+      - image: circleci/node:boron
+
+jobs:
+  test:
+    parameters:
+      executor:
+        type: executor
+
+      docker-version:
+        type: string
+        default: latest
+
+      docker-compose-version:
+        type: string
+        default: latest
+
+      dockerize-version:
+        type: string
+        default: latest
+
+    executor: <<parameters.executor>>
+
+    steps:
+      - jq/install
+
+      - docker/install-docker:
+          version: <<parameters.docker-version>>
+
+      - docker/install-docker-compose:
+          version: <<parameters.docker-compose-version>>
+
+      - docker/install-dockerize:
+          version: <<parameters.dockerize-version>>
+
+integration-dev_filters: &integration-dev_filters
+  branches:
+    ignore: /.*/
+  tags:
+    only: /integration-.*/
+
+integration-master_filters: &integration-master_filters
+  branches:
+    ignore: /.*/
+  tags:
+    only: /master-.*/
+
+prod-deploy_requires: &prod-deploy_requires
+  [
+    test-publish-machine-master,
+    test-publish-docker-master,
+    test-latest-alpine-master,
+    test-older-alpine-master,
+    test-latest-machine-master,
+    test-older-machine-master,
+    test-latest-mac-master,
+    test-older-mac-master,
+    test-latest-docker-master,
+    test-older-docker-master,
+    test-latest-ci-docker-master,
+    test-older-ci-docker-master
+  ]
+
+workflows:
+  lint_pack-validate_publish-dev:
+    jobs:
+      - orb-tools/lint
+
+      - orb-tools/pack:
+          requires:
+            - orb-tools/lint
+
+      - orb-tools/publish-dev:
+          orb-name: circleci/docker
+          context: orb-publishing
+          requires:
+            - orb-tools/pack
+
+      - orb-tools/trigger-integration-workflow:
+          name: trigger-integration-dev
+          context: orb-publishing
+          ssh-fingerprints: d9:97:a8:58:12:13:40:59:48:96:f8:10:be:b8:ba:07
+          requires:
+            - orb-tools/publish-dev
+          filters:
+            branches:
+              ignore: master
+
+      - orb-tools/trigger-integration-workflow:
+          name: trigger-integration-master
+          context: orb-publishing
+          cleanup-tags: true
+          ssh-fingerprints: d9:97:a8:58:12:13:40:59:48:96:f8:10:be:b8:ba:07
+          tag: master
+          requires:
+            - orb-tools/publish-dev
+          filters:
+            branches:
+              only: master
+
+  integration-tests_prod-release:
+    jobs:
+      # triggered by non-master branch commits
+      # build/publish
+      - docker/publish:
+          name: test-publish-machine-dev
+          context: orb-publishing
+          dockerfile: test.Dockerfile
+          image: circlecipublic/docker-orb-test
+          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          filters: *integration-dev_filters
+
+      - docker/publish:
+          name: test-publish-docker-dev
+          executor: docker/docker
+          context: orb-publishing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: circlecipublic/docker-orb-test
+          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          filters: *integration-dev_filters
+
+      # alpine
+      - test:
+          name: test-latest-alpine-dev
+          executor: ci-base
+          filters: *integration-dev_filters
+          pre-steps:
+            - run: apk add gnupg
+
+      - test:
+          name: test-older-alpine-dev
+          executor: ci-base
+          docker-version: v18.09.4
+          docker-compose-version: 1.17.1
+          dockerize-version: v0.4.0
+          filters: *integration-dev_filters
+          pre-steps:
+            - run: apk add gnupg
+
+      # machine
+      - test:
+          name: test-latest-machine-dev
+          executor: machine
+          filters: *integration-dev_filters
+
+      - test:
+          name: test-older-machine-dev
+          executor: machine
+          docker-version: v17.09.0-ce
+          docker-compose-version: 1.20.0
+          dockerize-version: v0.2.0
+          filters: *integration-dev_filters
+
+      # mac
+      - test:
+          name: test-latest-mac-dev
+          executor: macos
+          filters: *integration-dev_filters
+
+      - test:
+          name: test-older-mac-dev
+          executor: macos
+          docker-version: v17.12.1-ce
+          docker-compose-version: 1.21.2
+          dockerize-version: v0.5.0
+          filters: *integration-dev_filters
+
+      # docker
+      - test:
+          name: test-latest-docker-dev
+          executor: docker
+          filters: *integration-dev_filters
+
+      - test:
+          name: test-older-docker-dev
+          executor: docker
+          docker-version: v18.09.3
+          docker-compose-version: 1.22.0
+          dockerize-version: v0.6.0
+          filters: *integration-dev_filters
+
+      # ci-docker
+      - test:
+          name: test-latest-ci-docker-dev
+          executor: ci-docker
+          filters: *integration-dev_filters
+
+      - test:
+          name: test-older-ci-docker-dev
+          executor: ci-docker
+          docker-version: v18.06.2-ce
+          docker-compose-version: 1.23.1
+          dockerize-version: v0.3.0
+          filters: *integration-dev_filters
+
+      # triggered by master branch commits
+      # build/publish
+      - docker/publish:
+          name: test-publish-machine-master
+          context: orb-publishing
+          dockerfile: test.Dockerfile
+          image: circlecipublic/docker-orb-test
+          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          filters: *integration-master_filters
+
+      - docker/publish:
+          name: test-publish-docker-master
+          executor: docker/docker
+          context: orb-publishing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: circlecipublic/docker-orb-test
+          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          filters: *integration-master_filters
+
+      # alpine
+      - test:
+          name: test-latest-alpine-master
+          executor: ci-base
+          filters: *integration-master_filters
+          pre-steps:
+            - run: apk add gnupg
+
+      - test:
+          name: test-older-alpine-master
+          executor: ci-base
+          docker-version: v18.09.4
+          docker-compose-version: 1.17.1
+          dockerize-version: v0.4.0
+          filters: *integration-master_filters
+          pre-steps:
+            - run: apk add gnupg
+
+      # machine
+      - test:
+          name: test-latest-machine-master
+          executor: machine
+          filters: *integration-master_filters
+
+      - test:
+          name: test-older-machine-master
+          executor: machine
+          docker-version: v17.09.0-ce
+          docker-compose-version: 1.20.0
+          dockerize-version: v0.2.0
+          filters: *integration-master_filters
+
+      # mac
+      - test:
+          name: test-latest-mac-master
+          executor: macos
+          filters: *integration-master_filters
+
+      - test:
+          name: test-older-mac-master
+          executor: macos
+          docker-version: v17.12.1-ce
+          docker-compose-version: 1.21.2
+          dockerize-version: v0.5.0
+          filters: *integration-master_filters
+
+      # docker
+      - test:
+          name: test-latest-docker-master
+          executor: docker
+          filters: *integration-master_filters
+
+      - test:
+          name: test-older-docker-master
+          executor: docker
+          docker-version: v18.09.3
+          docker-compose-version: 1.22.0
+          dockerize-version: v0.6.0
+          filters: *integration-master_filters
+
+      # ci-docker
+      - test:
+          name: test-latest-ci-docker-master
+          executor: ci-docker
+          filters: *integration-master_filters
+
+      - test:
+          name: test-older-ci-docker-master
+          executor: ci-docker
+          docker-version: v18.06.2-ce
+          docker-compose-version: 1.23.1
+          dockerize-version: v0.3.0
+          filters: *integration-master_filters
+
+      # patch, minor, or major publishing
+      - orb-tools/dev-promote-prod:
+          name: dev-promote-patch
+          context: orb-publishing
+          orb-name: circleci/docker
+          requires: *prod-deploy_requires
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-patch.*/
+
+      - orb-tools/dev-promote-prod:
+          name: dev-promote-minor
+          context: orb-publishing
+          orb-name: circleci/docker
+          release: minor
+          requires: *prod-deploy_requires
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-minor.*/
+
+      - orb-tools/dev-promote-prod:
+          name: dev-promote-major
+          context: orb-publishing
+          orb-name: circleci/docker
+          release: major
+          requires: *prod-deploy_requires
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-major.*/

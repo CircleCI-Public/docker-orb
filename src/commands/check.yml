@@ -1,0 +1,36 @@
+description: >
+  Sanity check to make sure you can build a Docker image. Check that
+  Docker username and password environment variables are set, then
+  run docker login to ensure that you can push the built image
+
+parameters:
+  registry:
+    type: string
+    default: docker.io
+    description: Name of registry to use, defaults to docker.io
+
+  docker-username:
+    type: env_var_name
+    default: DOCKER_LOGIN
+    description: >
+      Name of environment variable storing your Docker username
+
+  docker-password:
+    type: env_var_name
+    default: DOCKER_PASSWORD
+    description: >
+      Name of environment variable storing your Docker password
+
+steps:
+  - orb-tools/check-env-var-param:
+      param: <<parameters.docker-username>>
+
+  - orb-tools/check-env-var-param:
+      param: <<parameters.docker-password>>
+
+  - run:
+      name: Docker login
+      command: |
+        docker login \
+          -u "$<<parameters.docker-username>>" -p "$<<parameters.docker-password>>" \
+          <<parameters.registry>>

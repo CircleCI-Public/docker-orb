@@ -1,0 +1,15 @@
+description: >
+  Build/publish a Docker image with extra build arguments
+
+usage:
+  version: 2.1
+
+  orbs:
+    docker: circleci/docker@x.y.z
+
+  workflows:
+    build-docker-image-only:
+      jobs:
+        - docker/publish:
+            image:  $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+            extra_build_args: --build-arg FOO=bar --build-arg BAZ=qux

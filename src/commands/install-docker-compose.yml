@@ -1,0 +1,120 @@
+description: >
+  Install the `docker-compose` CLI. Supports stable versions.
+  Requirements: curl, Docker, grep, jq, sha256sum,
+
+parameters:
+  version:
+    type: string
+    default: latest
+    description: >
+      Version of `docker-compose` to install, defaults to the latest stable release.
+      If specifying a version other than latest, provide a full release tag,
+      as listed at https://github.com/docker/compose/releases or
+      https://api.github.com/repos/docker/compose/releases, e.g., `1.23.1`.
+
+  install-dir:
+    type: string
+    default: /usr/local/bin
+    description: >
+      Directory in which to install `docker-compose`
+
+steps:
+  - run:
+      name: Install docker-compose
+      command: |
+        if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
+        # grab docker-compose version
+        if [[ <<parameters.version>> == "latest" ]]; then
+          # extract latest version from GitHub releases API
+          declare -i INDEX=0
+
+          while :
+          do
+            INDEX_VERSION=$(curl --silent --show-error --location --fail --retry 3 \
+              https://api.github.com/repos/docker/compose/releases | \
+              jq --argjson index "$INDEX" '.[$index].name')
+
+            # filter out betas & release candidates
+            if [[ $(echo "$INDEX_VERSION" | grep -v beta | grep -v rc) ]]; then
+
+              # strip leading/trailing quotes
+              # can't use substring expression < 0 on macOS
+              DOCKER_COMPOSE_VERSION="${INDEX_VERSION:1:$((${#INDEX_VERSION} - 1 - 1))}"
+
+              echo "Latest stable version of docker-compose is $DOCKER_COMPOSE_VERSION"
+              break
+            else
+              INDEX=INDEX+1
+            fi
+          done
+        else
+          DOCKER_COMPOSE_VERSION=<<parameters.version>>
+          echo "Selected version of docker-compose is $DOCKER_COMPOSE_VERSION"
+        fi
+
+        # check if docker-compose needs to be installed
+        if command -v docker-compose >> /dev/null 2>&1; then
+          if docker-compose --version | grep "$DOCKER_COMPOSE_VERSION" >> /dev/null 2>&1; then
+            echo "docker-compose $DOCKER_COMPOSE_VERSION is already installed"
+            exit 0
+          else
+            echo "A different version of docker-compose is installed ($(docker-compose --version)); removing it"
+            $SUDO rm -f $(command -v docker-compose)
+          fi
+        fi
+
+        # docker-compose binary won't run on alpine, install via pip
+        if cat /etc/issue | grep Alpine >> /dev/null 2>&1; then
+          $SUDO apk add gcc libc-dev libffi-dev openssl-dev make python-dev py-pip
+          $SUDO pip install docker-compose=="$DOCKER_COMPOSE_VERSION"
+        else
+          # get binary/shasum download URL for specified version
+          if uname -a | grep Darwin >> /dev/null 2>&1; then
+            PLATFORM=Darwin
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install coreutils
+          else
+            PLATFORM=Linux
+          fi
+
+          DOCKER_COMPOSE_BINARY_URL="https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-$PLATFORM-x86_64"
+
+          DOCKER_COMPOSE_SHASUM_URL="$DOCKER_COMPOSE_BINARY_URL.sha256"
+
+          # download binary and shasum
+          curl -O \
+            --silent --show-error --location --fail --retry 3 \
+            "$DOCKER_COMPOSE_BINARY_URL"
+
+          # just try doing it this way since some of the actual checksum files are malformatted anyway
+          DOCKER_COMPOSE_RELEASE_BODY=$(curl \
+            --silent --show-error --location --fail --retry 3 \
+            "https://api.github.com/repos/docker/compose/releases/tags/$DOCKER_COMPOSE_VERSION" | \
+            jq '.body')
+
+          if [[ $(echo $DOCKER_COMPOSE_RELEASE_BODY | \
+            grep -o -e "\`................................................................\` | \`docker-compose-$PLATFORM-x86_64") ]]; then
+
+            SHASUM_STRING=$(echo $DOCKER_COMPOSE_RELEASE_BODY | \
+              grep -o -e "\`................................................................\` | \`docker-compose-$PLATFORM-x86_64" | \
+              sed -E 's/`|\|//g')
+          elif [[ $(echo $DOCKER_COMPOSE_RELEASE_BODY | \
+            grep -o -e "\`docker-compose-$PLATFORM-x86_64\` | \`................................................................") ]]; then
+
+            SHASUM_STRING=$(echo $DOCKER_COMPOSE_RELEASE_BODY | \
+              grep -o -e "\`docker-compose-$PLATFORM-x86_64\` | \`................................................................" | \
+              sed -E 's/`|\|//g')
+          fi
+
+          SHASUM=$(echo "$SHASUM_STRING" | sed -E "s/docker-compose-$PLATFORM-x86_64| //g")
+
+          # verify shasum
+          echo "$SHASUM  docker-compose-$PLATFORM-x86_64" | sha256sum -c
+
+          # install docker-compose
+          $SUDO mv "docker-compose-$PLATFORM-x86_64" <<parameters.install-dir>>/docker-compose
+          $SUDO chmod +x <<parameters.install-dir>>/docker-compose
+        fi
+
+        # verify version
+        echo "$(docker-compose --version) has been installed to $(which docker-compose)"

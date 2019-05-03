@@ -87,6 +87,7 @@ steps:
 
         # just try doing it this way since some of the actual checksum files are malformatted anyway
         DOCKER_COMPOSE_RELEASE_BODY=$(curl \
+          --silent --show-error --location --fail --retry 3 \
           "https://api.github.com/repos/docker/compose/releases/tags/$DOCKER_COMPOSE_VERSION" | \
           jq '.body')
 

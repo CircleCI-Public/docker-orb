@@ -126,6 +126,7 @@ workflows:
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
+          filters: *integration-dev_filters
 
       - docker/publish:
           name: test-publish-docker-dev
@@ -137,6 +138,7 @@ workflows:
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
+          filters: *integration-dev_filters
 
       # alpine
       - test:

@@ -117,16 +117,37 @@ workflows:
   integration-tests_prod-release:
     jobs:
       # triggered by non-master branch commits
+      # build/publish
+      - docker/publish:
+          name: test-publish-machine-dev
+          context: orb-publishing
+          dockerfile: test.Dockerfile
+          image: circlecipublic/docker-orb-test
+          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+
+      - docker/publish:
+          name: test-publish-docker-dev
+          executor: docker/docker
+          context: orb-publishing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: circlecipublic/docker-orb-test
+          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+
       # alpine
       - test:
-          name: test-dev-latest-alpine
+          name: test-latest-alpine-dev
           executor: ci-base
           filters: *integration-dev_filters
           pre-steps:
             - run: apk add gnupg
 
       - test:
-          name: test-dev-older-alpine
+          name: test-older-alpine-dev
           executor: ci-base
           docker-version: v18.09.4
           docker-compose-version: 1.17.1
@@ -137,12 +158,12 @@ workflows:
 
       # machine
       - test:
-          name: test-dev-latest-machine
+          name: test-latest-machine-dev
           executor: machine
           filters: *integration-dev_filters
 
       - test:
-          name: test-dev-older-machine
+          name: test-older-machine-dev
           executor: machine
           docker-version: v17.09.0-ce
           docker-compose-version: 1.20.0
@@ -151,12 +172,12 @@ workflows:
 
       # mac
       - test:
-          name: test-dev-latest-mac
+          name: test-latest-mac-dev
           executor: macos
           filters: *integration-dev_filters
 
       - test:
-          name: test-dev-older-mac
+          name: test-older-mac-dev
           executor: macos
           docker-version: v17.12.1-ce
           docker-compose-version: 1.21.2
@@ -165,12 +186,12 @@ workflows:
 
       # docker
       - test:
-          name: test-dev-latest-docker
+          name: test-latest-docker-dev
           executor: docker
           filters: *integration-dev_filters
 
       - test:
-          name: test-dev-older-docker
+          name: test-older-docker-dev
           executor: docker
           docker-version: v18.09.3
           docker-compose-version: 1.22.0
@@ -179,12 +200,12 @@ workflows:
 
       # ci-docker
       - test:
-          name: test-dev-latest-ci-docker
+          name: test-latest-ci-docker-dev
           executor: ci-docker
           filters: *integration-dev_filters
 
       - test:
-          name: test-dev-older-ci-docker
+          name: test-older-ci-docker-dev
           executor: ci-docker
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1

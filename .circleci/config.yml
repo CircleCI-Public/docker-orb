@@ -42,6 +42,10 @@ jobs:
         type: string
         default: latest
 
+      dockerize-version:
+        type: string
+        default: latest
+
     executor: <<parameters.executor>>
 
     steps:
@@ -52,6 +56,9 @@ jobs:
 
       - docker/install-docker-compose:
           version: <<parameters.docker-compose-version>>
+
+      - docker/install-dockerize:
+          version: <<parameters.dockerize-version>>
 
 integration-dev_filters: &integration-dev_filters
   branches:
@@ -138,6 +145,7 @@ workflows:
           executor: machine
           docker-version: v17.09.0-ce
           docker-compose-version: 1.20.0
+          dockerize-version: v0.4.0
           filters: *integration-dev_filters
 
       # mac
@@ -151,6 +159,7 @@ workflows:
           executor: macos
           docker-version: v17.12.1-ce
           docker-compose-version: 1.21.2
+          dockerize-version: v0.5.0
           filters: *integration-dev_filters
 
       # docker
@@ -164,6 +173,7 @@ workflows:
           executor: docker
           docker-version: v18.09.3
           docker-compose-version: 1.22.0
+          dockerize-version: v0.6.0
           filters: *integration-dev_filters
 
       # ci-docker
@@ -177,6 +187,7 @@ workflows:
           executor: ci-docker
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
+          dockerize-version: v0.3.0
           filters: *integration-dev_filters
 
       # triggered by master branch commits

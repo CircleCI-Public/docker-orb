@@ -86,10 +86,18 @@ steps:
         #   "$DOCKER_COMPOSE_SHASUM_URL" || \
 
         # just try doing it this way since some of the actual checksum files are malformatted anyway
-        curl "https://api.github.com/repos/docker/compose/releases/tags/$DOCKER_COMPOSE_VERSION" | \
+        DOCKER_COMPOSE_SHASUM=$(curl \
+          "https://api.github.com/repos/docker/compose/releases/tags/$DOCKER_COMPOSE_VERSION" | \
           jq '.body' | \
           grep -o -e "\`................................................................\` | \`docker-compose-$PLATFORM-x86_64" | \
-          sed -E 's/`|\|//g' > docker-compose.sha256
+          sed -E 's/`|\|//g' || \
+          curl \
+          "https://api.github.com/repos/docker/compose/releases/tags/$DOCKER_COMPOSE_VERSION" | \
+          jq '.body' | \
+          grep -o -e "\`docker-compose-$PLATFORM-x86_64\` | \`................................................................" | \
+          sed -E 's/`|\|//g')
+
+        echo "$DOCKER_COMPOSE_SHASUM" > docker-compose.sha256
 
         # verify shasum
         grep "docker-compose-$PLATFORM-x86_64" docker-compose.sha256 | sha256sum -c -

@@ -82,7 +82,11 @@ steps:
 
         curl --output docker-compose.sha256 \
           --silent --show-error --location --fail --retry 3 \
-          "$DOCKER_COMPOSE_SHASUM_URL"
+          "$DOCKER_COMPOSE_SHASUM_URL" || \
+          curl "https://api.github.com/repos/docker/compose/releases/tags/$DOCKER_COMPOSE_VERSION" | \
+          jq '.body' | \
+          grep -o -e "\`................................................................\` | \`docker-compose-$PLATFORM-x86_64" | \
+          sed -E 's/`|\|//g' > docker-compose.sha256
 
         # verify shasum
         grep "docker-compose-$PLATFORM-x86_64" docker-compose.sha256 | sha256sum -c -

@@ -35,7 +35,7 @@ steps:
       name: Build Docker Image
       command: |
         docker build \
-          <<#parameters.extra_build_args>><<parameters.extra_build_args>> \ <</parameters.extra_build_args>>
+          <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
           -f <<parameters.dockerfile>> -t \
           <<parameters.image>>:<<parameters.tag>> \
           <<parameters.path>>

@@ -3,10 +3,11 @@ description: >
   $DOCKER_LOGIN and $DOCKER_PASSWORD environment variables are set, then
   run docker login to ensure that you can push the built image
 
-registry:
-  type: string
-  default: docker.io
-  description: Name of registry to use
+parameters:
+  registry:
+    type: string
+    default: docker.io
+    description: Name of registry to use
 
 steps:
   - run:

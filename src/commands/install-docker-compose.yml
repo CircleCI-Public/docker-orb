@@ -82,8 +82,8 @@ steps:
           "$DOCKER_COMPOSE_BINARY_URL"
 
         # curl --output docker-compose.sha256 \
-          --silent --show-error --location --fail --retry 3 \
-          "$DOCKER_COMPOSE_SHASUM_URL" || \
+        #   --silent --show-error --location --fail --retry 3 \
+        #   "$DOCKER_COMPOSE_SHASUM_URL" || \
 
         # just try doing it this way since some of the actual checksum files are malformatted anyway
         curl "https://api.github.com/repos/docker/compose/releases/tags/$DOCKER_COMPOSE_VERSION" | \

@@ -96,12 +96,12 @@ steps:
           DOCKER_COMPOSE_SHASUM=$(echo $DOCKER_COMPOSE_RELEASE_BODY | \
             grep -o -e "\`................................................................\` | \`docker-compose-$PLATFORM-x86_64" | \
             sed -E 's/`|\|//g')
-        elif [[ $($(echo $DOCKER_COMPOSE_RELEASE_BODY | \
+        elif [[ $(echo $DOCKER_COMPOSE_RELEASE_BODY | \
           grep -o -e "\`docker-compose-$PLATFORM-x86_64\` | \`................................................................") ]]; then
 
           DOCKER_COMPOSE_SHASUM=$(echo $DOCKER_COMPOSE_RELEASE_BODY | \
             grep -o -e "\`docker-compose-$PLATFORM-x86_64\` | \`................................................................" | \
-            sed -E 's/`|\|//g'
+            sed -E 's/`|\|//g')
         fi
 
         echo "$DOCKER_COMPOSE_SHASUM" > docker-compose.sha256

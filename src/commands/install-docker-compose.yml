@@ -106,11 +106,13 @@ steps:
 
         echo "$DOCKER_COMPOSE_SHASUM" > docker-compose.sha256
 
+        cat docker-compose.sha256
+
         # verify shasum
         grep "docker-compose-$PLATFORM-x86_64" docker-compose.sha256 | sha256sum -c -
 
         # install docker-compose
-        $SUDO mv -T "docker-compose-$PLATFORM-x86_64" <<parameters.install-dir>>/docker-compose
+        $SUDO mv "docker-compose-$PLATFORM-x86_64" <<parameters.install-dir>>/docker-compose
         $SUDO chmod +x <<parameters.install-dir>>/docker-compose
 
         # verify version

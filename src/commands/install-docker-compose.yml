@@ -93,27 +93,26 @@ steps:
         if [[ $(echo $DOCKER_COMPOSE_RELEASE_BODY | \
           grep -o -e "\`................................................................\` | \`docker-compose-$PLATFORM-x86_64") ]]; then
 
-          DOCKER_COMPOSE_SHASUM=$(echo $DOCKER_COMPOSE_RELEASE_BODY | \
+          SHASUM_STRING=$(echo $DOCKER_COMPOSE_RELEASE_BODY | \
             grep -o -e "\`................................................................\` | \`docker-compose-$PLATFORM-x86_64" | \
             sed -E 's/`|\|//g')
         elif [[ $(echo $DOCKER_COMPOSE_RELEASE_BODY | \
           grep -o -e "\`docker-compose-$PLATFORM-x86_64\` | \`................................................................") ]]; then
 
-          DOCKER_COMPOSE_SHASUM=$(echo $DOCKER_COMPOSE_RELEASE_BODY | \
+          SHASUM_STRING=$(echo $DOCKER_COMPOSE_RELEASE_BODY | \
             grep -o -e "\`docker-compose-$PLATFORM-x86_64\` | \`................................................................" | \
             sed -E 's/`|\|//g')
         fi
 
-        echo "$DOCKER_COMPOSE_SHASUM" > docker-compose.sha256
-
-        cat docker-compose.sha256
+        SHASUM=$(echo "$SHASUM_STRING" | sed -E "s/docker-compose-$PLATFORM-x86_64| //g")
 
         # verify shasum
-        grep "docker-compose-$PLATFORM-x86_64" docker-compose.sha256 | sha256sum -c -
+        echo "$SHASUM  docker-compose-$PLATFORM-x86_64" | sha256sum -c
 
         # install docker-compose
-        $SUDO mv "docker-compose-$PLATFORM-x86_64" <<parameters.install-dir>>/docker-compose
-        $SUDO chmod +x <<parameters.install-dir>>/docker-compose
+        mv "docker-compose-$PLATFORM-x86_64" docker-compose
+        $SUDO chmod +x docker-compose
+        $SUDO mv docker-compose <<parameters.install-dir>>
 
         # verify version
         echo "$(docker-compose --version) has been installed to $(which docker-compose)"

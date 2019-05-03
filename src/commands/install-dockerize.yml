@@ -47,11 +47,11 @@ steps:
         fi
 
         # construct binary download URL
-        if cat /etc/issue | grep Alpine >> /dev/null 2>&1; then
+        if uname -a | grep Darwin >> /dev/null 2>&1; then
+          PLATFORM=darwin-amd64
+        elif cat /etc/issue | grep Alpine >> /dev/null 2>&1; then
           PLATFORM=alpine-linux-amd64
           apk add --no-cache openssl
-        elif uname -a | grep Darwin >> /dev/null 2>&1; then
-          PLATFORM=darwin-amd64
         else
           PLATFORM=linux-amd64
         fi

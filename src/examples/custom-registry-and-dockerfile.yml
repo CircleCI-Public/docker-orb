@@ -1,0 +1,18 @@
+description: >
+  Build and deploy a Docker image with a non-standard Dockerfile to
+  a custom registry
+
+usage:
+  version: 2.1
+
+  orbs:
+    docker: circleci/docker@x.y.z
+
+  workflows:
+    build-and-publish-docker-image:
+      jobs:
+        - docker/publish:
+            dockerfile: my.Dockerfile
+            path: path/to/Docker/build/context
+            image:  $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+            registry: my.docker.registry

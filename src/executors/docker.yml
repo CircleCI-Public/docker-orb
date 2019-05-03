@@ -1,0 +1,16 @@
+description: >
+  The docker container to use when running this orb's jobs
+
+parameters:
+  image:
+    type: string
+    default: circleci/python
+    description: Docker image name
+
+  tag:
+    type: string
+    default: "3.6"
+    description: Image tag
+
+docker:
+  - image: <<parameters.image>>:<<parameters.tag>>

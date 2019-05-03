@@ -1,0 +1,12 @@
+description: CircleCI's machine executor
+
+parameters:
+  image:
+    type: string
+    default: circleci/classic:latest
+    description: >
+      Machine image name; for available options, see
+      https://circleci.com/docs/2.0/configuration-reference/#machine
+
+machine:
+  image: <<parameters.image>>

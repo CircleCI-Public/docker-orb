@@ -130,6 +130,7 @@ workflows:
           executor: ci-base
           docker-version: v18.09.4
           docker-compose-version: 1.17.1
+          dockerize-version: v0.4.0
           filters: *integration-dev_filters
           pre-steps:
             - run: apk add gnupg
@@ -145,7 +146,7 @@ workflows:
           executor: machine
           docker-version: v17.09.0-ce
           docker-compose-version: 1.20.0
-          dockerize-version: v0.4.0
+          dockerize-version: v0.2.0
           filters: *integration-dev_filters
 
       # mac

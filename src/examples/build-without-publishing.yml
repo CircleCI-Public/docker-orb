@@ -1,0 +1,15 @@
+description: >
+  Build, but don't publish, an image using the publish job
+
+usage:
+  version: 2.1
+
+  orbs:
+    docker: circleci/docker@x.y.z
+
+  workflows:
+    build-docker-image-only:
+      jobs:
+        - docker/publish:
+            image:  $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+            deploy: false

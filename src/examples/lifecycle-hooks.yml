@@ -1,0 +1,31 @@
+description: >
+  Build and deploy a Docker image with custom lifecycle hooks: after
+  checking out the code from the VCS repository, before building the
+  Docker image, and after building the Docker image
+
+usage:
+  version: 2.1
+
+  orbs:
+    docker: circleci/docker@x.y.z
+
+  workflows:
+    build-and-publish-docker-image:
+      jobs:
+        - docker/publish:
+            image:  $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+
+            after_checkout:
+              - run:
+                  name: Do this after checkout
+                  command: echo "Did this after checkout"
+
+            before_build:
+              - run:
+                  name: Do this before the build
+                  command: echo "Did this before the build"
+
+            after_build:
+              - run:
+                  name: Do this after the build
+                  command: echo "Did this after the build"

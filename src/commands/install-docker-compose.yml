@@ -66,7 +66,7 @@ steps:
 
         # docker-compose binary won't run on alpine, install via pip
         if cat /etc/issue | grep Alpine >> /dev/null 2>&1; then
-          $SUDO apk add py-pip
+          $SUDO apk add gcc py-pip
           $SUDO pip install docker-compose=="$DOCKER_COMPOSE_VERSION"
         else
           # get binary/shasum download URL for specified version
@@ -116,7 +116,7 @@ steps:
           echo "$SHASUM  docker-compose-$PLATFORM-x86_64" | sha256sum -c
 
           # install docker-compose
-          $SUDO "docker-compose-$PLATFORM-x86_64" <<parameters.install-dir>>/docker-compose
+          $SUDO mv "docker-compose-$PLATFORM-x86_64" <<parameters.install-dir>>/docker-compose
           $SUDO chmod +x <<parameters.install-dir>>/docker-compose
         fi
 

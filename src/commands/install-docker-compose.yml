@@ -67,6 +67,7 @@ steps:
         # get binary/shasum download URL for specified version
         if uname -a | grep Darwin >> /dev/null 2>&1; then
           PLATFORM=Darwin
+          HOMEBREW_NO_AUTO_UPDATE=1 brew install coreutils
         else
           PLATFORM=Linux
         fi
@@ -80,10 +81,12 @@ steps:
           --silent --show-error --location --fail --retry 3 \
           "$DOCKER_COMPOSE_BINARY_URL"
 
-        curl --output docker-compose.sha256 \
+        # curl --output docker-compose.sha256 \
           --silent --show-error --location --fail --retry 3 \
           "$DOCKER_COMPOSE_SHASUM_URL" || \
-          curl "https://api.github.com/repos/docker/compose/releases/tags/$DOCKER_COMPOSE_VERSION" | \
+
+        # just try doing it this way since some of the actual checksum files are malformatted anyway
+        curl "https://api.github.com/repos/docker/compose/releases/tags/$DOCKER_COMPOSE_VERSION" | \
           jq '.body' | \
           grep -o -e "\`................................................................\` | \`docker-compose-$PLATFORM-x86_64" | \
           sed -E 's/`|\|//g' > docker-compose.sha256
@@ -92,7 +95,7 @@ steps:
         grep "docker-compose-$PLATFORM-x86_64" docker-compose.sha256 | sha256sum -c -
 
         # install docker-compose
-        $SUDO mv "docker-compose-$PLATFORM-x86_64" <<parameters.install-dir>>/docker-compose
+        $SUDO mv -T "docker-compose-$PLATFORM-x86_64" <<parameters.install-dir>>/docker-compose
         $SUDO chmod +x <<parameters.install-dir>>/docker-compose
 
         # verify version

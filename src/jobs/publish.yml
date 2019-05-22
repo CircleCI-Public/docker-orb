@@ -112,6 +112,7 @@ steps:
   - build:
       dockerfile: <<parameters.dockerfile>>
       path: <<parameters.path>>
+      registry: <<parameters.registry>>
       image: <<parameters.image>>
       tag: <<parameters.tag>>
       extra_build_args: <<parameters.extra_build_args>>

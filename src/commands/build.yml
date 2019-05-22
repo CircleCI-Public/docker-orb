@@ -14,6 +14,12 @@ parameters:
       Path to the directory containing your Dockerfile and build context,
       defaults to . (working directory)
 
+  registry:
+    type: string
+    default: docker.io
+    description: >
+      Name of registry to use, defaults to docker.io
+
   image:
     type: string
     description: Name of image to build
@@ -37,5 +43,5 @@ steps:
         docker build \
           <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
           -f <<parameters.dockerfile>> -t \
-          <<parameters.image>>:<<parameters.tag>> \
+          <<parameters.registry>>/<< parameters.image>>:<<parameters.tag>> \
           <<parameters.path>>

@@ -2,8 +2,8 @@ version: 2.1
 
 orbs:
   docker: circleci/docker@dev:alpha
-  jq: circleci/jq@1.6.1
-  orb-tools: circleci/orb-tools@8.5.0
+  jq: circleci/jq@1.8.0
+  orb-tools: circleci/orb-tools@8.13.0
 
 executors:
   ci-base:
@@ -46,19 +46,34 @@ jobs:
         type: string
         default: latest
 
+      test-all-in-one-command:
+        type: boolean
+        default: false
+
     executor: <<parameters.executor>>
 
     steps:
       - jq/install
 
-      - docker/install-docker:
-          version: <<parameters.docker-version>>
+      - unless:
+          condition: <<parameters.test-all-in-one-command>>
+          steps:
+            - docker/install-docker:
+                version: <<parameters.docker-version>>
 
-      - docker/install-docker-compose:
-          version: <<parameters.docker-compose-version>>
+            - docker/install-docker-compose:
+                version: <<parameters.docker-compose-version>>
 
-      - docker/install-dockerize:
-          version: <<parameters.dockerize-version>>
+            - docker/install-dockerize:
+                version: <<parameters.dockerize-version>>
+
+      - when:
+          condition: <<parameters.test-all-in-one-command>>
+          steps:
+            - docker/install-docker-tools:
+                docker-version: <<parameters.docker-version>>
+                docker-compose-version: <<parameters.docker-compose-version>>
+                dockerize-version: <<parameters.dockerize-version>>
 
 integration-dev_filters: &integration-dev_filters
   branches:
@@ -85,7 +100,17 @@ prod-deploy_requires: &prod-deploy_requires
     test-latest-docker-master,
     test-older-docker-master,
     test-latest-ci-docker-master,
-    test-older-ci-docker-master
+    test-older-ci-docker-master,
+    test-latest-alpine-altogether-master,
+    test-older-alpine-altogether-master,
+    test-latest-machine-altogether-master,
+    test-older-machine-altogether-master,
+    test-latest-mac-altogether-master,
+    test-older-mac-altogether-master,
+    test-latest-docker-altogether-master,
+    test-older-docker-altogether-master,
+    test-latest-ci-docker-altogether-master,
+    test-older-ci-docker-altogether-master
   ]
 
 workflows:
@@ -169,6 +194,25 @@ workflows:
           pre-steps:
             - run: apk add gnupg
 
+      - test:
+          name: test-latest-alpine-altogether-dev
+          executor: ci-base
+          test-all-in-one-command: true
+          filters: *integration-dev_filters
+          pre-steps:
+            - run: apk add gnupg
+
+      - test:
+          name: test-older-alpine-altogether-dev
+          executor: ci-base
+          test-all-in-one-command: true
+          docker-version: v18.09.4
+          docker-compose-version: 1.17.1
+          dockerize-version: v0.4.0
+          filters: *integration-dev_filters
+          pre-steps:
+            - run: apk add gnupg
+
       # machine
       - test:
           name: test-latest-machine-dev
@@ -178,6 +222,21 @@ workflows:
       - test:
           name: test-older-machine-dev
           executor: machine
+          docker-version: v17.09.0-ce
+          docker-compose-version: 1.20.0
+          dockerize-version: v0.2.0
+          filters: *integration-dev_filters
+
+      - test:
+          name: test-latest-machine-altogether-dev
+          executor: machine
+          test-all-in-one-command: true
+          filters: *integration-dev_filters
+
+      - test:
+          name: test-older-machine-altogether-dev
+          executor: machine
+          test-all-in-one-command: true
           docker-version: v17.09.0-ce
           docker-compose-version: 1.20.0
           dockerize-version: v0.2.0
@@ -197,6 +256,21 @@ workflows:
           dockerize-version: v0.5.0
           filters: *integration-dev_filters
 
+      - test:
+          name: test-latest-mac-altogether-dev
+          executor: macos
+          test-all-in-one-command: true
+          filters: *integration-dev_filters
+
+      - test:
+          name: test-older-mac-altogether-dev
+          executor: macos
+          test-all-in-one-command: true
+          docker-version: v17.12.1-ce
+          docker-compose-version: 1.21.2
+          dockerize-version: v0.5.0
+          filters: *integration-dev_filters
+
       # docker
       - test:
           name: test-latest-docker-dev
@@ -211,6 +285,21 @@ workflows:
           dockerize-version: v0.6.0
           filters: *integration-dev_filters
 
+      - test:
+          name: test-latest-docker-altogether-dev
+          executor: docker
+          test-all-in-one-command: true
+          filters: *integration-dev_filters
+
+      - test:
+          name: test-older-docker-altogether-dev
+          executor: docker
+          test-all-in-one-command: true
+          docker-version: v18.09.3
+          docker-compose-version: 1.22.0
+          dockerize-version: v0.6.0
+          filters: *integration-dev_filters
+
       # ci-docker
       - test:
           name: test-latest-ci-docker-dev
@@ -220,6 +309,21 @@ workflows:
       - test:
           name: test-older-ci-docker-dev
           executor: ci-docker
+          docker-version: v18.06.2-ce
+          docker-compose-version: 1.23.1
+          dockerize-version: v0.3.0
+          filters: *integration-dev_filters
+
+      - test:
+          name: test-latest-ci-docker-altogether-dev
+          executor: ci-docker
+          test-all-in-one-command: true
+          filters: *integration-dev_filters
+
+      - test:
+          name: test-older-ci-docker-altogether-dev
+          executor: ci-docker
+          test-all-in-one-command: true
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
@@ -267,6 +371,25 @@ workflows:
           pre-steps:
             - run: apk add gnupg
 
+      - test:
+          name: test-latest-alpine-altogether-master
+          executor: ci-base
+          test-all-in-one-command: true
+          filters: *integration-master_filters
+          pre-steps:
+            - run: apk add gnupg
+
+      - test:
+          name: test-older-alpine-altogether-master
+          executor: ci-base
+          test-all-in-one-command: true
+          docker-version: v18.09.4
+          docker-compose-version: 1.17.1
+          dockerize-version: v0.4.0
+          filters: *integration-master_filters
+          pre-steps:
+            - run: apk add gnupg
+
       # machine
       - test:
           name: test-latest-machine-master
@@ -276,6 +399,21 @@ workflows:
       - test:
           name: test-older-machine-master
           executor: machine
+          docker-version: v17.09.0-ce
+          docker-compose-version: 1.20.0
+          dockerize-version: v0.2.0
+          filters: *integration-master_filters
+
+      - test:
+          name: test-latest-machine-altogether-master
+          executor: machine
+          test-all-in-one-command: true
+          filters: *integration-master_filters
+
+      - test:
+          name: test-older-machine-altogether-master
+          executor: machine
+          test-all-in-one-command: true
           docker-version: v17.09.0-ce
           docker-compose-version: 1.20.0
           dockerize-version: v0.2.0
@@ -295,6 +433,21 @@ workflows:
           dockerize-version: v0.5.0
           filters: *integration-master_filters
 
+      - test:
+          name: test-latest-mac-altogether-master
+          executor: macos
+          test-all-in-one-command: true
+          filters: *integration-master_filters
+
+      - test:
+          name: test-older-mac-altogether-master
+          executor: macos
+          test-all-in-one-command: true
+          docker-version: v17.12.1-ce
+          docker-compose-version: 1.21.2
+          dockerize-version: v0.5.0
+          filters: *integration-master_filters
+
       # docker
       - test:
           name: test-latest-docker-master
@@ -309,6 +462,21 @@ workflows:
           dockerize-version: v0.6.0
           filters: *integration-master_filters
 
+      - test:
+          name: test-latest-docker-altogether-master
+          executor: docker
+          test-all-in-one-command: true
+          filters: *integration-master_filters
+
+      - test:
+          name: test-older-docker-altogether-master
+          executor: docker
+          test-all-in-one-command: true
+          docker-version: v18.09.3
+          docker-compose-version: 1.22.0
+          dockerize-version: v0.6.0
+          filters: *integration-master_filters
+
       # ci-docker
       - test:
           name: test-latest-ci-docker-master
@@ -318,6 +486,21 @@ workflows:
       - test:
           name: test-older-ci-docker-master
           executor: ci-docker
+          docker-version: v18.06.2-ce
+          docker-compose-version: 1.23.1
+          dockerize-version: v0.3.0
+          filters: *integration-master_filters
+
+      - test:
+          name: test-latest-ci-docker-altogether-master
+          executor: ci-docker
+          test-all-in-one-command: true
+          filters: *integration-master_filters
+
+      - test:
+          name: test-older-ci-docker-altogether-master
+          executor: ci-docker
+          test-all-in-one-command: true
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0

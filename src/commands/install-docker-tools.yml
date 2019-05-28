@@ -1,0 +1,96 @@
+description: >
+  Install commonly used Docker tools (Docker, `docker-compose`,
+  `dockerize`). Requirements: curl, grep, jq, sha256sum, tar
+
+parameters:
+  # docker
+  install-docker:
+    type: boolean
+    default: true
+    description: >
+      Install the Docker CLI? Supports stable versions `v17.06.0-ce` and
+      newer, on all platforms (Linux, macOS). Requirements: curl, grep,
+      jq, tar
+
+  docker-version:
+    type: string
+    default: latest
+    description: >
+      Version of Docker to install, defaults to the latest stable release.
+      If specifying a version other than latest, provide a full release tag,
+      as listed at https://api.github.com/repos/docker/cli/tags, e.g.,
+      `v18.09.4`.
+
+  docker-install-dir:
+    type: string
+    default: /usr/local/bin
+    description: >
+      Directory in which to install Docker binaries
+
+  # docker-compose
+  install-docker-compose:
+    type: boolean
+    default: true
+    description: >
+      Install the `docker-compose` CLI? Supports stable versions.
+      Requirements: curl, Docker, grep, jq, sha256sum
+
+  docker-compose-version:
+    type: string
+    default: latest
+    description: >
+      Version of `docker-compose` to install, defaults to the latest stable release.
+      If specifying a version other than latest, provide a full release tag,
+      as listed at https://github.com/docker/compose/releases or
+      https://api.github.com/repos/docker/compose/releases, e.g., `1.23.1`.
+
+  docker-compose-install-dir:
+    type: string
+    default: /usr/local/bin
+    description: >
+      Directory in which to install `docker-compose`
+
+  # dockerize
+  install-dockerize:
+    type: boolean
+    default: true
+    description: >
+      Install `dockerize`? Supports versions `v.0.4.0` and later.
+      Requirements: curl, Docker
+
+  dockerize-version:
+    type: string
+    default: latest
+    description: >
+      Version of `dockerize` to install, defaults to the latest release. If
+      specifying a version other than latest, provide a full release tag, as
+      listed at https://github.com/jwilder/dockerize/releases, e.g.,
+      `v0.5.0`. Supports versions `v.0.4.0` and later.
+
+  dockerize-install-dir:
+    type: string
+    default: /usr/local/bin
+    description: >
+      Directory in which to install `dockerize`
+
+steps:
+  - when:
+      condition: <<parameters.install-docker>>
+      steps:
+        - install-docker:
+            version: <<parameters.docker-version>>
+            install-dir: <<parameters.docker-install-dir>>
+
+  - when:
+      condition: <<parameters.install-docker-compose>>
+      steps:
+        - install-docker-compose:
+            version: <<parameters.docker-compose-version>>
+            install-dir: <<parameters.docker-compose-install-dir>>
+
+  - when:
+      condition: <<parameters.install-dockerize>>
+      steps:
+        - install-dockerize:
+            version: <<parameters.dockerize-version>>
+            install-dir: <<parameters.dockerize-install-dir>>

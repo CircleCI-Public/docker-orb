@@ -1,0 +1,21 @@
+description: >
+  Quickly install Docker, docker-compose, and dockerize in any CircleCI
+  job environment where they are missing
+
+usage:
+  version: 2.1
+
+  orbs:
+    docker: circleci/docker@x.y.z
+
+  jobs:
+    your-job:
+      executor: your-executor
+      steps:
+        - checkout
+        - docker/install-docker-tools
+
+  workflows:
+    your-workflow:
+      jobs:
+        - your-job

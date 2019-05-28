@@ -8,5 +8,10 @@ parameters:
       Machine image name; for available options, see
       https://circleci.com/docs/2.0/configuration-reference/#machine
 
+  docker-layer-caching:
+    type: boolean
+    default: false
+
 machine:
   image: <<parameters.image>>
+  docker_layer_caching: <<parameters.docker-layer-caching>>

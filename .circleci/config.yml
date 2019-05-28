@@ -2,8 +2,8 @@ version: 2.1
 
 orbs:
   docker: circleci/docker@dev:alpha
-  jq: circleci/jq@1.6.1
-  orb-tools: circleci/orb-tools@8.5.0
+  jq: circleci/jq@1.8.0
+  orb-tools: circleci/orb-tools@8.13.0
 
 executors:
   ci-base:

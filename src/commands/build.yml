@@ -2,7 +2,7 @@ description: >
   Build and tag a Docker image
 
 parameters:
-  name:
+  step-name:
     type: string
     default: Docker build
     description: Specify a custom name for this command, if desired
@@ -43,7 +43,7 @@ parameters:
 
 steps:
   - run:
-      name: <<parameters.name>>
+      name: <<parameters.step-name>>
       command: |
         docker build \
           <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \

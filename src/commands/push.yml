@@ -1,6 +1,11 @@
 description: Push a Docker image to a registry
 
 parameters:
+  step-name:
+    type: string
+    default: Docker push
+    description: Specify a custom step name for this command, if desired
+
   registry:
     type: string
     default: docker.io
@@ -18,6 +23,6 @@ parameters:
 
 steps:
   - deploy:
-      name: Push Docker image
+      name: <<parameters.step-name>>
       command: |
         docker push <<parameters.registry>>/<< parameters.image>>:<<parameters.tag>>

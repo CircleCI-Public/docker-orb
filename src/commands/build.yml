@@ -5,7 +5,7 @@ parameters:
   step-name:
     type: string
     default: Docker build
-    description: Specify a custom name for this command, if desired
+    description: Specify a custom step name for this command, if desired
 
   dockerfile:
     type: string

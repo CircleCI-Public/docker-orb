@@ -1,32 +1,10 @@
 version: 2.1
 
 orbs:
+  build-tools: circleci/build-tools@2.5.0
   docker: circleci/docker@dev:alpha
-  jq: circleci/jq@1.8.0
-  orb-tools: circleci/orb-tools@8.13.0
-
-executors:
-  ci-base:
-    resource_class: small
-    docker:
-      - image: cibuilds/base
-
-  machine:
-    machine: true
-
-  macos:
-    macos:
-      xcode: "10.2.0"
-
-  docker:
-    resource_class: small
-    docker:
-      - image: node
-
-  ci-docker:
-    resource_class: small
-    docker:
-      - image: circleci/node:boron
+  jq: circleci/jq@1.9.0
+  orb-tools: circleci/orb-tools@8.20.1
 
 jobs:
   test:
@@ -53,6 +31,7 @@ jobs:
     executor: <<parameters.executor>>
 
     steps:
+      - build-tools/install-ci-tools
       - jq/install
 
       - unless:
@@ -110,7 +89,11 @@ prod-deploy_requires: &prod-deploy_requires
     test-latest-docker-altogether-master,
     test-older-docker-altogether-master,
     test-latest-ci-docker-altogether-master,
-    test-older-ci-docker-altogether-master
+    test-older-ci-docker-altogether-master,
+    test-latest-oracle-master,
+    test-older-oracle-master,
+    test-latest-oracle-altogether-master,
+    test-older-oracle-altogether-master
   ]
 
 workflows:
@@ -119,21 +102,18 @@ workflows:
       - orb-tools/lint
 
       - orb-tools/pack:
-          requires:
-            - orb-tools/lint
+          requires: [orb-tools/lint]
 
       - orb-tools/publish-dev:
           orb-name: circleci/docker
           context: orb-publishing
-          requires:
-            - orb-tools/pack
+          requires: [orb-tools/pack]
 
       - orb-tools/trigger-integration-workflow:
           name: trigger-integration-dev
           context: orb-publishing
           ssh-fingerprints: d9:97:a8:58:12:13:40:59:48:96:f8:10:be:b8:ba:07
-          requires:
-            - orb-tools/publish-dev
+          requires: [orb-tools/publish-dev]
           filters:
             branches:
               ignore: master
@@ -144,8 +124,7 @@ workflows:
           cleanup-tags: true
           ssh-fingerprints: d9:97:a8:58:12:13:40:59:48:96:f8:10:be:b8:ba:07
           tag: master
-          requires:
-            - orb-tools/publish-dev
+          requires: [orb-tools/publish-dev]
           filters:
             branches:
               only: master
@@ -179,49 +158,45 @@ workflows:
       # alpine
       - test:
           name: test-latest-alpine-dev
-          executor: ci-base
+          executor: orb-tools/alpine
           filters: *integration-dev_filters
-          pre-steps:
-            - run: apk add gnupg
+          pre-steps: [run: apk add gnupg]
 
       - test:
           name: test-older-alpine-dev
-          executor: ci-base
+          executor: orb-tools/alpine
           docker-version: v18.09.4
           docker-compose-version: 1.17.1
           dockerize-version: v0.4.0
           filters: *integration-dev_filters
-          pre-steps:
-            - run: apk add gnupg
+          pre-steps: [run: apk add gnupg]
 
       - test:
           name: test-latest-alpine-altogether-dev
-          executor: ci-base
+          executor: orb-tools/alpine
           test-all-in-one-command: true
           filters: *integration-dev_filters
-          pre-steps:
-            - run: apk add gnupg
+          pre-steps: [run: apk add gnupg]
 
       - test:
           name: test-older-alpine-altogether-dev
-          executor: ci-base
+          executor: orb-tools/alpine
           test-all-in-one-command: true
           docker-version: v18.09.4
           docker-compose-version: 1.17.1
           dockerize-version: v0.4.0
           filters: *integration-dev_filters
-          pre-steps:
-            - run: apk add gnupg
+          pre-steps: [run: apk add gnupg]
 
       # machine
       - test:
           name: test-latest-machine-dev
-          executor: machine
+          executor: orb-tools/machine
           filters: *integration-dev_filters
 
       - test:
           name: test-older-machine-dev
-          executor: machine
+          executor: orb-tools/machine
           docker-version: v17.09.0-ce
           docker-compose-version: 1.20.0
           dockerize-version: v0.2.0
@@ -229,13 +204,13 @@ workflows:
 
       - test:
           name: test-latest-machine-altogether-dev
-          executor: machine
+          executor: orb-tools/machine
           test-all-in-one-command: true
           filters: *integration-dev_filters
 
       - test:
           name: test-older-machine-altogether-dev
-          executor: machine
+          executor: orb-tools/machine
           test-all-in-one-command: true
           docker-version: v17.09.0-ce
           docker-compose-version: 1.20.0
@@ -245,12 +220,12 @@ workflows:
       # mac
       - test:
           name: test-latest-mac-dev
-          executor: macos
+          executor: orb-tools/macos
           filters: *integration-dev_filters
 
       - test:
           name: test-older-mac-dev
-          executor: macos
+          executor: orb-tools/macos
           docker-version: v17.12.1-ce
           docker-compose-version: 1.21.2
           dockerize-version: v0.5.0
@@ -258,13 +233,13 @@ workflows:
 
       - test:
           name: test-latest-mac-altogether-dev
-          executor: macos
+          executor: orb-tools/macos
           test-all-in-one-command: true
           filters: *integration-dev_filters
 
       - test:
           name: test-older-mac-altogether-dev
-          executor: macos
+          executor: orb-tools/macos
           test-all-in-one-command: true
           docker-version: v17.12.1-ce
           docker-compose-version: 1.21.2
@@ -274,12 +249,12 @@ workflows:
       # docker
       - test:
           name: test-latest-docker-dev
-          executor: docker
+          executor: orb-tools/node
           filters: *integration-dev_filters
 
       - test:
           name: test-older-docker-dev
-          executor: docker
+          executor: orb-tools/node
           docker-version: v18.09.3
           docker-compose-version: 1.22.0
           dockerize-version: v0.6.0
@@ -287,13 +262,13 @@ workflows:
 
       - test:
           name: test-latest-docker-altogether-dev
-          executor: docker
+          executor: orb-tools/node
           test-all-in-one-command: true
           filters: *integration-dev_filters
 
       - test:
           name: test-older-docker-altogether-dev
-          executor: docker
+          executor: orb-tools/node
           test-all-in-one-command: true
           docker-version: v18.09.3
           docker-compose-version: 1.22.0
@@ -303,12 +278,12 @@ workflows:
       # ci-docker
       - test:
           name: test-latest-ci-docker-dev
-          executor: ci-docker
+          executor: orb-tools/node-cci
           filters: *integration-dev_filters
 
       - test:
           name: test-older-ci-docker-dev
-          executor: ci-docker
+          executor: orb-tools/node-cci
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
@@ -316,13 +291,42 @@ workflows:
 
       - test:
           name: test-latest-ci-docker-altogether-dev
-          executor: ci-docker
+          executor: orb-tools/node-cci
           test-all-in-one-command: true
           filters: *integration-dev_filters
 
       - test:
           name: test-older-ci-docker-altogether-dev
-          executor: ci-docker
+          executor: orb-tools/node-cci
+          test-all-in-one-command: true
+          docker-version: v18.06.2-ce
+          docker-compose-version: 1.23.1
+          dockerize-version: v0.3.0
+          filters: *integration-dev_filters
+
+      # oracle
+      - test:
+          name: test-latest-oracle-dev
+          executor: orb-tools/oracle
+          filters: *integration-dev_filters
+
+      - test:
+          name: test-older-oracle-dev
+          executor: orb-tools/oracle
+          docker-version: v18.06.2-ce
+          docker-compose-version: 1.23.1
+          dockerize-version: v0.3.0
+          filters: *integration-dev_filters
+
+      - test:
+          name: test-latest-oracle-altogether-dev
+          executor: orb-tools/oracle
+          test-all-in-one-command: true
+          filters: *integration-dev_filters
+
+      - test:
+          name: test-older-oracle-altogether-dev
+          executor: orb-tools/oracle
           test-all-in-one-command: true
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
@@ -356,49 +360,45 @@ workflows:
       # alpine
       - test:
           name: test-latest-alpine-master
-          executor: ci-base
+          executor: orb-tools/alpine
           filters: *integration-master_filters
-          pre-steps:
-            - run: apk add gnupg
+          pre-steps: [run: apk add gnupg]
 
       - test:
           name: test-older-alpine-master
-          executor: ci-base
+          executor: orb-tools/alpine
           docker-version: v18.09.4
           docker-compose-version: 1.17.1
           dockerize-version: v0.4.0
           filters: *integration-master_filters
-          pre-steps:
-            - run: apk add gnupg
+          pre-steps: [run: apk add gnupg]
 
       - test:
           name: test-latest-alpine-altogether-master
-          executor: ci-base
+          executor: orb-tools/alpine
           test-all-in-one-command: true
           filters: *integration-master_filters
-          pre-steps:
-            - run: apk add gnupg
+          pre-steps: [run: apk add gnupg]
 
       - test:
           name: test-older-alpine-altogether-master
-          executor: ci-base
+          executor: orb-tools/alpine
           test-all-in-one-command: true
           docker-version: v18.09.4
           docker-compose-version: 1.17.1
           dockerize-version: v0.4.0
           filters: *integration-master_filters
-          pre-steps:
-            - run: apk add gnupg
+          pre-steps: [run: apk add gnupg]
 
       # machine
       - test:
           name: test-latest-machine-master
-          executor: machine
+          executor: orb-tools/machine
           filters: *integration-master_filters
 
       - test:
           name: test-older-machine-master
-          executor: machine
+          executor: orb-tools/machine
           docker-version: v17.09.0-ce
           docker-compose-version: 1.20.0
           dockerize-version: v0.2.0
@@ -406,13 +406,13 @@ workflows:
 
       - test:
           name: test-latest-machine-altogether-master
-          executor: machine
+          executor: orb-tools/machine
           test-all-in-one-command: true
           filters: *integration-master_filters
 
       - test:
           name: test-older-machine-altogether-master
-          executor: machine
+          executor: orb-tools/machine
           test-all-in-one-command: true
           docker-version: v17.09.0-ce
           docker-compose-version: 1.20.0
@@ -422,12 +422,12 @@ workflows:
       # mac
       - test:
           name: test-latest-mac-master
-          executor: macos
+          executor: orb-tools/macos
           filters: *integration-master_filters
 
       - test:
           name: test-older-mac-master
-          executor: macos
+          executor: orb-tools/macos
           docker-version: v17.12.1-ce
           docker-compose-version: 1.21.2
           dockerize-version: v0.5.0
@@ -435,13 +435,13 @@ workflows:
 
       - test:
           name: test-latest-mac-altogether-master
-          executor: macos
+          executor: orb-tools/macos
           test-all-in-one-command: true
           filters: *integration-master_filters
 
       - test:
           name: test-older-mac-altogether-master
-          executor: macos
+          executor: orb-tools/macos
           test-all-in-one-command: true
           docker-version: v17.12.1-ce
           docker-compose-version: 1.21.2
@@ -451,12 +451,12 @@ workflows:
       # docker
       - test:
           name: test-latest-docker-master
-          executor: docker
+          executor: orb-tools/node
           filters: *integration-master_filters
 
       - test:
           name: test-older-docker-master
-          executor: docker
+          executor: orb-tools/node
           docker-version: v18.09.3
           docker-compose-version: 1.22.0
           dockerize-version: v0.6.0
@@ -464,13 +464,13 @@ workflows:
 
       - test:
           name: test-latest-docker-altogether-master
-          executor: docker
+          executor: orb-tools/node
           test-all-in-one-command: true
           filters: *integration-master_filters
 
       - test:
           name: test-older-docker-altogether-master
-          executor: docker
+          executor: orb-tools/node
           test-all-in-one-command: true
           docker-version: v18.09.3
           docker-compose-version: 1.22.0
@@ -480,12 +480,12 @@ workflows:
       # ci-docker
       - test:
           name: test-latest-ci-docker-master
-          executor: ci-docker
+          executor: orb-tools/node-cci
           filters: *integration-master_filters
 
       - test:
           name: test-older-ci-docker-master
-          executor: ci-docker
+          executor: orb-tools/node-cci
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
@@ -493,13 +493,42 @@ workflows:
 
       - test:
           name: test-latest-ci-docker-altogether-master
-          executor: ci-docker
+          executor: orb-tools/node-cci
           test-all-in-one-command: true
           filters: *integration-master_filters
 
       - test:
           name: test-older-ci-docker-altogether-master
-          executor: ci-docker
+          executor: orb-tools/node-cci
+          test-all-in-one-command: true
+          docker-version: v18.06.2-ce
+          docker-compose-version: 1.23.1
+          dockerize-version: v0.3.0
+          filters: *integration-master_filters
+
+      # oracle
+      - test:
+          name: test-latest-oracle-master
+          executor: orb-tools/oracle
+          filters: *integration-master_filters
+
+      - test:
+          name: test-older-oracle-master
+          executor: orb-tools/oracle
+          docker-version: v18.06.2-ce
+          docker-compose-version: 1.23.1
+          dockerize-version: v0.3.0
+          filters: *integration-master_filters
+
+      - test:
+          name: test-latest-oracle-altogether-master
+          executor: orb-tools/oracle
+          test-all-in-one-command: true
+          filters: *integration-master_filters
+
+      - test:
+          name: test-older-oracle-altogether-master
+          executor: orb-tools/oracle
           test-all-in-one-command: true
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
@@ -509,6 +538,7 @@ workflows:
       # patch, minor, or major publishing
       - orb-tools/dev-promote-prod:
           name: dev-promote-patch
+          ssh-fingerprints: d9:97:a8:58:12:13:40:59:48:96:f8:10:be:b8:ba:07
           context: orb-publishing
           orb-name: circleci/docker
           requires: *prod-deploy_requires
@@ -520,6 +550,7 @@ workflows:
 
       - orb-tools/dev-promote-prod:
           name: dev-promote-minor
+          ssh-fingerprints: d9:97:a8:58:12:13:40:59:48:96:f8:10:be:b8:ba:07
           context: orb-publishing
           orb-name: circleci/docker
           release: minor
@@ -532,6 +563,7 @@ workflows:
 
       - orb-tools/dev-promote-prod:
           name: dev-promote-major
+          ssh-fingerprints: d9:97:a8:58:12:13:40:59:48:96:f8:10:be:b8:ba:07
           context: orb-publishing
           orb-name: circleci/docker
           release: major

@@ -9,7 +9,7 @@ usage:
 
   jobs:
     check-and-build-only:
-      executor: docker-publish/machine
+      executor: docker/machine
       steps:
         - checkout
 

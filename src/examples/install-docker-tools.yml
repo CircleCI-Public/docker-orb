@@ -10,7 +10,9 @@ usage:
 
   jobs:
     your-job:
-      executor: your-executor
+      executor:
+        name: docker/docker
+        tag: "3.6"
       steps:
         - checkout
         - docker/install-docker-tools

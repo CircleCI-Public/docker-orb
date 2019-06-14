@@ -1,0 +1,23 @@
+description: >
+  Build and Deploy docker image with a custom name and tag, using a
+  non-default executor with custom parameter values (note: when using a
+  Docker-based excecutor, the `use-remote-docker` parameter must be
+  set to true in order for Docker commands to run successfully).
+
+usage:
+  version: 2.1
+
+  orbs:
+    docker: circleci/docker@x.y.z
+
+  workflows:
+    build-and-publish-docker-image:
+      jobs:
+        - docker/publish:
+            executor:
+              name: docker/docker
+              image: circleci/node
+              tag: boron-browsers
+            use-remote-docker: true
+            image:  my/image
+            tag: my-tag

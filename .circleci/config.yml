@@ -38,7 +38,7 @@ jobs:
 
       debug:
         type: boolean
-        default: true
+        default: false
 
     executor: <<parameters.executor>>
 

@@ -29,7 +29,7 @@ parameters:
 
 steps:
   - run:
-      name: Install Goss, `dgoss`
+      name: Install Goss and dgoss
       command: |
         #!/usr/bin/env bash
 
@@ -74,6 +74,14 @@ steps:
         $SUDO mv goss-linux-amd64 <<parameters.install-dir>>/goss
         $SUDO chmod +rx /usr/local/bin/goss
 
+        # test/verify goss
+        if goss --version | grep "$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+          echo "$(goss --version) has been installed to $(command -v goss)"
+        else
+          echo "Something went wrong; the specified version of Goss could not be installed"
+          exit 1
+        fi
+
         # dgoss
         if [[ $(curl --silent --show-error --location --fail --retry 3 \
           "https://raw.githubusercontent.com/aelsabbahy/goss/$VERSION/extras/dgoss/dgoss"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>) ]]; then
@@ -93,12 +101,4 @@ steps:
         else
           echo "No dgoss wrapper found for the selected version of Goss ((echo $VERSION))..."
           echo "Goss installation will proceed, but to use dgoss, please try again with a newer version"
-        fi
-
-        # test/verify goss
-        if goss --version | grep "$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
-          echo "$(goss --version) has been installed to $(command -v goss)"
-        else
-          echo "Something went wrong; the specified version of Goss could not be installed"
-          exit 1
         fi

@@ -73,7 +73,7 @@ jobs:
                 docker-version: <<parameters.docker-version>>
                 docker-compose-version: <<parameters.docker-compose-version>>
                 dockerize-version: <<parameters.dockerize-version>>
-                install-goss: <<parameters.install-goss>>
+                install-goss-dgoss: <<parameters.install-goss>>
                 goss-version: <<parameters.goss-version>>
                 debug: <<parameters.debug>>
 

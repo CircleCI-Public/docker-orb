@@ -1,0 +1,103 @@
+description: >
+  Install the Goss and `dgoss` CLI tools, commonly using for testing
+  Docker containers. Only compatible with Linux-based execution
+  environments. More info: https://github.com/aelsabbahy/goss
+  https://github.com/aelsabbahy/goss/tree/master/extras/dgoss
+
+parameters:
+  version:
+    type: string
+    default: latest
+    description: >
+      Version of Goss and `dgoss` to install, defaults to the latest stable
+      release. If specifying a version other than latest, provide a full
+      release tag, as listed at https://github.com/aelsabbahy/goss/releases
+      or https://api.github.com/repos/aelsabbahy/goss/releases, e.g.,
+      `v0.3.7`. Supports versions `v0.3.1` and newer.
+
+  install-dir:
+    type: string
+    default: /usr/local/bin
+    description: >
+      Directory in which to install Goss and `dgoss`
+
+  debug:
+    type: boolean
+    default: false
+    description: >
+      Extra output for orb developers
+
+steps:
+  - run:
+      name: Install Goss and dgoss
+      command: |
+        #!/usr/bin/env bash
+
+        if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
+        # determine specified version
+        if [[ <<parameters.version>> == latest ]]; then
+          VERSION=$(curl --silent --show-error \
+            --location --fail --retry 3 \
+            https://api.github.com/repos/aelsabbahy/goss/releases/latest | \
+            grep tag_name | cut -d '"' -f 4)
+
+          echo "Latest version of Goss is $VERSION"
+        else
+          VERSION=<<parameters.version>>
+
+          echo "Selected version of Goss is $VERSION"
+        fi
+
+        # installation check
+        if command -v goss<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+
+          if goss --version | \
+            grep "$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>> && \
+            command -v dgoss<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+
+            echo "Goss and dgoss $VERSION are already installed"
+            exit 0
+          else
+            echo "A different version of Goss is installed ($(goss --version)); removing it"
+
+            $SUDO rm -rf "$(command -v goss)"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+            $SUDO rm -rf "$(command -v dgoss)"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+          fi
+        fi
+
+        # download/install
+        # goss
+        curl -O --silent --show-error --location --fail --retry 3 \
+          "https://github.com/aelsabbahy/goss/releases/download/$VERSION/goss-linux-amd64"
+
+        $SUDO mv goss-linux-amd64 <<parameters.install-dir>>/goss
+        $SUDO chmod +rx /usr/local/bin/goss
+
+        # test/verify goss
+        if goss --version | grep "$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+          echo "$(goss --version) has been installed to $(command -v goss)"
+        else
+          echo "Something went wrong; the specified version of Goss could not be installed"
+          exit 1
+        fi
+
+        # dgoss
+        DGOSS_URL="https://raw.githubusercontent.com/aelsabbahy/goss/$VERSION/extras/dgoss/dgoss"
+        if curl<<^parameters.debug>> --output /dev/null<</parameters.debug>> --silent --head --fail "$DGOSS_URL"; then
+          curl -O --silent --show-error --location --fail --retry 3 "$DGOSS_URL"
+
+          $SUDO mv dgoss <<parameters.install-dir>>
+          $SUDO chmod +rx /usr/local/bin/dgoss
+
+          # test/verify dgoss
+          if command -v dgoss<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+            echo "dgoss has been installed to $(command -v dgoss)"
+          else
+            echo "Something went wrong; the dgoss wrapper for the specified version of Goss could not be installed"
+            exit 1
+          fi
+        else
+          echo "No dgoss wrapper found for the selected version of Goss ($(echo $VERSION))..."
+          echo "Goss installation will proceed, but to use dgoss, please try again with a newer version"
+        fi

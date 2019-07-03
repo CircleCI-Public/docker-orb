@@ -73,6 +73,35 @@ parameters:
     description: >
       Directory in which to install `dockerize`
 
+  # goss/dgoss
+  install-goss-dgoss:
+    type: boolean
+    default: true
+    description: >
+      Install Goss and `dgoss`?
+
+  goss-version:
+    type: string
+    default: latest
+    description: >
+      Version of Goss and `dgoss` to install, defaults to the latest stable
+      release. If specifying a version other than latest, provide a full
+      release tag, as listed at https://github.com/aelsabbahy/goss/releases
+      or https://api.github.com/repos/aelsabbahy/goss/releases, e.g.,
+      `v0.3.7`.
+
+  goss-install-dir:
+    type: string
+    default: /usr/local/bin
+    description: >
+      Directory in which to install Goss and `dgoss`
+
+  debug:
+    type: boolean
+    default: false
+    description: >
+      Extra output for orb developers
+
 steps:
   - when:
       condition: <<parameters.install-docker>>
@@ -94,3 +123,11 @@ steps:
         - install-dockerize:
             version: <<parameters.dockerize-version>>
             install-dir: <<parameters.dockerize-install-dir>>
+
+  - when:
+      condition: <<parameters.install-goss-dgoss>>
+      steps:
+        - install-goss:
+            version: <<parameters.goss-version>>
+            install-dir: <<parameters.goss-install-dir>>
+            debug: <<parameters.debug>>

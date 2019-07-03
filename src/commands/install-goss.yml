@@ -13,7 +13,7 @@ parameters:
       release. If specifying a version other than latest, provide a full
       release tag, as listed at https://github.com/aelsabbahy/goss/releases
       or https://api.github.com/repos/aelsabbahy/goss/releases, e.g.,
-      `v0.3.7`.
+      `v0.3.7`. Supports versions `v0.3.1` and newer.
 
   install-dir:
     type: string
@@ -75,24 +75,30 @@ steps:
         $SUDO chmod +rx /usr/local/bin/goss
 
         # dgoss
-        curl -O --silent --show-error --location --fail --retry 3 \
-          "https://raw.githubusercontent.com/aelsabbahy/goss/$VERSION/extras/dgoss/dgoss"
+        if [[ $(curl --silent --show-error --location --fail --retry 3 \
+          "https://raw.githubusercontent.com/aelsabbahy/goss/$VERSION/extras/dgoss/dgoss"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>) ]]; then
+          curl -O --silent --show-error --location --fail --retry 3 \
+            "https://raw.githubusercontent.com/aelsabbahy/goss/$VERSION/extras/dgoss/dgoss"
 
-        $SUDO mv dgoss <<parameters.install-dir>>
-        $SUDO chmod +rx /usr/local/bin/dgoss
+          $SUDO mv dgoss <<parameters.install-dir>>
+          $SUDO chmod +rx /usr/local/bin/dgoss
+
+          # test/verify dgoss
+          if command -v dgoss<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+            echo "dgoss has been installed to $(command -v dgoss)"
+          else
+            echo "Something went wrong; the dgoss wrapper for the specified version of Goss could not be installed"
+            exit 1
+          fi
+        else
+          echo "No dgoss wrapper found for the selected version of Goss ((echo $VERSION))..."
+          echo "Goss installation will proceed, but to use dgoss, please try again with a newer version"
+        fi
 
         # test/verify goss
         if goss --version | grep "$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
           echo "$(goss --version) has been installed to $(command -v goss)"
         else
           echo "Something went wrong; the specified version of Goss could not be installed"
-          exit 1
-        fi
-
-        # test/verify dgoss
-        if command -v dgoss<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
-          echo "dgoss has been installed to $(command -v dgoss)"
-        else
-          echo "Something went wrong; the dgoss wrapper for the specified version of Goss could not be installed"
           exit 1
         fi

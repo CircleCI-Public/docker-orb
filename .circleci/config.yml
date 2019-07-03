@@ -191,7 +191,7 @@ workflows:
           docker-version: v18.09.4
           docker-compose-version: 1.17.1
           dockerize-version: v0.4.0
-          goss-version: v0.3.6
+          goss-version: v0.3.2
           filters: *integration-dev_filters
           pre-steps: [run: apk add gnupg]
 
@@ -209,7 +209,7 @@ workflows:
           docker-version: v18.09.4
           docker-compose-version: 1.17.1
           dockerize-version: v0.4.0
-          goss-version: v0.3.5
+          goss-version: v0.3.3
           filters: *integration-dev_filters
           pre-steps: [run: apk add gnupg]
 
@@ -241,7 +241,7 @@ workflows:
           docker-version: v17.09.0-ce
           docker-compose-version: 1.20.0
           dockerize-version: v0.2.0
-          goss-version: v0.3.3
+          goss-version: v0.3.5
           filters: *integration-dev_filters
 
       # mac
@@ -289,7 +289,7 @@ workflows:
           docker-version: v18.09.3
           docker-compose-version: 1.22.0
           dockerize-version: v0.6.0
-          goss-version: v0.3.2
+          goss-version: v0.3.6
           filters: *integration-dev_filters
 
       - test:
@@ -305,7 +305,7 @@ workflows:
           docker-version: v18.09.3
           docker-compose-version: 1.22.0
           dockerize-version: v0.6.0
-          goss-version: v0.3.1
+          goss-version: v0.3.5
           filters: *integration-dev_filters
 
       # ci-docker
@@ -320,7 +320,7 @@ workflows:
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
-          goss-version: v0.3.0
+          goss-version: v0.3.4
           filters: *integration-dev_filters
 
       - test:
@@ -336,7 +336,7 @@ workflows:
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
-          goss-version: v0.2.6
+          goss-version: v0.3.3
           filters: *integration-dev_filters
 
       # oracle
@@ -351,7 +351,7 @@ workflows:
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
-          goss-version: v0.2.5
+          goss-version: v0.3.2
           filters: *integration-dev_filters
 
       - test:
@@ -367,7 +367,7 @@ workflows:
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
-          goss-version: v0.2.4
+          goss-version: v0.3.1
           filters: *integration-dev_filters
 
       # triggered by master branch commits

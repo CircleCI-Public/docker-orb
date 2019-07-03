@@ -60,6 +60,7 @@ jobs:
 
             - when:
                 condition: <<parameters.install-goss>>
+                steps:
                   - docker/install-goss:
                       version: <<parameters.goss-version>>
                       debug: <<parameters.debug>>

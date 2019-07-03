@@ -83,10 +83,9 @@ steps:
         fi
 
         # dgoss
-        if [[ $(curl --silent --show-error --location --fail --retry 3 \
-          "https://raw.githubusercontent.com/aelsabbahy/goss/$VERSION/extras/dgoss/dgoss"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>) ]]; then
-          curl -O --silent --show-error --location --fail --retry 3 \
-            "https://raw.githubusercontent.com/aelsabbahy/goss/$VERSION/extras/dgoss/dgoss"
+        DGOSS_URL="https://raw.githubusercontent.com/aelsabbahy/goss/$VERSION/extras/dgoss/dgoss"
+        if curl<<^parameters.debug>> --output /dev/null<</parameters.debug>> --silent --head --fail "$DGOSS_URL"; then
+          curl -O --silent --show-error --location --fail --retry 3 "$DGOSS_URL"
 
           $SUDO mv dgoss <<parameters.install-dir>>
           $SUDO chmod +rx /usr/local/bin/dgoss
@@ -99,6 +98,6 @@ steps:
             exit 1
           fi
         else
-          echo "No dgoss wrapper found for the selected version of Goss ((echo $VERSION))..."
+          echo "No dgoss wrapper found for the selected version of Goss ($(echo $VERSION))..."
           echo "Goss installation will proceed, but to use dgoss, please try again with a newer version"
         fi

@@ -4,7 +4,7 @@ orbs:
   build-tools: circleci/build-tools@2.5.0
   docker: circleci/docker@dev:alpha
   jq: circleci/jq@1.9.0
-  orb-tools: circleci/orb-tools@8.20.1
+  orb-tools: circleci/orb-tools@8.27.1
 
 jobs:
   test:
@@ -24,9 +24,21 @@ jobs:
         type: string
         default: latest
 
+      install-goss:
+        type: boolean
+        default: true
+
+      goss-version:
+        type: string
+        default: latest
+
       test-all-in-one-command:
         type: boolean
         default: false
+
+      debug:
+        type: boolean
+        default: true
 
     executor: <<parameters.executor>>
 
@@ -46,6 +58,13 @@ jobs:
             - docker/install-dockerize:
                 version: <<parameters.dockerize-version>>
 
+            - when:
+                condition: <<parameters.install-goss>>
+                  - docker/install-goss:
+                      version: <<parameters.goss-version>>
+                      debug: <<parameters.debug>>
+
+
       - when:
           condition: <<parameters.test-all-in-one-command>>
           steps:
@@ -53,6 +72,9 @@ jobs:
                 docker-version: <<parameters.docker-version>>
                 docker-compose-version: <<parameters.docker-compose-version>>
                 dockerize-version: <<parameters.dockerize-version>>
+                install-goss: <<parameters.install-goss>>
+                goss-version: <<parameters.goss-version>>
+                debug: <<parameters.debug>>
 
 integration-dev_filters: &integration-dev_filters
   branches:
@@ -168,6 +190,7 @@ workflows:
           docker-version: v18.09.4
           docker-compose-version: 1.17.1
           dockerize-version: v0.4.0
+          goss-version: v0.3.6
           filters: *integration-dev_filters
           pre-steps: [run: apk add gnupg]
 
@@ -185,6 +208,7 @@ workflows:
           docker-version: v18.09.4
           docker-compose-version: 1.17.1
           dockerize-version: v0.4.0
+          goss-version: v0.3.5
           filters: *integration-dev_filters
           pre-steps: [run: apk add gnupg]
 
@@ -200,6 +224,7 @@ workflows:
           docker-version: v17.09.0-ce
           docker-compose-version: 1.20.0
           dockerize-version: v0.2.0
+          goss-version: v0.3.4
           filters: *integration-dev_filters
 
       - test:
@@ -215,12 +240,14 @@ workflows:
           docker-version: v17.09.0-ce
           docker-compose-version: 1.20.0
           dockerize-version: v0.2.0
+          goss-version: v0.3.3
           filters: *integration-dev_filters
 
       # mac
       - test:
           name: test-latest-mac-dev
           executor: orb-tools/macos
+          install-goss: false
           filters: *integration-dev_filters
 
       - test:
@@ -229,12 +256,14 @@ workflows:
           docker-version: v17.12.1-ce
           docker-compose-version: 1.21.2
           dockerize-version: v0.5.0
+          install-goss: false
           filters: *integration-dev_filters
 
       - test:
           name: test-latest-mac-altogether-dev
           executor: orb-tools/macos
           test-all-in-one-command: true
+          install-goss: false
           filters: *integration-dev_filters
 
       - test:
@@ -244,6 +273,7 @@ workflows:
           docker-version: v17.12.1-ce
           docker-compose-version: 1.21.2
           dockerize-version: v0.5.0
+          install-goss: false
           filters: *integration-dev_filters
 
       # docker
@@ -258,6 +288,7 @@ workflows:
           docker-version: v18.09.3
           docker-compose-version: 1.22.0
           dockerize-version: v0.6.0
+          goss-version: v0.3.2
           filters: *integration-dev_filters
 
       - test:
@@ -273,6 +304,7 @@ workflows:
           docker-version: v18.09.3
           docker-compose-version: 1.22.0
           dockerize-version: v0.6.0
+          goss-version: v0.3.1
           filters: *integration-dev_filters
 
       # ci-docker
@@ -287,6 +319,7 @@ workflows:
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
+          goss-version: v0.3.0
           filters: *integration-dev_filters
 
       - test:
@@ -302,6 +335,7 @@ workflows:
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
+          goss-version: v0.2.6
           filters: *integration-dev_filters
 
       # oracle
@@ -316,6 +350,7 @@ workflows:
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
+          goss-version: v0.2.5
           filters: *integration-dev_filters
 
       - test:
@@ -331,6 +366,7 @@ workflows:
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
+          goss-version: v0.2.4
           filters: *integration-dev_filters
 
       # triggered by master branch commits

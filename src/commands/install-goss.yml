@@ -69,14 +69,14 @@ steps:
         # download/install
         # goss
         curl -O --silent --show-error --location --fail --retry 3 \
-          "https://github.com/aelsabbahy/goss/releases/download/v$VERSION/goss-linux-amd64"
+          "https://github.com/aelsabbahy/goss/releases/download/$VERSION/goss-linux-amd64"
 
         $SUDO mv goss-linux-amd64 <<parameters.install-dir>>/goss
         $SUDO chmod +rx /usr/local/bin/goss
 
         # dgoss
         curl -O --silent --show-error --location --fail --retry 3 \
-          "https://raw.githubusercontent.com/aelsabbahy/goss/v$VERSION/extras/dgoss/dgoss"
+          "https://raw.githubusercontent.com/aelsabbahy/goss/$VERSION/extras/dgoss/dgoss"
 
         $SUDO mv dgoss <<parameters.install-dir>>
         $SUDO chmod +rx /usr/local/bin/dgoss

@@ -40,8 +40,7 @@ steps:
           VERSION=$(curl --silent --show-error \
             --location --fail --retry 3 \
             https://api.github.com/repos/aelsabbahy/goss/releases/latest | \
-            grep tag_name | cut -d '"' -f 4 | \
-            cut -d 'v' -f 2)
+            grep tag_name | cut -d '"' -f 4)
 
           echo "Latest version of Goss is $VERSION"
         else

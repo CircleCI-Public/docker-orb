@@ -407,6 +407,7 @@ workflows:
           docker-version: v18.09.4
           docker-compose-version: 1.17.1
           dockerize-version: v0.4.0
+          goss-version: v0.3.2
           filters: *integration-master_filters
           pre-steps: [run: apk add gnupg]
 
@@ -424,6 +425,7 @@ workflows:
           docker-version: v18.09.4
           docker-compose-version: 1.17.1
           dockerize-version: v0.4.0
+          goss-version: v0.3.3
           filters: *integration-master_filters
           pre-steps: [run: apk add gnupg]
 
@@ -439,6 +441,7 @@ workflows:
           docker-version: v17.09.0-ce
           docker-compose-version: 1.20.0
           dockerize-version: v0.2.0
+          goss-version: v0.3.4
           filters: *integration-master_filters
 
       - test:
@@ -454,12 +457,14 @@ workflows:
           docker-version: v17.09.0-ce
           docker-compose-version: 1.20.0
           dockerize-version: v0.2.0
+          goss-version: v0.3.5
           filters: *integration-master_filters
 
       # mac
       - test:
           name: test-latest-mac-master
           executor: orb-tools/macos
+          install-goss: false
           filters: *integration-master_filters
 
       - test:
@@ -468,12 +473,14 @@ workflows:
           docker-version: v17.12.1-ce
           docker-compose-version: 1.21.2
           dockerize-version: v0.5.0
+          install-goss: false
           filters: *integration-master_filters
 
       - test:
           name: test-latest-mac-altogether-master
           executor: orb-tools/macos
           test-all-in-one-command: true
+          install-goss: false
           filters: *integration-master_filters
 
       - test:
@@ -483,6 +490,7 @@ workflows:
           docker-version: v17.12.1-ce
           docker-compose-version: 1.21.2
           dockerize-version: v0.5.0
+          install-goss: false
           filters: *integration-master_filters
 
       # docker
@@ -497,6 +505,7 @@ workflows:
           docker-version: v18.09.3
           docker-compose-version: 1.22.0
           dockerize-version: v0.6.0
+          goss-version: v0.3.6
           filters: *integration-master_filters
 
       - test:
@@ -512,6 +521,7 @@ workflows:
           docker-version: v18.09.3
           docker-compose-version: 1.22.0
           dockerize-version: v0.6.0
+          goss-version: v0.3.5
           filters: *integration-master_filters
 
       # ci-docker
@@ -526,6 +536,7 @@ workflows:
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
+          goss-version: v0.3.4
           filters: *integration-master_filters
 
       - test:
@@ -541,6 +552,7 @@ workflows:
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
+          goss-version: v0.3.3
           filters: *integration-master_filters
 
       # oracle
@@ -555,6 +567,7 @@ workflows:
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
+          goss-version: v0.3.2
           filters: *integration-master_filters
 
       - test:
@@ -570,6 +583,7 @@ workflows:
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
+          goss-version: v0.3.1
           filters: *integration-master_filters
 
       # patch, minor, or major publishing

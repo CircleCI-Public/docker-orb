@@ -31,8 +31,6 @@ steps:
   - run:
       name: Install Goss and dgoss
       command: |
-        #!/usr/bin/env bash
-
         if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
         # determine specified version

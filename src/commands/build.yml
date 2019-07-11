@@ -47,6 +47,6 @@ steps:
       command: |
         docker build \
           <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
-          -f <<parameters.dockerfile>> -t \
+          -f <<parameters.path>>/<<parameters.dockerfile>> -t \
           <<parameters.registry>>/<< parameters.image>>:<<parameters.tag>> \
           <<parameters.path>>

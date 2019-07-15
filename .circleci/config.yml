@@ -50,6 +50,7 @@ jobs:
 
       - node/install:
           install-yarn: false
+          debug: true
 
       - unless:
           condition: <<parameters.test-all-in-one-command>>

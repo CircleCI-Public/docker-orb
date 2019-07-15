@@ -1,0 +1,35 @@
+description: >
+  Lint a given Dockerfile (requires NPM)
+
+parameters:
+  dockerfile:
+    type: string
+    default: Dockerfile
+    description: >
+      Relative or absolute path, including name, to Dockerfile to be linted,
+      e.g., `~/project/app/deploy.Dockerfile`, defaults to a Dockerfile
+      named `Dockerfile` in the working directory
+
+  treat-warnings-as-errors:
+    type: boolean
+    default: false
+    description: >
+      Treat linting warnings as errors (would trigger an exist code and
+      fail the CircleCI job)?
+
+  debug:
+    type: boolean
+    default: false
+    description: >
+      Extra output for orb developers
+
+steps:
+  - run:
+      name: Lint Dockerfile at <<parameters.dockerfile>>
+      command: |
+        if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
+        $SUDO npm install -g dockerlint<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+
+        dockerlint<<#parameters.treat-warnings-as-errors>> -p<</parameters.treat-warnings-as-errors>> \
+          <<parameters.dockerfile>>

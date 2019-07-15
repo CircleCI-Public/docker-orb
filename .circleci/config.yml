@@ -4,7 +4,7 @@ orbs:
   build-tools: circleci/build-tools@2.5.0
   docker: circleci/docker@dev:alpha
   jq: circleci/jq@1.9.0
-  node: circleci/node@1.1.12
+  node: circleci/node@1.1.2
   orb-tools: circleci/orb-tools@8.27.3
 
 jobs:

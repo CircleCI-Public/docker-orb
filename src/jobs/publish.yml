@@ -29,6 +29,19 @@ parameters:
       Path to the directory containing your Dockerfile and build context,
       defaults to . (working directory)
 
+  lint-dockerfile:
+    type: boolean
+    default: false
+    description: >
+      Lint Dockerfile before building?
+
+  treat-warnings-as-errors:
+    type: boolean
+    default: false
+    description: >
+     If linting Dockerfile, treat linting warnings as errors (would trigger
+     an exist code and fail the CircleCI job)?
+
   image:
     type: string
     description: Name of image to build
@@ -116,6 +129,8 @@ steps:
       image: <<parameters.image>>
       tag: <<parameters.tag>>
       extra_build_args: <<parameters.extra_build_args>>
+      lint-dockerfile: <<parameters.lint-dockerfile>>
+      treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>
 
   - when:
       name: Run after_build lifecycle hook steps

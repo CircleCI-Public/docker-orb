@@ -19,6 +19,19 @@ parameters:
       Path to the directory containing your Dockerfile and build context,
       defaults to . (working directory)
 
+  lint-dockerfile:
+    type: boolean
+    default: false
+    description: >
+      Lint Dockerfile before building?
+
+  treat-warnings-as-errors:
+    type: boolean
+    default: false
+    description: >
+     If linting Dockerfile, treat linting warnings as errors (would trigger
+     an exist code and fail the CircleCI job)?
+
   registry:
     type: string
     default: docker.io
@@ -42,6 +55,13 @@ parameters:
       https://docs.docker.com/engine/reference/commandline/build
 
 steps:
+  - when:
+      condition: <<parameters.lint-dockerfile>>
+      steps:
+        - dockerlint:
+            treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>
+            dockerfile: <<parameters.path>>/<<parameters.dockerfile>>
+
   - run:
       name: <<parameters.step-name>>
       command: |

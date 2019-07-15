@@ -29,7 +29,8 @@ steps:
       command: |
         if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
-        $SUDO npm install -g dockerlint<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+        npm install -g dockerlint<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>> || \
+          $SUDO npm install -g dockerlint<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
 
         dockerlint<<#parameters.treat-warnings-as-errors>> -p<</parameters.treat-warnings-as-errors>> \
           <<parameters.dockerfile>>

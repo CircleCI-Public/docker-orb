@@ -82,7 +82,7 @@ jobs:
                 goss-version: <<parameters.goss-version>>
                 debug: <<parameters.debug>>
 
-      - dockerlint:
+      - docker/dockerlint:
           debug: true
           dockerfile: test.Dockerfile
 

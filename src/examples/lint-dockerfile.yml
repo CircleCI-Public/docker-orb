@@ -1,0 +1,24 @@
+description: >
+  Use the `dockerlint` command to install Dockerlint and lint a
+  Dockerfile
+
+usage:
+  version: 2.1
+
+  orbs:
+    docker: circleci/docker@x.y.z
+
+    jobs:
+      lint:
+        executor: docker/machine
+        steps:
+          - checkout
+
+          - docker/dockerlint:
+              dockerfile: path/to/and/name/of/Dockerfile
+              treat-warnings-as-errors: true
+
+  workflows:
+    lint-dockerfile:
+      jobs:
+        - lint

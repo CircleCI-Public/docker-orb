@@ -4,6 +4,7 @@ orbs:
   build-tools: circleci/build-tools@2.5.0
   docker: circleci/docker@dev:alpha
   jq: circleci/jq@1.9.0
+  node: circleci/node@1.1.12
   orb-tools: circleci/orb-tools@8.27.3
 
 jobs:
@@ -43,8 +44,12 @@ jobs:
     executor: <<parameters.executor>>
 
     steps:
+      - checkout
       - build-tools/install-ci-tools
       - jq/install
+
+      - node/install:
+          install-yarn: false
 
       - unless:
           condition: <<parameters.test-all-in-one-command>>
@@ -76,6 +81,10 @@ jobs:
                 install-goss-dgoss: <<parameters.install-goss>>
                 goss-version: <<parameters.goss-version>>
                 debug: <<parameters.debug>>
+
+      - dockerlint:
+          debug: true
+          dockerfile: test.Dockerfile
 
 integration-dev_filters: &integration-dev_filters
   branches:

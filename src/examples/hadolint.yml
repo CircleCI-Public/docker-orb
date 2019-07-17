@@ -1,0 +1,16 @@
+description: >
+  Use hadolint to lint a Dockerfile
+
+usage:
+  version: 2.1
+
+  orbs:
+    docker: circleci/docker@x.y.z
+
+  workflows:
+    lint:
+      jobs:
+        - docker/hadolint:
+            ignore-rules: DL4005,DL3008,DL3009,DL3015
+            trusted-registries: docker.io,my-company.com:5000
+            dockerfile: test.Dockerfile

@@ -1,0 +1,55 @@
+description: >
+  Lint a given Dockerfile using a hadolint Docker image:
+  https://hub.docker.com/r/hadolint/hadolint
+
+parameters:
+  dockerfile:
+    type: string
+    default: Dockerfile
+    description: >
+      Relative or absolute path, including name, to Dockerfile to be linted,
+      e.g., `~/project/app/deploy.Dockerfile`, defaults to a Dockerfile
+      named `Dockerfile` in the working directory
+
+  ignore-rules:
+    type: string
+    default: ""
+    description: >
+      Comma-separated string list of rules to ignore (e.g.,
+      `DL3000,SC1010`): https://github.com/hadolint/hadolint#rules
+
+  trusted-registries:
+    type: string
+    default: ""
+    description: >
+      Comma-separated list of trusted registries (e.g.,
+      `docker.io,my-company.com:5000`); if set, return an error if
+      Dockerfiles use any images from registries not included in this list
+
+executor: hadolint
+
+steps:
+  - checkout
+
+  - run:
+      name: Lint <<parameters.dockerfile>> with hadolint
+      command: |
+        <<#parameters.ignore-rules>>
+        IGNORE_STRING=<<parameters.ignore-rules>>
+        IGNORE_RULES=$(echo "--ignore ${IGNORE_STRING//,/ --ignore }")
+        <</parameters.ignore-rules>>
+
+        <<#parameters.trusted-registries>>
+        REGISTRIES_STRING=<<parameters.trusted-registries>>
+        TRUSTED_REGISTRIES=$(echo "--trusted-registry ${REGISTRIES_STRING//,/ --trusted-registry }")
+        <</parameters.trusted-registries>>
+
+        echo "Running hadolint with the following options..."
+        echo "$IGNORE_RULES"
+        echo "$TRUSTED_REGISTRIES"
+
+        hadolint<<#parameters.ignore-rules>> $IGNORE_RULES<</parameters.ignore-rules>> \
+          <<#parameters.trusted-registries>>$TRUSTED_REGISTRIES <</parameters.trusted-registries>><<parameters.dockerfile>>
+
+  - store_artifacts:
+      path: <<parameters.dockerfile>>

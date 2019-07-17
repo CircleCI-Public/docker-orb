@@ -48,10 +48,6 @@ jobs:
       - build-tools/install-ci-tools
       - jq/install
 
-      - node/install:
-          install-yarn: false
-          debug: true
-
       - unless:
           condition: <<parameters.test-all-in-one-command>>
           steps:
@@ -71,7 +67,6 @@ jobs:
                       version: <<parameters.goss-version>>
                       debug: <<parameters.debug>>
 
-
       - when:
           condition: <<parameters.test-all-in-one-command>>
           steps:
@@ -82,10 +77,6 @@ jobs:
                 install-goss-dgoss: <<parameters.install-goss>>
                 goss-version: <<parameters.goss-version>>
                 debug: <<parameters.debug>>
-
-      - docker/dockerlint:
-          debug: true
-          dockerfile: test.Dockerfile
 
 integration-dev_filters: &integration-dev_filters
   branches:

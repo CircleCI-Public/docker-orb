@@ -48,8 +48,8 @@ steps:
         echo "$IGNORE_RULES"
         echo "$TRUSTED_REGISTRIES"
 
-        hadolint<<#parameters.ignore-rules>> "$IGNORE_RULES"<</parameters.ignore-rules>> \
-          <<#parameters.trusted-registries>>"$TRUSTED_REGISTRIES" <</parameters.trusted-registries>><<parameters.dockerfile>>
+        hadolint<<#parameters.ignore-rules>> $IGNORE_RULES<</parameters.ignore-rules>> \
+          <<#parameters.trusted-registries>>$TRUSTED_REGISTRIES <</parameters.trusted-registries>><<parameters.dockerfile>>
 
   - store_artifacts:
       path: <<parameters.dockerfile>>

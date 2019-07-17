@@ -1,0 +1,20 @@
+description: Hadolint Docker image
+
+parameters:
+  tag:
+    type: string
+    default: latest-debian
+    description: >
+      Specific Hadolint image (make sure to use a `debian` tag,
+      otherwise image will not be usable on CircleCI):
+      https://hub.docker.com/r/hadolint/hadolint/tags
+
+  resource-class:
+    type: enum
+    default: small
+    enum: [small, medium, medium+, large, xlarge]
+
+resource_class: <<parameters.resource-class>>
+
+docker:
+  - image: hadolint/hadolint:<<parameters.tag>>

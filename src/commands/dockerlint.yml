@@ -1,7 +1,14 @@
 description: >
-  Lint a given Dockerfile (requires NPM)
+  Install hadolint and lint a given Dockerfile
 
 parameters:
+  version:
+    type: string
+    default: latest
+    description: >
+      Version of hadolint to install, defaults to the latest release:
+      https://github.com/hadolint/hadolint/releases
+
   dockerfile:
     type: string
     default: Dockerfile

@@ -3,6 +3,25 @@ description: >
   https://hub.docker.com/r/hadolint/hadolint
 
 parameters:
+  checkout:
+    type: boolean
+    default: true
+    description: Checkout as a first step? Default is true
+
+  attach-workspace:
+    type: boolean
+    default: false
+    description: >
+      Boolean for whether or not to attach to an existing workspace,
+      default is false
+
+  workspace-root:
+    type: string
+    default: workspace
+    description: >
+      Workspace root path that is either an absolute path or a path relative
+      to the working directory
+
   dockerfile:
     type: string
     default: Dockerfile
@@ -29,7 +48,16 @@ parameters:
 executor: hadolint
 
 steps:
-  - checkout
+  - when:
+      condition: <<parameters.checkout>>
+      steps:
+        - checkout
+
+  - when:
+      condition: <<parameters.attach-workspace>>
+      steps:
+        - attach_workspace:
+            at: <<parameters.workspace-root>>
 
   - run:
       name: Lint <<parameters.dockerfile>> with hadolint

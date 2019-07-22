@@ -161,7 +161,7 @@ workflows:
           name: hadolint-dev
           ignore-rules: DL4005,DL3008,DL3009,DL3015
           trusted-registries: docker.io,my-company.com:5000
-          dockerfile: test.Dockerfile,test2.Dockerfile
+          dockerfiles: test.Dockerfile,test2.Dockerfile
           filters: *integration-dev_filters
 
       # build/publish
@@ -386,7 +386,7 @@ workflows:
           name: hadolint-master
           ignore-rules: DL4005,DL3008,DL3009,DL3015
           trusted-registries: docker.io,my-company.com:5000
-          dockerfile: test.Dockerfile,test2.Dockerfile
+          dockerfiles: test.Dockerfile,test2.Dockerfile
           filters: *integration-master_filters
 
       # build/publish

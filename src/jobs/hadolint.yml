@@ -49,7 +49,7 @@ parameters:
 
   artifacts-path:
     type: string
-    default: ~/
+    default: ~/project
     description: >
       Relative or absolute path to directory to store as job artifacts.
 

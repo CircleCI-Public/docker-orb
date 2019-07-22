@@ -6,4 +6,5 @@ description: >
   https://github.com/CircleCI-Public/docker-orb
 
 orbs:
+  bt: circleci/build-tools@2.6.3
   orb-tools: circleci/orb-tools@8.8.0

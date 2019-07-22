@@ -56,6 +56,8 @@ parameters:
 executor: hadolint
 
 steps:
+  - bt/install-ci-tools
+
   - when:
       condition: <<parameters.checkout>>
       steps:
@@ -93,7 +95,7 @@ steps:
         for ((i=0;i<END;i++)); do
           DOCKERFILE="${arrDOCKERFILES[i]}"
 
-          hadolint<<#parameters.ignore-rules>> "$IGNORE_RULES"<</parameters.ignore-rules>> <<#parameters.trusted-registries>>"$TRUSTED_REGISTRIES" <</parameters.trusted-registries>>"$DOCKERFILE"
+          hadolint<<#parameters.ignore-rules>> $IGNORE_RULES<</parameters.ignore-rules>> <<#parameters.trusted-registries>>$TRUSTED_REGISTRIES <</parameters.trusted-registries>>$DOCKERFILE
         done
 
   - store_artifacts:

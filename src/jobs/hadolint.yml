@@ -22,13 +22,15 @@ parameters:
       Workspace root path that is either an absolute path or a path relative
       to the working directory
 
-  dockerfile:
+  dockerfiles:
     type: string
     default: Dockerfile
     description: >
-      Relative or absolute path, including name, to Dockerfile to be linted,
-      e.g., `~/project/app/deploy.Dockerfile`, defaults to a Dockerfile
-      named `Dockerfile` in the working directory
+      Relative or absolute path, including name, to Dockerfile(s) to be
+      linted, e.g., `~/project/app/deploy.Dockerfile`, defaults to a
+      Dockerfile named `Dockerfile` in the working directory. To lint
+      multiple Dockerfiles, pass a comma-separated string, e.g.,
+      `~/project/app/deploy.Dockerfile,~/project/app/test.Dockerfile`.
 
   ignore-rules:
     type: string
@@ -76,8 +78,18 @@ steps:
         echo "$IGNORE_RULES"
         echo "$TRUSTED_REGISTRIES"
 
-        hadolint<<#parameters.ignore-rules>> $IGNORE_RULES<</parameters.ignore-rules>> \
-          <<#parameters.trusted-registries>>$TRUSTED_REGISTRIES <</parameters.trusted-registries>><<parameters.dockerfile>>
+        DOCKERFILES=<<parameters.dockerfiles>>
+
+        # use comma delimiters to create array
+        arrDOCKERFILES=(${DOCKERFILES//,/ })
+        let END=${#arrDOCKERFILES[@]}
+
+        for ((i=0;i<END;i++)); do
+          DOCKERFILE="${arrDOCKERFILES[i]}"
+
+          hadolint<<#parameters.ignore-rules>> "$IGNORE_RULES"<</parameters.ignore-rules>> \
+            <<#parameters.trusted-registries>>"$TRUSTED_REGISTRIES" <</parameters.trusted-registries>>"$DOCKERFILE"
+        done
 
   - store_artifacts:
       path: <<parameters.dockerfile>>

@@ -62,7 +62,7 @@ steps:
             at: <<parameters.workspace-root>>
 
   - run:
-      name: Lint <<parameters.dockerfile>> with hadolint
+      name: Lint <<parameters.dockerfiles>> with hadolint
       command: |
         <<#parameters.ignore-rules>>
         IGNORE_STRING=<<parameters.ignore-rules>>
@@ -92,4 +92,4 @@ steps:
         done
 
   - store_artifacts:
-      path: <<parameters.dockerfile>>
+      path: ~/

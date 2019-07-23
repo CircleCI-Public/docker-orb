@@ -96,6 +96,8 @@ steps:
           DOCKERFILE="${arrDOCKERFILES[i]}"
 
           hadolint<<#parameters.ignore-rules>> $IGNORE_RULES<</parameters.ignore-rules>> <<#parameters.trusted-registries>>$TRUSTED_REGISTRIES <</parameters.trusted-registries>>$DOCKERFILE
+
+          echo "Success! $DOCKERFILE linted; no issues found"
         done
 
   - store_artifacts:

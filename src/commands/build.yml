@@ -54,6 +54,13 @@ parameters:
       Extra flags to pass to docker build. For examples, see
       https://docs.docker.com/engine/reference/commandline/build
 
+  cache_from:
+    type: string
+    default: ""
+    description: >
+      Comma separated list of containers to pull before build for --cache-from
+      https://docs.docker.com/engine/reference/commandline/build/
+
   debug:
     type: boolean
     default: false
@@ -69,11 +76,22 @@ steps:
             dockerfile: <<parameters.path>>/<<parameters.dockerfile>>
             debug: <<parameters.debug>>
 
-  - run:
-      name: <<parameters.step-name>>
-      command: |
-        docker build \
-          <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
-          -f <<parameters.path>>/<<parameters.dockerfile>> -t \
-          <<parameters.registry>>/<< parameters.image>>:<<parameters.tag>> \
-          <<parameters.path>>
+  - when:
+      condition: <<parameters.cache_from>>
+      steps:
+        - run: |
+            docker build \
+              <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
+              --cache-from <<parameters.cache_from>> \
+              -f <<parameters.path>>/<<parameters.dockerfile>> -t \
+              <<parameters.registry>>/<< parameters.image>>:<<parameters.tag>> \
+              <<parameters.path>>
+  - unless:
+      condition: <<parameters.cache_from>>
+      steps:
+        - run: |
+            docker build \
+              <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
+              -f <<parameters.path>>/<<parameters.dockerfile>> -t \
+              <<parameters.registry>>/<< parameters.image>>:<<parameters.tag>> \
+              <<parameters.path>>

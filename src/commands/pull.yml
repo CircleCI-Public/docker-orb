@@ -1,0 +1,17 @@
+description: Pull one or more Docker images from a registry
+
+parameters:
+  containers:
+    type: string
+    default: ""
+    description: Comma separated list of containers to pull
+
+steps:
+  - when:
+      condition: <<parameters.containers>>
+      steps:
+        - run: |
+            echo "<<parameters.containers>>" | sed -n 1'p' | tr ',' '\n' | while read container; do
+              echo "Pulling ${container}";
+              docker pull ${container};
+            done

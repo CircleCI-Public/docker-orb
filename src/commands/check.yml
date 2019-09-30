@@ -31,6 +31,6 @@ steps:
   - run:
       name: Docker login
       command: |
-        docker login \
-          -u "$<<parameters.docker-username>>" -p "$<<parameters.docker-password>>" \
+        echo "$<<parameters.docker-password>>" | docker login \
+          --username "$<<parameters.docker-username>>" --password-stdin \
           <<parameters.registry>>

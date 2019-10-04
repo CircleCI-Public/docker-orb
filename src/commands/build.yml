@@ -16,7 +16,7 @@ parameters:
     type: string
     default: .
     description: >
-      Path to the directory containing your Dockerfile and build context,
+      Path to the directory containing your Dockerfile,
       defaults to . (working directory)
 
   lint-dockerfile:
@@ -59,7 +59,15 @@ parameters:
     default: false
     description: >
       Extra output for orb developers
-
+      
+  docker-context:
+    type: string
+    default: .
+    description: >
+      Path to the directory containing your build context,
+      defaults to . (working directory)     
+      
+      
 steps:
   - when:
       condition: <<parameters.lint-dockerfile>>
@@ -76,4 +84,4 @@ steps:
           <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
           -f <<parameters.path>>/<<parameters.dockerfile>> -t \
           <<parameters.registry>>/<< parameters.image>>:<<parameters.tag>> \
-          <<parameters.path>>
+          <<parameters.docker-context>>

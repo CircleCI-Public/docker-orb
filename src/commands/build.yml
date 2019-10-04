@@ -29,8 +29,8 @@ parameters:
     type: boolean
     default: false
     description: >
-     If linting Dockerfile, treat linting warnings as errors (would trigger
-     an exist code and fail the CircleCI job)?
+      If linting Dockerfile, treat linting warnings as errors (would trigger
+      an exit code and fail the CircleCI job)?
 
   registry:
     type: string
@@ -46,6 +46,15 @@ parameters:
     type: string
     default: $CIRCLE_SHA1
     description: Image tag, defaults to the value of $CIRCLE_SHA1
+
+  cache-from:
+    type: string
+    default: ""
+    description: >
+      Images to consider as cache sources. Specified as comma separated values of
+      image and tag syntax.
+      Example, node:13,python:latest,openjdk:12,gcr.io/google-containers/busybox.
+      Please see, https://docs.docker.com/engine/reference/commandline/build/
 
   extra_build_args:
     type: string
@@ -72,7 +81,13 @@ steps:
   - run:
       name: <<parameters.step-name>>
       command: |
+        IFS="," read -ra CACHE_FROM_IMAGES \<<< "<< parameters.cache-from >>"
+        for image in "${CACHE_FROM_IMAGES[@]}"; do
+          docker pull $image || echo "Failed to pull the specified image: $image. Ignoring..."
+        done
+
         docker build \
+          --cache-from "<<parameters.cache-from>>" \
           <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
           -f <<parameters.path>>/<<parameters.dockerfile>> -t \
           <<parameters.registry>>/<< parameters.image>>:<<parameters.tag>> \

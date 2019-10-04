@@ -63,6 +63,13 @@ parameters:
       Extra flags to pass to docker build. For examples, see
       https://docs.docker.com/engine/reference/commandline/build
 
+  cache_from:
+    type: string
+    default: ""
+    description: >
+      Comma separated list of containers to pull before build for --cache-from
+      https://docs.docker.com/engine/reference/commandline/build/
+
   debug:
     type: boolean
     default: false

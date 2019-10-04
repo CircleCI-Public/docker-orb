@@ -80,6 +80,11 @@ steps:
       condition: <<parameters.cache_from>>
       steps:
         - run: |
+            echo "<<parameters.cache_from>>" | sed -n 1'p' | tr ',' '\n' | while read container; do
+              echo "Pulling ${container}";
+              docker pull ${container};
+            done
+
             docker build \
               <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
               --cache-from <<parameters.cache_from>> \

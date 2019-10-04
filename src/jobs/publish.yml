@@ -125,13 +125,6 @@ steps:
             docker-password: <<parameters.docker-password>>
 
   - when:
-      name: Pull containers for cache_from
-      condition: <<parameters.cache_from>>
-      steps:
-        - pull:
-            containers: <<parameters.cache_from>>
-
-  - when:
       name: Run before_build lifecycle hook steps
       condition: <<parameters.before_build>>
       steps: <<parameters.before_build>>

@@ -64,6 +64,13 @@ parameters:
       Extra flags to pass to docker build. For examples, see
       https://docs.docker.com/engine/reference/commandline/build
 
+  cache_from:
+    type: string
+    default: ""
+    description: >
+      Comma separated list of containers to pull before build for --cache-from
+      https://docs.docker.com/engine/reference/commandline/build/
+
   after_checkout:
     description: Optional steps to run after checking out the code
     type: steps
@@ -128,6 +135,7 @@ steps:
       registry: <<parameters.registry>>
       image: <<parameters.image>>
       tag: <<parameters.tag>>
+      cache_from: <<parameters.cache_from>>
       extra_build_args: <<parameters.extra_build_args>>
       lint-dockerfile: <<parameters.lint-dockerfile>>
       treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>

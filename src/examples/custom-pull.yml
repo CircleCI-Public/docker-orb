@@ -1,0 +1,21 @@
+description: >
+  Use the pull command to pull one or more Docker containers
+usage:
+  version: 2.1
+
+  orbs:
+    docker: circleci/docker@x.y.z
+
+    jobs:
+      pull:
+        executor: docker/machine
+        steps:
+          - checkout
+
+          - docker/pull:
+              containers: ubuntu:16.04,ubuntu:18.04
+
+  workflows:
+    pull-containers:
+      jobs:
+        - pull

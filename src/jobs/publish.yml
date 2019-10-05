@@ -39,8 +39,8 @@ parameters:
     type: boolean
     default: false
     description: >
-     If linting Dockerfile, treat linting warnings as errors (would trigger
-     an exist code and fail the CircleCI job)?
+      If linting Dockerfile, treat linting warnings as errors (would trigger
+      an exit code and fail the CircleCI job)?
 
   image:
     type: string
@@ -56,6 +56,17 @@ parameters:
     default: docker.io
     description: >
       Name of registry to use, defaults to docker.io
+
+  cache_from:
+    type: string
+    default: ""
+    description: >
+      Images to consider as cache sources. Specified as comma separated values of
+      image and tag syntax. An implicit `docker pull` will be done for each image
+      specific to fetch the image. Thus, an explicit `docker pull` does not need
+      to be done.
+      For example, node:13,python:latest,openjdk:12,gcr.io/google-containers/busybox.
+      Please see https://docs.docker.com/engine/reference/commandline/build/
 
   extra_build_args:
     type: string
@@ -128,6 +139,7 @@ steps:
       registry: <<parameters.registry>>
       image: <<parameters.image>>
       tag: <<parameters.tag>>
+      cache_from: <<parameters.cache_from>>
       extra_build_args: <<parameters.extra_build_args>>
       lint-dockerfile: <<parameters.lint-dockerfile>>
       treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>

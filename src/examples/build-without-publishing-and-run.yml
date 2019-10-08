@@ -1,0 +1,29 @@
+description: >
+  Build, but don't publish, an image using the check and build commands and run image
+
+usage:
+  version: 2.1
+
+  orbs:
+    docker: circleci/docker@x.y.z
+
+  jobs:
+    check-and-build-run:
+      executor: docker/machine
+      steps:
+        - checkout
+
+        - docker/check
+
+        - docker/build:
+            image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+
+        - docker/run:
+            image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+            options: -e MY_ENV:my_env_var_value
+            command: echo $MY_ENV
+
+  workflows:
+    build-docker-image-run:
+      jobs:
+        - check-and-build-run

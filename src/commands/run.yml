@@ -1,0 +1,38 @@
+description: Run a docker container with a command
+
+parameters:
+  step-name:
+    type: string
+    default: Docker run
+    description: Specify a custom step name for this command, if desired
+
+  registry:
+    type: string
+    default: docker.io
+    description: >
+      Name of registry to use, defaults to docker.io
+
+  image:
+    type: string
+    description: Name of image to run
+
+  tag:
+    type: string
+    default: $CIRCLE_SHA1
+    description: Image tag, defaults to the value of $CIRCLE_SHA1
+
+  options:
+    type: string
+    default: ""
+    description: >
+      Any options you need to pass to the run command for example mounting volumes or exposing ports. Defaults to none.
+
+  command:
+    type: string
+    description: The command to run within your container
+
+steps:
+  - deploy:
+      name: <<parameters.step-name>>
+      command: |
+        docker run --rm <<parameters.registry>>/<< parameters.image>>:<<parameters.tag>> <<parameters.options>> <<parameters.command>>

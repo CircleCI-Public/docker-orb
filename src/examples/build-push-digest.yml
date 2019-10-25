@@ -19,8 +19,6 @@ usage:
             image: my_repo/orb-test
         - docker/push:
             image: my_repo/orb-test
-        - docker/push:
-            image: my_repo/orb-test
             digest-path: /tmp/digest.txt
         - run:
             command: |

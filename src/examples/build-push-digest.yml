@@ -1,0 +1,30 @@
+description: >
+  Build and push an image, save the digest to a file
+  and echo the file.
+
+usage:
+  version: 2.1
+
+  orbs:
+    docker: circleci/docker@x.y.z
+
+  jobs:
+    build-and-push:
+      executor: docker/docker
+      steps:
+        - setup_remote_docker
+        - checkout
+        - docker/check
+        - docker/build:
+            image: my_repo/orb-test
+        - docker/push:
+            image: my_repo/orb-test
+            digest-path: /tmp/digest.txt
+        - run:
+            command: |
+              echo "Digest is: $(</tmp/digest.txt)"
+
+  workflows:
+    commit:
+      jobs:
+        - build-and-push

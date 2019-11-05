@@ -76,16 +76,18 @@ steps:
         DOCKER_BINARY_URL="https://download.docker.com/$PLATFORM/static/stable/x86_64/docker-$DOCKER_VERSION_NUMBER.tgz"
 
         # download binary tarball
-        curl --output docker.tgz \
+        DOWNLOAD_DIR="$(mktemp -d)"
+        DOWNLOAD_FILE="${DOWNLOAD_DIR}/docker.tgz"
+        curl --output "$DOWNLOAD_FILE" \
           --silent --show-error --location --fail --retry 3 \
           "$DOCKER_BINARY_URL"
 
-        tar xf docker.tgz && rm -f docker.tgz
+        tar xf "$DOWNLOAD_FILE" -C "$DOWNLOAD_DIR" && rm -f "$DOWNLOAD_FILE"
 
         # install Docker binaries
-        BINARIES=$(ls docker)
-        $SUDO mv docker/* <<parameters.install-dir>>
-        $SUDO rm -rf docker
+        BINARIES=$(ls "${DOWNLOAD_DIR}/docker")
+        $SUDO mv "$DOWNLOAD_DIR"/docker/* <<parameters.install-dir>>
+        $SUDO rm -rf "$DOWNLOAD_DIR"
 
         for binary in $BINARIES
         do

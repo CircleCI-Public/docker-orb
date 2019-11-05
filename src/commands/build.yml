@@ -83,7 +83,7 @@ steps:
         - run: |
             echo "<<parameters.cache_from>>" | sed -n 1'p' | tr ',' '\n' | while read image; do
               echo "Pulling ${image}";
-              docker pull ${image} || exit 0
+              docker pull ${image} || true
             done
 
             docker build \

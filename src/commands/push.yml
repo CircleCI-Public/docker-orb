@@ -21,8 +21,18 @@ parameters:
     default: $CIRCLE_SHA1
     description: Image tag, defaults to the value of $CIRCLE_SHA1
 
+  digest-path:
+    type: string
+    description: The path to save the RepoDigest of the pushed image
+    default: ""
+
 steps:
   - deploy:
       name: <<parameters.step-name>>
       command: |
         docker push <<parameters.registry>>/<< parameters.image>>:<<parameters.tag>>
+
+        if [ -n "<<parameters.digest-path>>" ]; then
+          mkdir -p "$(dirname <<parameters.digest-path>>)"
+          docker image inspect --format="{{index .RepoDigests 0}}" <<parameters.registry>>/<< parameters.image>>:<<parameters.tag>> > "<<parameters.digest-path>>"
+        fi

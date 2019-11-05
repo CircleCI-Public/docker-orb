@@ -29,8 +29,8 @@ parameters:
     type: boolean
     default: false
     description: >
-     If linting Dockerfile, treat linting warnings as errors (would trigger
-     an exist code and fail the CircleCI job)?
+      If linting Dockerfile, treat linting warnings as errors (would trigger
+      an exist code and fail the CircleCI job)?
 
   registry:
     type: string
@@ -54,20 +54,27 @@ parameters:
       Extra flags to pass to docker build. For examples, see
       https://docs.docker.com/engine/reference/commandline/build
 
+  cache_from:
+    type: string
+    default: ""
+    description: >
+      Comma-separated list of images, images will first be pulled, then
+      passed as the --cache-from build argument
+      https://docs.docker.com/engine/reference/commandline/build/
+
   debug:
     type: boolean
     default: false
     description: >
       Extra output for orb developers
-      
+
   docker-context:
     type: string
     default: .
     description: >
       Path to the directory containing your build context,
-      defaults to . (working directory)     
-      
-      
+      defaults to . (working directory)
+
 steps:
   - when:
       condition: <<parameters.lint-dockerfile>>
@@ -77,11 +84,27 @@ steps:
             dockerfile: <<parameters.path>>/<<parameters.dockerfile>>
             debug: <<parameters.debug>>
 
-  - run:
-      name: <<parameters.step-name>>
-      command: |
-        docker build \
-          <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
-          -f <<parameters.path>>/<<parameters.dockerfile>> -t \
-          <<parameters.registry>>/<< parameters.image>>:<<parameters.tag>> \
-          <<parameters.docker-context>>
+  - when:
+      condition: <<parameters.cache_from>>
+      steps:
+        - run: |
+            echo "<<parameters.cache_from>>" | sed -n 1'p' | tr ',' '\n' | while read image; do
+              echo "Pulling ${image}";
+              docker pull ${image} || true
+            done
+
+            docker build \
+              <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
+              --cache-from <<parameters.cache_from>> \
+              -f <<parameters.path>>/<<parameters.dockerfile>> -t \
+              <<parameters.registry>>/<< parameters.image>>:<<parameters.tag>> \
+              <<parameters.docker-context>>
+  - unless:
+      condition: <<parameters.cache_from>>
+      steps:
+        - run: |
+            docker build \
+              <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
+              -f <<parameters.path>>/<<parameters.dockerfile>> -t \
+              <<parameters.registry>>/<< parameters.image>>:<<parameters.tag>> \
+              <<parameters.docker-context>>

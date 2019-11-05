@@ -1,0 +1,15 @@
+description: >
+  Build/publish a Docker image using --cache-from
+usage:
+  version: 2.1
+
+  orbs:
+    docker: circleci/docker@x.y.z
+
+  workflows:
+    build-docker-image-only:
+      jobs:
+        - docker/publish:
+            image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+            tag: latest
+            cache_from: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME:latest

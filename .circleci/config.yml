@@ -77,6 +77,18 @@ jobs:
                 install-goss-dgoss: <<parameters.install-goss>>
                 goss-version: <<parameters.goss-version>>
                 debug: <<parameters.debug>>
+  test-pull:
+    executor: orb-tools/node-cci
+
+    steps:
+      - setup_remote_docker
+
+      - docker/pull:
+          images: cimg/base:stable,ubuntu:18.04
+
+      - docker/pull:
+          images: cimg/base:stable,cimg/base:not_exists,cimg/go:stable
+          ignore-docker-pull-error: true
 
 integration-dev_filters: &integration-dev_filters
   branches:
@@ -94,7 +106,9 @@ prod-deploy_requires: &prod-deploy_requires
   [
     hadolint-master,
     publish-machine-master,
-    publish-docker-master,
+    publish-docker-cache-from-master,
+    publish-docker-cache-not-found-master,
+    test-pull-master,
     latest-alpine-master,
     older-alpine-master,
     latest-machine-master,
@@ -182,9 +196,41 @@ workflows:
           use-remote-docker: true
           dockerfile: test.Dockerfile
           image: circlecipublic/docker-orb-test
-          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
+          tag: dev-$CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
+          filters: *integration-dev_filters
+
+      - docker/publish:
+          name: publish-docker-cache-from-dev
+          requires:
+            - publish-docker-dev
+          executor: docker/docker
+          context: orb-publishing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: circlecipublic/docker-orb-test
+          tag: dev-$CIRCLE_SHA1
+          cache_from: circlecipublic/docker-orb-test:dev-$CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          filters: *integration-dev_filters
+
+      - docker/publish:
+          name: publish-docker-cache-not-found-dev
+          executor: docker/docker
+          context: orb-publishing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: circlecipublic/docker-orb-test
+          tag: dev-$CIRCLE_SHA1-2
+          cache_from: circlecipublic/docker-orb-test:not-exists
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          filters: *integration-dev_filters
+
+      - test-pull:
+          name: test-pull-dev
           filters: *integration-dev_filters
 
       # alpine
@@ -407,9 +453,41 @@ workflows:
           use-remote-docker: true
           dockerfile: test.Dockerfile
           image: circlecipublic/docker-orb-test
-          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
+          tag: $CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
+          filters: *integration-master_filters
+
+      - docker/publish:
+          name: publish-docker-cache-from-master
+          requires:
+            - publish-docker-master
+          executor: docker/docker
+          context: orb-publishing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: circlecipublic/docker-orb-test
+          tag: $CIRCLE_SHA1
+          cache_from: circlecipublic/docker-orb-test:$CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          filters: *integration-master_filters
+
+      - docker/publish:
+          name: publish-docker-cache-not-found-master
+          executor: docker/docker
+          context: orb-publishing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: circlecipublic/docker-orb-test
+          tag: $CIRCLE_SHA1-2
+          cache_from: circlecipublic/docker-orb-test:not-exists
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          filters: *integration-master_filters
+
+      - test-pull:
+          name: test-pull-master
           filters: *integration-master_filters
 
       # alpine

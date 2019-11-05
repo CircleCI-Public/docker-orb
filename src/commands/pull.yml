@@ -1,17 +1,21 @@
 description: Pull one or more Docker images from a registry
 
 parameters:
-  containers:
+  images:
     type: string
     default: ""
-    description: Comma separated list of containers to pull
+    description: Comma separated list of images to pull
+  ignore-docker-pull-error:
+    type: boolean
+    default: false
+    description: Ignores errors from docker pull command
 
 steps:
   - when:
-      condition: <<parameters.containers>>
+      condition: <<parameters.images>>
       steps:
         - run: |
-            echo "<<parameters.containers>>" | sed -n 1'p' | tr ',' '\n' | while read container; do
-              echo "Pulling ${container}";
-              docker pull ${container};
+            echo "<<parameters.images>>" | sed -n 1'p' | tr ',' '\n' | while read image; do
+              echo "Pulling ${image}";
+              docker pull ${image} <<#parameters.ignore-docker-pull-error>>|| exit 0<</parameters.ignore-docker-pull-error>>
             done

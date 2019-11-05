@@ -68,7 +68,7 @@ parameters:
     type: string
     default: ""
     description: >
-      Comma separated list of containers to pull before build for --cache-from
+      Comma separated list of images to pull before build for --cache-from
       https://docs.docker.com/engine/reference/commandline/build/
 
   after_checkout:

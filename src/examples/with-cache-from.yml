@@ -11,4 +11,5 @@ usage:
       jobs:
         - docker/publish:
             image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
-            cache_from: ubuntu:18.04,ubuntu:16.04
+            tag: latest
+            cache_from: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME:latest

@@ -58,7 +58,7 @@ parameters:
     type: string
     default: ""
     description: >
-      Comma separated list of containers, images will first be pulled, then
+      Comma separated list of images, images will first be pulled, then
       passed as the --cache-from build argument
       https://docs.docker.com/engine/reference/commandline/build/
 
@@ -81,9 +81,9 @@ steps:
       condition: <<parameters.cache_from>>
       steps:
         - run: |
-            echo "<<parameters.cache_from>>" | sed -n 1'p' | tr ',' '\n' | while read container; do
-              echo "Pulling ${container}";
-              docker pull ${container};
+            echo "<<parameters.cache_from>>" | sed -n 1'p' | tr ',' '\n' | while read image; do
+              echo "Pulling ${image}";
+              docker pull ${image} || exit 0
             done
 
             docker build \

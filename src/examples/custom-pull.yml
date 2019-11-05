@@ -1,5 +1,5 @@
 description: >
-  Use the pull command to pull one or more Docker containers
+  Use the pull command to pull one or more Docker images
 usage:
   version: 2.1
 
@@ -13,9 +13,9 @@ usage:
           - checkout
 
           - docker/pull:
-              containers: ubuntu:16.04,ubuntu:18.04
+              images: ubuntu:16.04,ubuntu:18.04
 
   workflows:
-    pull-containers:
+    pull-images:
       jobs:
         - pull

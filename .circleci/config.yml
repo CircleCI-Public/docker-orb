@@ -94,7 +94,7 @@ prod-deploy_requires: &prod-deploy_requires
   [
     hadolint-master,
     publish-machine-master,
-    publish-docker-master,
+    publish-docker-cache-from-master,
     latest-alpine-master,
     older-alpine-master,
     latest-machine-master,
@@ -182,7 +182,22 @@ workflows:
           use-remote-docker: true
           dockerfile: test.Dockerfile
           image: circlecipublic/docker-orb-test
-          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
+          tag: dev-$CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          filters: *integration-dev_filters
+
+      - docker/publish:
+          name: publish-docker-cache-from-dev
+          requires:
+            - publish-docker-dev
+          executor: docker/docker
+          context: orb-publishing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: circlecipublic/docker-orb-test
+          tag: dev-$CIRCLE_SHA1
+          cache_from: circlecipublic/docker-orb-test:$CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           filters: *integration-dev_filters
@@ -407,10 +422,25 @@ workflows:
           use-remote-docker: true
           dockerfile: test.Dockerfile
           image: circlecipublic/docker-orb-test
-          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
+          tag: $CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           filters: *integration-master_filters
+
+      - docker/publish:
+          name: publish-docker-cache-from-master
+          requires:
+            - publish-docker-master
+          executor: docker/docker
+          context: orb-publishing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: circlecipublic/docker-orb-test
+          tag: $CIRCLE_SHA1
+          cache_from: circlecipublic/docker-orb-test:$CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          filters: *integration-dev_filters
 
       # alpine
       - test:

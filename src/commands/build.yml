@@ -58,7 +58,7 @@ parameters:
     type: string
     default: ""
     description: >
-      Comma separated list of containers, images will first be pulled, then 
+      Comma separated list of containers, images will first be pulled, then
       passed as the --cache-from build argument
       https://docs.docker.com/engine/reference/commandline/build/
 

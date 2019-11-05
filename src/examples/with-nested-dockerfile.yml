@@ -12,4 +12,4 @@ usage:
         - docker/publish:
             image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
             path: dockerfiles/prod
-            docker-context: ../..
+            docker-context: .

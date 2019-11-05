@@ -4,7 +4,7 @@ parameters:
   images:
     type: string
     default: ""
-    description: Comma separated list of images to pull
+    description: Comma-separated list of images to pull
   ignore-docker-pull-error:
     type: boolean
     default: false

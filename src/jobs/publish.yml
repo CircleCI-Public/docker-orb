@@ -39,8 +39,8 @@ parameters:
     type: boolean
     default: false
     description: >
-     If linting Dockerfile, treat linting warnings as errors (would trigger
-     an exist code and fail the CircleCI job)?
+      If linting Dockerfile, treat linting warnings as errors (would trigger
+      an exist code and fail the CircleCI job)?
 
   image:
     type: string
@@ -132,6 +132,7 @@ steps:
   - build:
       dockerfile: <<parameters.dockerfile>>
       path: <<parameters.path>>
+      docker-context: <<parameters.docker-context>>
       registry: <<parameters.registry>>
       image: <<parameters.image>>
       tag: <<parameters.tag>>

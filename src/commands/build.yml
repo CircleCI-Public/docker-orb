@@ -67,6 +67,19 @@ parameters:
     default: false
     description: >
       Extra output for orb developers
+ 
+  persistence:
+    type: boolean
+    default: false
+    description: >
+      add a folder/files from a previous step
+  
+  attach-location:
+    type: string
+    default: ./
+    description: >
+      attach_workspace location
+
 
 steps:
   - when:
@@ -76,6 +89,15 @@ steps:
             treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>
             dockerfile: <<parameters.path>>/<<parameters.dockerfile>>
             debug: <<parameters.debug>>
+
+  - when:
+      condition: <<parameters.persistence>>
+      parameters:
+        attach-location:
+          type: string
+      steps:
+        - attach_workspace:
+              at: <<parameters.attach-location>> 
 
   - when:
       condition: <<parameters.cache_from>>

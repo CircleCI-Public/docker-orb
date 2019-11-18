@@ -229,7 +229,7 @@ workflows:
           docker-password: DOCKER_PASS
           filters: *integration-dev_filters
 
-        - docker/publish:
+      - docker/publish:
           name: publish-multiple-tag-dev
           executor: docker/docker
           context: orb-publishing

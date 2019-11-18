@@ -19,7 +19,7 @@ parameters:
   tag:
     type: string
     default: $CIRCLE_SHA1
-    description: Image tag, defaults to the value of $CIRCLE_SHA1
+    description: Comma-separated list of image tag, defaults to the value of $CIRCLE_SHA1
 
   digest-path:
     type: string
@@ -30,7 +30,10 @@ steps:
   - deploy:
       name: <<parameters.step-name>>
       command: |
-        docker push <<parameters.registry>>/<< parameters.image>>:<<parameters.tag>>
+        IFS="," read -ra DOCKER_TAGS \<<< "<< parameters.tag >>"
+        for tag in "${DOCKER_TAGS[@]}"; do
+          docker push <<parameters.registry>>/<< parameters.image>>:${tag}
+        done
 
         if [ -n "<<parameters.digest-path>>" ]; then
           mkdir -p "$(dirname <<parameters.digest-path>>)"

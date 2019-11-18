@@ -108,6 +108,8 @@ steps:
               docker_tag_args="$docker_tag_args -t $<<parameters.registry>>/<<parameters.image>>:${tag}"
             done
 
+            echo "$docker_tag_args"
+
             docker build \
               <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
               -f <<parameters.path>>/<<parameters.dockerfile>> \

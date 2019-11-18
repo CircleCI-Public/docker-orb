@@ -105,7 +105,7 @@ steps:
             docker_tag_args=""
             IFS="," read -ra DOCKER_TAGS \<<< "<< parameters.tag >>"
             for tag in "${DOCKER_TAGS[@]}"; do
-              docker_tag_args="$docker_tag_args -t $<<parameters.registry>>/<<parameters.image>>:${tag}"
+              docker_tag_args='"$docker_tag_args" -t "$<<parameters.registry>>/<<parameters.image>>:${tag}"'
             done
 
             echo "$docker_tag_args"

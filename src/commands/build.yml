@@ -86,18 +86,30 @@ steps:
               docker pull ${image} || true
             done
 
+            docker_tag_args=""
+            IFS="," read -ra DOCKER_TAGS \<<< "<< parameters.tag >>"
+            for tag in "${DOCKER_TAGS[@]}"; do
+              docker_tag_args="$docker_tag_args -t $<<parameters.registry>>/<<parameters.image>>:${tag}"
+            done
+
             docker build \
               <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
               --cache-from <<parameters.cache_from>> \
-              -f <<parameters.path>>/<<parameters.dockerfile>> -t \
-              <<parameters.registry>>/<< parameters.image>>:<<parameters.tag>> \
+              -f <<parameters.path>>/<<parameters.dockerfile>> \
+              $docker_tag_args \
               <<parameters.path>>
   - unless:
       condition: <<parameters.cache_from>>
       steps:
         - run: |
+            docker_tag_args=""
+            IFS="," read -ra DOCKER_TAGS \<<< "<< parameters.tag >>"
+            for tag in "${DOCKER_TAGS[@]}"; do
+              docker_tag_args="$docker_tag_args -t $<<parameters.registry>>/<<parameters.image>>:${tag}"
+            done
+
             docker build \
               <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
-              -f <<parameters.path>>/<<parameters.dockerfile>> -t \
-              <<parameters.registry>>/<< parameters.image>>:<<parameters.tag>> \
+              -f <<parameters.path>>/<<parameters.dockerfile>> \
+              $docker_tag_args
               <<parameters.path>>

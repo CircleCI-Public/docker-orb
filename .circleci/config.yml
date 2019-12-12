@@ -202,6 +202,19 @@ workflows:
           filters: *integration-dev_filters
 
       - docker/publish:
+          name: publish-docker-with-dlc
+          executor: docker/docker
+          context: orb-publishing
+          use-remote-docker: true
+          remote-docker-dlc: true
+          dockerfile: test.Dockerfile
+          image: circlecipublic/docker-orb-test
+          tag: dev-$CIRCLE_SHA1-dlc
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          filters: *integration-dev_filters
+
+      - docker/publish:
           name: publish-docker-cache-from-dev
           requires:
             - publish-docker-dev

@@ -229,6 +229,18 @@ workflows:
           docker-password: DOCKER_PASS
           filters: *integration-dev_filters
 
+      - docker/publish:
+          name: publish-multiple-tag-dev
+          executor: docker/docker
+          context: orb-publishing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: circlecipublic/docker-orb-test
+          tag: dev,$CIRCLE_SHA1,dev-${CIRCLE_SHA1}
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          filters: *integration-dev_filters
+
       - test-pull:
           name: test-pull-dev
           filters: *integration-dev_filters

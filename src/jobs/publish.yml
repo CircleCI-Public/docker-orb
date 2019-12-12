@@ -49,7 +49,7 @@ parameters:
   tag:
     type: string
     default: $CIRCLE_SHA1
-    description: Image tag, defaults to the value of $CIRCLE_SHA1
+    description: Comma-separated list of image tags, defaults to the value of $CIRCLE_SHA1
 
   registry:
     type: string

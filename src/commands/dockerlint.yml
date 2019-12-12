@@ -1,14 +1,7 @@
 description: >
-  Install hadolint and lint a given Dockerfile
+  Install dockerlint and lint a given Dockerfile
 
 parameters:
-  version:
-    type: string
-    default: latest
-    description: >
-      Version of hadolint to install, defaults to the latest release:
-      https://github.com/hadolint/hadolint/releases
-
   dockerfile:
     type: string
     default: Dockerfile
@@ -21,7 +14,7 @@ parameters:
     type: boolean
     default: false
     description: >
-      Treat linting warnings as errors (would trigger an exist code and
+      Treat linting warnings as errors (would trigger an exit code and
       fail the CircleCI job)?
 
   debug:

@@ -17,6 +17,13 @@ parameters:
       Setup a remote Docker engine for Docker commands? Only required
       if using a Docker-based executor
 
+  remote-docker-dlc:
+    type: boolean
+    default: false
+    description: >
+     Enable docker layer caching if using remote Docker engine.
+     Defaults to false.
+
   dockerfile:
     type: string
     default: Dockerfile
@@ -114,7 +121,8 @@ steps:
   - when:
       condition: <<parameters.use-remote-docker>>
       steps:
-        - setup_remote_docker
+        - setup_remote_docker:
+            docker_layer_caching: <<parameters.remote-docker-dlc>>
 
   - when:
       condition: <<parameters.deploy>>

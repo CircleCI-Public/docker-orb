@@ -1,0 +1,16 @@
+description: >
+  Build, deploy, and update the description of a Docker image with a non-standard description file
+
+usage:
+  version: 2.1
+
+  orbs:
+    docker: circleci/docker@x.y.z
+
+  workflows:
+    build-and-publish-docker-image:
+      jobs:
+        - docker/publish:
+            readme: my.README.md
+            path: path/to/Docker/build/context
+            image:  $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME

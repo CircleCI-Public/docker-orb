@@ -1,0 +1,55 @@
+description: Update a Docker image's description on Docker Hub
+
+parameters:
+  readme:
+    type: string
+    default: README.md
+    description: Name of the file containing the image description to update, defaults to README.md
+
+  path:
+    type: string
+    default: .
+    description: >
+      Path to the directory containing your Dockerfile and build context,
+      defaults to . (working directory)
+
+  registry:
+    type: string
+    default: docker.io
+    description: >
+      Name of registry to use, defaults to docker.io
+
+  image:
+    type: string
+    description: Name of image to push
+
+  docker-username:
+    type: env_var_name
+    default: DOCKER_LOGIN
+    description: >
+      Name of environment variable storing your Docker username
+
+  docker-password:
+    type: env_var_name
+    default: DOCKER_PASSWORD
+    description: >
+      Name of environment variable storing your Docker password
+
+steps:
+  - deploy:
+      name: Update description
+      command: |
+        if [ "<<parameters.registry>>" != "docker.io" ]; then
+          echo "Registry is not set to Docker Hub. Exiting"
+          exit 1
+        fi
+        DESCRIPTION="<<parameters.path>>/<<parameters.readme>>"
+        PAYLOAD="username=$<<parameters.docker-username>>&password=$<<parameters.docker-password>>"
+        JWT=$(curl -s -d $PAYLOAD https://hub.docker.com/v2/users/login/ | jq -r .token)
+        HEADER="Authorization: JWT $JWT"
+        URL="https://hub.docker.com/v2/repositories/<<parameters.image>>/"
+        STATUS=$(curl -s -o /dev/null -w %{http_code} -X PATCH -H "$HEADER" --data-urlencode full_description@$DESCRIPTION $URL)
+        if [ $STATUS -ne 200 ]; then
+          echo "Could not update image description"
+          exit 1
+        fi

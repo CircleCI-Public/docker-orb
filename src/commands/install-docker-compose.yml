@@ -53,6 +53,9 @@ steps:
           echo "Selected version of docker-compose is $DOCKER_COMPOSE_VERSION"
         fi
 
+        # extract docker-compose version number
+        DOCKER_COMPOSE_VERSION=`echo $DOCKER_COMPOSE_VERSION | grep -o -E "(\d+\.)+\d+"`
+
         # check if docker-compose needs to be installed
         if command -v docker-compose >> /dev/null 2>&1; then
           if docker-compose --version | grep "$DOCKER_COMPOSE_VERSION" >> /dev/null 2>&1; then

@@ -81,7 +81,7 @@ steps:
       condition: <<parameters.cache_from>>
       steps:
         - run:
-            name: Docker build
+            name: <<parameters.step-name>>
             command: |
               echo "<<parameters.cache_from>>" | sed -n 1'p' | tr ',' '\n' | while read image; do
                 echo "Pulling ${image}";
@@ -104,7 +104,7 @@ steps:
       condition: <<parameters.cache_from>>
       steps:
         - run:
-            name: Docker build
+            name: <<parameters.step-name>>
             command: |
               docker_tag_args=""
 

@@ -196,18 +196,21 @@ workflows:
       - test-credentials-store:
           name: test-credentials-store-docker
           executor: docker/docker
+          context: orb-publishing
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
 
       - test-credentials-store:
           name: test-credentials-store-machine
           executor: orb-tools/machine
+          context: orb-publishing
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
 
       - test-credentials-store:
           name: test-credentials-store-macos
           executor: orb-tools/macos
+          context: orb-publishing
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
 

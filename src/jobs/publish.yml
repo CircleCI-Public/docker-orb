@@ -64,6 +64,13 @@ parameters:
     description: >
       Name of registry to use, defaults to docker.io
 
+  use-docker-credentials-store:
+    type: boolean
+    default: false
+    description: >
+      Configure Docker to use a credentials store.
+      This option is only supported on Ubuntu/Debian platforms.
+
   extra_build_args:
     type: string
     default: ""
@@ -123,6 +130,12 @@ steps:
       steps:
         - setup_remote_docker:
             docker_layer_caching: <<parameters.remote-docker-dlc>>
+
+  - when:
+      condition: <<parameters.use-docker-credentials-store>>
+      steps:
+        - install-docker-credential-helper
+        - configure-docker-credentials-store
 
   - when:
       condition: <<parameters.deploy>>

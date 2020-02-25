@@ -225,10 +225,9 @@ workflows:
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
           pre-steps:
-            - docker/install-docker-credential-helper
-            - docker/configure-docker-credentials-store
-            # Test that it's OK to invoke them twice
+            # Test that it's OK to invoke the commands twice
             - docker/install-docker-credential-helper
             - docker/configure-docker-credentials-store
 
@@ -242,6 +241,7 @@ workflows:
           tag: $CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
 
       - docker/publish:
           name: publish-docker-cache

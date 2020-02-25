@@ -228,6 +228,9 @@ workflows:
           pre-steps:
             - docker/install-docker-credential-helper
             - docker/configure-docker-credentials-store
+            # Test that it's OK to invoke them twice
+            - docker/install-docker-credential-helper
+            - docker/configure-docker-credentials-store
 
       - docker/publish:
           name: publish-docker
@@ -254,8 +257,10 @@ workflows:
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           pre-steps:
-            - docker/install-docker-credential-helper
-            - docker/configure-docker-credentials-store
+            - docker/install-docker-credential-helper:
+                release-tag: v0.6.3
+            - docker/configure-docker-credentials-store:
+                helper-name: pass
 
       - docker/publish:
           name: publish-docker-cache-not-found

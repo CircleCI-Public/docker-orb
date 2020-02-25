@@ -2,9 +2,12 @@ version: 2.1
 
 description: >
   Quickly and easily install/configure/use Docker, `dockerize`, and
-  `docker-compose` in any CircleCI job. See this orb's source:
-  https://github.com/CircleCI-Public/docker-orb
+  `docker-compose` in any CircleCI job.
+
+display:
+  source_url: https://github.com/CircleCI-Public/docker-orb
 
 orbs:
   bt: circleci/build-tools@2.6.3
+  jq: circleci/jq@1.9
   orb-tools: circleci/orb-tools@8.8.0

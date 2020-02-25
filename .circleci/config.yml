@@ -101,9 +101,38 @@ jobs:
           images: cimg/base:stable,cimg/base:not_exists,cimg/go:stable
           ignore-docker-pull-error: true
 
+  test-credentials-store:
+    parameters:
+      executor:
+        type: executor
+      docker-username:
+        type: env_var_name
+      docker-password:
+        type: env_var_name
+    executor: <<parameters.executor>>
+
+    steps:
+      - docker/install-docker-credential-helper
+      - docker/configure-docker-credentials-store
+      - run:
+          name: Test login
+          command: |
+            LOGIN_RESULT=$(echo "$<<parameters.docker-password>>" \
+            | docker login -u "$<<parameters.docker-username>>" --password-stdin)
+            set -x
+            echo "$LOGIN_RESULT" | grep "Login Succeeded"
+            set +x
+            if echo "$LOGIN_RESULT" | grep -q "WARNING"; then
+            echo "Error - warning found in login result"
+            exit 1
+            fi
+
 promotion_requires: &promotion_requires
   [
     hadolint,
+    test-credentials-store-docker,
+    test-credentials-store-machine,
+    test-credentials-store-macos,
     publish-machine,
     publish-docker-cache,
     publish-docker-cache-not-found,
@@ -163,6 +192,25 @@ workflows:
           trusted-registries: docker.io,my-company.com:5000
           dockerfiles: test.Dockerfile,test2.Dockerfile
 
+      # login with credentials store
+      - test-credentials-store:
+          name: test-credentials-store-docker
+          executor: docker/docker
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+
+      - test-credentials-store:
+          name: test-credentials-store-machine
+          executor: orb-tools/machine
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+
+      - test-credentials-store:
+          name: test-credentials-store-macos
+          executor: orb-tools/macos
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+
       # build/publish
       - docker/publish:
           name: publish-machine
@@ -172,6 +220,9 @@ workflows:
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
+          pre-steps:
+            - docker/install-docker-credential-helper
+            - docker/configure-docker-credentials-store
 
       - docker/publish:
           name: publish-docker
@@ -197,6 +248,9 @@ workflows:
           cache_from: circlecipublic/docker-orb-test:$CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
+          pre-steps:
+            - docker/install-docker-credential-helper
+            - docker/configure-docker-credentials-store
 
       - docker/publish:
           name: publish-docker-cache-not-found

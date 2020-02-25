@@ -213,6 +213,8 @@ workflows:
           context: orb-publishing
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
+          pre-steps:
+            - docker/install-docker
 
       # build/publish
       - docker/publish:

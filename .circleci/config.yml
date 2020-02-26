@@ -111,7 +111,7 @@ jobs:
         type: env_var_name
       use-docker-credentials-store:
         type: boolean
-      executor: <<parameters.executor>>
+    executor: <<parameters.executor>>
 
     steps:
       - docker/check:

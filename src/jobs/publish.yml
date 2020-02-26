@@ -132,18 +132,13 @@ steps:
             docker_layer_caching: <<parameters.remote-docker-dlc>>
 
   - when:
-      condition: <<parameters.use-docker-credentials-store>>
-      steps:
-        - install-docker-credential-helper
-        - configure-docker-credentials-store
-
-  - when:
       condition: <<parameters.deploy>>
       steps:
         - check:
             registry: <<parameters.registry>>
             docker-username: <<parameters.docker-username>>
             docker-password: <<parameters.docker-password>>
+            use-docker-credentials-store: <<parameters.use-docker-credentials-store>>
 
   - when:
       name: Run before_build lifecycle hook steps

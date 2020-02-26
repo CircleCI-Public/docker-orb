@@ -101,6 +101,24 @@ jobs:
           images: cimg/base:stable,cimg/base:not_exists,cimg/go:stable
           ignore-docker-pull-error: true
 
+  test-check-command:
+    parameters:
+      executor:
+        type: executor
+      docker-username:
+        type: env_var_name
+      docker-password:
+        type: env_var_name
+      use-docker-credentials-store:
+        type: boolean
+      executor: <<parameters.executor>>
+
+    steps:
+      - docker/check:
+          docker-username: <<parameters.docker-username>>
+          docker-password: <<parameters.docker-password>>
+          use-docker-credentials-store: <<parameters.use-docker-credentials-store>>
+
   test-credentials-store:
     parameters:
       executor:
@@ -130,6 +148,9 @@ jobs:
 promotion_requires: &promotion_requires
   [
     hadolint,
+    test-check-command-docker,
+    test-check-command-machine,
+    test-check-command-macos,
     test-credentials-store-docker,
     test-credentials-store-machine,
     test-credentials-store-macos,
@@ -192,7 +213,34 @@ workflows:
           trusted-registries: docker.io,my-company.com:5000
           dockerfiles: test.Dockerfile,test2.Dockerfile
 
-      # login with credentials store
+      # check command
+      - test-check-command:
+          name: test-check-command-docker
+          executor: docker/docker
+          context: orb-publishing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: false
+
+      - test-check-command:
+          name: test-check-command-machine
+          executor: orb-tools/machine
+          context: orb-publishing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
+
+      - test-check-command:
+          name: test-check-command-macos
+          executor: orb-tools/macos
+          context: orb-publishing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
+          pre-steps:
+            - docker/install-docker
+
+      # login with credentials store does not result in warning
       - test-credentials-store:
           name: test-credentials-store-docker
           executor: docker/docker

@@ -101,9 +101,65 @@ jobs:
           images: cimg/base:stable,cimg/base:not_exists,cimg/go:stable
           ignore-docker-pull-error: true
 
+  test-check-command:
+    parameters:
+      executor:
+        type: executor
+      docker-username:
+        type: env_var_name
+      docker-password:
+        type: env_var_name
+      use-docker-credentials-store:
+        type: boolean
+    executor: <<parameters.executor>>
+
+    steps:
+      - docker/check:
+          docker-username: <<parameters.docker-username>>
+          docker-password: <<parameters.docker-password>>
+          use-docker-credentials-store: <<parameters.use-docker-credentials-store>>
+
+  test-credentials-store:
+    parameters:
+      executor:
+        type: executor
+      helper-name:
+        type: enum
+        enum: ["", "pass", "osxkeychain"]
+        default: ""
+      docker-username:
+        type: env_var_name
+      docker-password:
+        type: env_var_name
+    executor: <<parameters.executor>>
+
+    steps:
+      - docker/install-docker-credential-helper:
+          helper-name: <<parameters.helper-name>>
+      - docker/configure-docker-credentials-store:
+          helper-name: <<parameters.helper-name>>
+      - run:
+          name: Test login
+          command: |
+            LOGIN_RESULT=$(echo "$<<parameters.docker-password>>" \
+            | docker login -u "$<<parameters.docker-username>>" --password-stdin)
+            set -x
+            echo "$LOGIN_RESULT" | grep "Login Succeeded"
+            set +x
+            if echo "$LOGIN_RESULT" | grep -q "WARNING"; then
+            echo "Error - warning found in login result"
+            exit 1
+            fi
+
 promotion_requires: &promotion_requires
   [
     hadolint,
+    test-check-command-docker,
+    test-check-command-machine,
+    test-check-command-macos,
+    test-credentials-store-docker,
+    test-credentials-store-machine,
+    test-credentials-store-macos,
     publish-machine,
     publish-docker-cache,
     publish-docker-cache-not-found,
@@ -163,6 +219,58 @@ workflows:
           trusted-registries: docker.io,my-company.com:5000
           dockerfiles: test.Dockerfile,test2.Dockerfile
 
+      # check command
+      - test-check-command:
+          name: test-check-command-docker
+          executor: docker/docker
+          context: orb-publishing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: false
+
+      - test-check-command:
+          name: test-check-command-machine
+          executor: orb-tools/machine
+          context: orb-publishing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
+
+      - test-check-command:
+          name: test-check-command-macos
+          executor: orb-tools/macos
+          context: orb-publishing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
+          pre-steps:
+            - docker/install-docker
+
+      # login with credentials store does not result in warning
+      - test-credentials-store:
+          name: test-credentials-store-docker
+          executor: docker/docker
+          context: orb-publishing
+          helper-name: pass
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+
+      - test-credentials-store:
+          name: test-credentials-store-machine
+          executor: orb-tools/machine
+          context: orb-publishing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+
+      - test-credentials-store:
+          name: test-credentials-store-macos
+          executor: orb-tools/macos
+          context: orb-publishing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          pre-steps:
+            - docker/install-docker
+
       # build/publish
       - docker/publish:
           name: publish-machine
@@ -172,6 +280,11 @@ workflows:
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
+          pre-steps:
+            # Test that it's OK to invoke the commands twice
+            - docker/install-docker-credential-helper
+            - docker/configure-docker-credentials-store
 
       - docker/publish:
           name: publish-docker
@@ -183,6 +296,7 @@ workflows:
           tag: $CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
 
       - docker/publish:
           name: publish-docker-cache
@@ -197,6 +311,11 @@ workflows:
           cache_from: circlecipublic/docker-orb-test:$CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
+          pre-steps:
+            - docker/install-docker-credential-helper:
+                release-tag: v0.6.3
+            - docker/configure-docker-credentials-store:
+                helper-name: pass
 
       - docker/publish:
           name: publish-docker-cache-not-found

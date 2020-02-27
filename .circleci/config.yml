@@ -123,6 +123,10 @@ jobs:
     parameters:
       executor:
         type: executor
+      helper-name:
+        type: enum
+        enum: ["", "pass", "osxkeychain"]
+        default: ""
       docker-username:
         type: env_var_name
       docker-password:
@@ -130,8 +134,10 @@ jobs:
     executor: <<parameters.executor>>
 
     steps:
-      - docker/install-docker-credential-helper
-      - docker/configure-docker-credentials-store
+      - docker/install-docker-credential-helper:
+          helper-name: <<parameters.helper-name>>
+      - docker/configure-docker-credentials-store:
+          helper-name: <<parameters.helper-name>>
       - run:
           name: Test login
           command: |
@@ -245,6 +251,7 @@ workflows:
           name: test-credentials-store-docker
           executor: docker/docker
           context: orb-publishing
+          helper-name: pass
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
 

@@ -47,12 +47,6 @@ parameters:
       `docker.io,my-company.com:5000`); if set, return an error if
       Dockerfiles use any images from registries not included in this list
 
-  artifacts-path:
-    type: string
-    default: ~/project
-    description: >
-      Relative or absolute path to directory to store as job artifacts.
-
 executor: hadolint
 
 steps:
@@ -99,6 +93,3 @@ steps:
 
           echo "Success! $DOCKERFILE linted; no issues found"
         done
-
-  - store_artifacts:
-      path: <<parameters.artifacts-path>>

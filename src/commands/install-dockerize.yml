@@ -25,11 +25,8 @@ steps:
 
         # grab dockerize version
         if [[ <<parameters.version>> == "latest" ]]; then
-          # extract latest version from GitHub releases API
-          DOCKERIZE_VERSION=$(curl \
-            --silent --show-error --location --fail --retry 3 \
-            https://api.github.com/repos/jwilder/dockerize/releases/latest | \
-            jq '.tag_name' | sed -E 's/"//g')
+          DOCKERIZE_VERSION=$(curl --fail --retry 3 -Ls -o /dev/null -w %{url_effective} "https://github.com/jwilder/dockerize/releases/latest" | sed 's:.*/::')
+          echo "Latest version of dockerize is $DOCKERIZE_VERSION"
         else
           DOCKERIZE_VERSION=<<parameters.version>>
           echo "Selected version of dockerize is $DOCKERIZE_VERSION"

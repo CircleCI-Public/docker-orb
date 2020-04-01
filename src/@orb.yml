@@ -10,4 +10,4 @@ display:
 orbs:
   bt: circleci/build-tools@2.6.3
   jq: circleci/jq@2.0
-  orb-tools: circleci/orb-tools@8.8.0
+  orb-tools: circleci/orb-tools@9.1

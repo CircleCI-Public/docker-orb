@@ -329,6 +329,19 @@ workflows:
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
 
+      - docker/publish:
+          name: publish-docker-update-description
+          executor: docker/docker
+          context: orb-publishing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: circlecipublic/docker-orb-test
+          tag: $CIRCLE_SHA1
+          cache_from: circlecipublic/docker-orb-test:$CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          update-description: true
+
       - test-pull
 
       # alpine

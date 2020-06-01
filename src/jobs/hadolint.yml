@@ -29,8 +29,8 @@ parameters:
       Relative or absolute path, including name, to Dockerfile(s) to be
       linted, e.g., `~/project/app/deploy.Dockerfile`, defaults to a
       Dockerfile named `Dockerfile` in the working directory. To lint
-      multiple Dockerfiles, pass a comma-separated string, e.g.,
-      `~/project/app/deploy.Dockerfile,~/project/app/test.Dockerfile`.
+      multiple Dockerfiles, pass a colon-separated string, e.g.,
+      `~/project/app/deploy.Dockerfile:~/project/app/test.Dockerfile`.
 
   ignore-rules:
     type: string
@@ -82,8 +82,8 @@ steps:
 
         DOCKERFILES=<<parameters.dockerfiles>>
 
-        # use comma delimiters to create array
-        arrDOCKERFILES=(${DOCKERFILES//,/ })
+        # use colon delimiters to create array
+        arrDOCKERFILES=(${DOCKERFILES//:/ })
         let END=${#arrDOCKERFILES[@]}
 
         for ((i=0;i<END;i++)); do

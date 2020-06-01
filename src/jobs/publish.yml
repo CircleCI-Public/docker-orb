@@ -117,6 +117,13 @@ parameters:
     description: >
       Name of environment variable storing your Docker password
 
+  docker-context:
+    type: string
+    default: .
+    description: >
+      Path to the directory containing your build context,
+      defaults to . (working directory)
+
 steps:
   - checkout
 

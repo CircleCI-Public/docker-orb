@@ -21,6 +21,13 @@ parameters:
     description: >
       Name of environment variable storing your Docker password
 
+  use-docker-credentials-store:
+    type: boolean
+    default: false
+    description: >
+      Configure Docker to use a credentials store.
+      This option is only supported on Ubuntu/Debian/macOS platforms.
+
 steps:
   - orb-tools/check-env-var-param:
       param: <<parameters.docker-username>>
@@ -28,9 +35,15 @@ steps:
   - orb-tools/check-env-var-param:
       param: <<parameters.docker-password>>
 
+  - when:
+      condition: <<parameters.use-docker-credentials-store>>
+      steps:
+        - install-docker-credential-helper
+        - configure-docker-credentials-store
+
   - run:
       name: Docker login
       command: |
-        docker login \
-          -u "$<<parameters.docker-username>>" -p "$<<parameters.docker-password>>" \
-          <<parameters.registry>>
+        echo "$<<parameters.docker-password>>" \
+          | docker login -u "$<<parameters.docker-username>>" \
+              --password-stdin <<parameters.registry>>

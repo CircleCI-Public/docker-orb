@@ -69,6 +69,13 @@ parameters:
     description: >
       Name of registry to use, defaults to docker.io
 
+  use-docker-credentials-store:
+    type: boolean
+    default: false
+    description: >
+      Configure Docker to use a credentials store.
+      This option is only supported on Ubuntu/Debian platforms.
+
   extra_build_args:
     type: string
     default: ""
@@ -141,6 +148,7 @@ steps:
             registry: <<parameters.registry>>
             docker-username: <<parameters.docker-username>>
             docker-password: <<parameters.docker-password>>
+            use-docker-credentials-store: <<parameters.use-docker-credentials-store>>
 
   - when:
       name: Run before_build lifecycle hook steps

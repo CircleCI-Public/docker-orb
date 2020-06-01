@@ -106,7 +106,7 @@ parameters:
   update-description:
     description: Update the image description on Docker Hub?
     type: boolean
-    default: true
+    default: false # Defaults to false for backwards compatibility.
 
   docker-username:
     type: env_var_name

@@ -1,5 +1,5 @@
 description: >
-  Build and publish, but don't update the description of an image using the publish job
+  Build and publish, and update the description of an image using the publish job
 
 usage:
   version: 2.1
@@ -12,4 +12,4 @@ usage:
       jobs:
         - docker/publish:
             image:  $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
-            update-description: false
+            update-description: true

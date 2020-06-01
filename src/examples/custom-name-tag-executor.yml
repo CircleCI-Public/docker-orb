@@ -19,5 +19,6 @@ usage:
               image: circleci/node
               tag: boron-browsers
             use-remote-docker: true
+            remote-docker-dlc: true
             image:  my/image
             tag: my-tag

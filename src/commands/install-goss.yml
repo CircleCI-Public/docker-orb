@@ -35,11 +35,8 @@ steps:
 
         # determine specified version
         if [[ <<parameters.version>> == latest ]]; then
-          VERSION=$(curl --silent --show-error \
-            --location --fail --retry 3 \
-            https://api.github.com/repos/aelsabbahy/goss/releases/latest | \
-            grep tag_name | cut -d '"' -f 4)
-
+          VERSION=$(curl -Ls --fail --retry 3 -o /dev/null -w %{url_effective} \
+            "https://github.com/aelsabbahy/goss/releases/latest" | sed 's:.*/::')
           echo "Latest version of Goss is $VERSION"
         else
           VERSION=<<parameters.version>>

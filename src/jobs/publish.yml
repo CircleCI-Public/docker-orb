@@ -17,6 +17,13 @@ parameters:
       Setup a remote Docker engine for Docker commands? Only required
       if using a Docker-based executor
 
+  remote-docker-dlc:
+    type: boolean
+    default: false
+    description: >
+     Enable docker layer caching if using remote Docker engine.
+     Defaults to false.
+
   dockerfile:
     type: string
     default: Dockerfile
@@ -49,13 +56,20 @@ parameters:
   tag:
     type: string
     default: $CIRCLE_SHA1
-    description: Image tag, defaults to the value of $CIRCLE_SHA1
+    description: Comma-separated list of image tags, defaults to the value of $CIRCLE_SHA1
 
   registry:
     type: string
     default: docker.io
     description: >
       Name of registry to use, defaults to docker.io
+
+  use-docker-credentials-store:
+    type: boolean
+    default: false
+    description: >
+      Configure Docker to use a credentials store.
+      This option is only supported on Ubuntu/Debian platforms.
 
   extra_build_args:
     type: string
@@ -114,7 +128,8 @@ steps:
   - when:
       condition: <<parameters.use-remote-docker>>
       steps:
-        - setup_remote_docker
+        - setup_remote_docker:
+            docker_layer_caching: <<parameters.remote-docker-dlc>>
 
   - when:
       condition: <<parameters.deploy>>
@@ -123,6 +138,7 @@ steps:
             registry: <<parameters.registry>>
             docker-username: <<parameters.docker-username>>
             docker-password: <<parameters.docker-password>>
+            use-docker-credentials-store: <<parameters.use-docker-credentials-store>>
 
   - when:
       name: Run before_build lifecycle hook steps

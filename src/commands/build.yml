@@ -87,24 +87,40 @@ steps:
   - when:
       condition: <<parameters.cache_from>>
       steps:
-        - run: |
-            echo "<<parameters.cache_from>>" | sed -n 1'p' | tr ',' '\n' | while read image; do
-              echo "Pulling ${image}";
-              docker pull ${image} || true
-            done
+        - run:
+            name: <<parameters.step-name>>
+            command: |
+              echo "<<parameters.cache_from>>" | sed -n 1'p' | tr ',' '\n' | while read image; do
+                echo "Pulling ${image}";
+                docker pull ${image} || true
+              done
 
-            docker build \
-              <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
-              --cache-from <<parameters.cache_from>> \
-              -f <<parameters.path>>/<<parameters.dockerfile>> -t \
-              <<parameters.registry>>/<< parameters.image>>:<<parameters.tag>> \
-              <<parameters.docker-context>>
+              docker_tag_args=""
+
+              IFS="," read -ra DOCKER_TAGS \<<< "<< parameters.tag >>"
+              for tag in "${DOCKER_TAGS[@]}"; do
+                docker_tag_args="$docker_tag_args -t <<parameters.registry>>/<<parameters.image>>:${tag}"
+              done
+
+              docker build <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
+                --cache-from <<parameters.cache_from>> \
+                -f <<parameters.path>>/<<parameters.dockerfile>> \
+                $docker_tag_args \
+                <<parameters.docker-context>>
   - unless:
       condition: <<parameters.cache_from>>
       steps:
-        - run: |
-            docker build \
-              <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
-              -f <<parameters.path>>/<<parameters.dockerfile>> -t \
-              <<parameters.registry>>/<< parameters.image>>:<<parameters.tag>> \
-              <<parameters.docker-context>>
+        - run:
+            name: <<parameters.step-name>>
+            command: |
+              docker_tag_args=""
+
+              IFS="," read -ra DOCKER_TAGS \<<< "<< parameters.tag >>"
+              for tag in "${DOCKER_TAGS[@]}"; do
+                docker_tag_args="$docker_tag_args -t <<parameters.registry>>/<<parameters.image>>:${tag}"
+              done
+
+              docker build <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
+                -f <<parameters.path>>/<<parameters.dockerfile>> \
+                $docker_tag_args \
+                <<parameters.docker-context>>

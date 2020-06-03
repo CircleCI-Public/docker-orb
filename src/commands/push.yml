@@ -37,5 +37,6 @@ steps:
 
         if [ -n "<<parameters.digest-path>>" ]; then
           mkdir -p "$(dirname <<parameters.digest-path>>)"
-          docker image inspect --format="{{index .RepoDigests 0}}" <<parameters.registry>>/<< parameters.image>>:<<parameters.tag>> > "<<parameters.digest-path>>"
+          IFS="," read -ra DOCKER_TAGS \<<< "<< parameters.tag >>"
+          docker image inspect --format="{{index .RepoDigests 0}}" <<parameters.registry>>/<< parameters.image>>:"${DOCKER_TAGS[0]}" > "<<parameters.digest-path>>"
         fi

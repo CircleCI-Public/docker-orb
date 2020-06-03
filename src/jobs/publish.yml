@@ -29,6 +29,11 @@ parameters:
     default: Dockerfile
     description: Name of dockerfile to use, defaults to Dockerfile
 
+  readme:
+    type: string
+    default: README.md
+    description: Name of the file containing the image description to update, defaults to README.md
+
   path:
     type: string
     default: .
@@ -105,6 +110,11 @@ parameters:
     type: boolean
     default: true
 
+  update-description:
+    description: Update the image description on Docker Hub?
+    type: boolean
+    default: false # Defaults to false for backwards compatibility.
+
   docker-username:
     type: env_var_name
     default: DOCKER_LOGIN
@@ -173,3 +183,14 @@ steps:
             registry: <<parameters.registry>>
             image: <<parameters.image>>
             tag: <<parameters.tag>>
+
+  - when:
+      condition: <<parameters.update-description>>
+      steps:
+        - update-description:
+            readme: <<parameters.readme>>
+            path: <<parameters.path>>
+            registry: <<parameters.registry>>
+            image: <<parameters.image>>
+            docker-username: <<parameters.docker-username>>
+            docker-password: <<parameters.docker-password>>

@@ -128,7 +128,6 @@ steps:
   - checkout
 
   - when:
-      name: Run after_checkout lifecycle hook steps
       condition: <<parameters.after_checkout>>
       steps: <<parameters.after_checkout>>
 
@@ -148,7 +147,6 @@ steps:
             use-docker-credentials-store: <<parameters.use-docker-credentials-store>>
 
   - when:
-      name: Run before_build lifecycle hook steps
       condition: <<parameters.before_build>>
       steps: <<parameters.before_build>>
 
@@ -165,7 +163,6 @@ steps:
       treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>
 
   - when:
-      name: Run after_build lifecycle hook steps
       condition: <<parameters.after_build>>
       steps: <<parameters.after_build>>
 

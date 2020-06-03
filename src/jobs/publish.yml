@@ -29,6 +29,11 @@ parameters:
     default: Dockerfile
     description: Name of dockerfile to use, defaults to Dockerfile
 
+  readme:
+    type: string
+    default: README.md
+    description: Name of the file containing the image description to update, defaults to README.md
+
   path:
     type: string
     default: .
@@ -46,8 +51,8 @@ parameters:
     type: boolean
     default: false
     description: >
-     If linting Dockerfile, treat linting warnings as errors (would trigger
-     an exist code and fail the CircleCI job)?
+      If linting Dockerfile, treat linting warnings as errors (would trigger
+      an exist code and fail the CircleCI job)?
 
   image:
     type: string
@@ -105,6 +110,11 @@ parameters:
     type: boolean
     default: true
 
+  update-description:
+    description: Update the image description on Docker Hub?
+    type: boolean
+    default: false # Defaults to false for backwards compatibility.
+
   docker-username:
     type: env_var_name
     default: DOCKER_LOGIN
@@ -117,11 +127,17 @@ parameters:
     description: >
       Name of environment variable storing your Docker password
 
+  docker-context:
+    type: string
+    default: .
+    description: >
+      Path to the directory containing your build context,
+      defaults to . (working directory)
+
 steps:
   - checkout
 
   - when:
-      name: Run after_checkout lifecycle hook steps
       condition: <<parameters.after_checkout>>
       steps: <<parameters.after_checkout>>
 
@@ -141,13 +157,13 @@ steps:
             use-docker-credentials-store: <<parameters.use-docker-credentials-store>>
 
   - when:
-      name: Run before_build lifecycle hook steps
       condition: <<parameters.before_build>>
       steps: <<parameters.before_build>>
 
   - build:
       dockerfile: <<parameters.dockerfile>>
       path: <<parameters.path>>
+      docker-context: <<parameters.docker-context>>
       registry: <<parameters.registry>>
       image: <<parameters.image>>
       tag: <<parameters.tag>>
@@ -157,7 +173,6 @@ steps:
       treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>
 
   - when:
-      name: Run after_build lifecycle hook steps
       condition: <<parameters.after_build>>
       steps: <<parameters.after_build>>
 
@@ -168,3 +183,14 @@ steps:
             registry: <<parameters.registry>>
             image: <<parameters.image>>
             tag: <<parameters.tag>>
+
+  - when:
+      condition: <<parameters.update-description>>
+      steps:
+        - update-description:
+            readme: <<parameters.readme>>
+            path: <<parameters.path>>
+            registry: <<parameters.registry>>
+            image: <<parameters.image>>
+            docker-username: <<parameters.docker-username>>
+            docker-password: <<parameters.docker-password>>

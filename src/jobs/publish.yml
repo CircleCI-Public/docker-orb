@@ -182,7 +182,7 @@ steps:
   - when:
       condition: <<parameters.update-description>>
       steps:
-        - update:
+        - update-description:
             readme: <<parameters.readme>>
             path: <<parameters.path>>
             registry: <<parameters.registry>>

@@ -67,18 +67,21 @@ parameters:
     default: false
     description: >
       Extra output for orb developers
- 
-  persistence:
+
+  use-workspace:
     type: boolean
     default: false
     description: >
-      add a folder/files from a previous step
-  
-  attach-location:
+      Mount folder/files that were `persist_to_workspace` in a previous step.
+      https://circleci.com/docs/2.0/configuration-reference/#persist_to_workspace
+
+  attach-at:
     type: string
     default: ./
     description: >
-      attach_workspace location
+      `attach_workspace` attached location - where to mount folder/files that were `persist_to_workspace` in a previous step.
+      https://circleci.com/docs/2.0/configuration-reference/#attach_workspace
+
 
 
   docker-context:
@@ -98,13 +101,13 @@ steps:
             debug: <<parameters.debug>>
 
   - when:
-      condition: <<parameters.persistence>>
+      condition: <<parameters.use-workspace>>
       parameters:
-        attach-location:
+        attach-at:
           type: string
       steps:
         - attach_workspace:
-              at: <<parameters.attach-location>> 
+              at: <<parameters.attach-at>>
 
   - when:
       condition: <<parameters.cache_from>>

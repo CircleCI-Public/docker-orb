@@ -127,17 +127,19 @@ parameters:
     description: >
       Name of environment variable storing your Docker password
 
-  persistence:
+  use-workspace:
     type: boolean
     default: false
     description: >
-      add a folder/files from a previous step
+      Mount folder/files that were `persist_to_workspace` in a previous step.
+      https://circleci.com/docs/2.0/configuration-reference/#persist_to_workspace
 
-  attach-location:
+  attach-at:
     type: string
     default: ./
     description: >
-      attach_workspace location
+      `attach_workspace` attached location - where to mount folder/files that were `persist_to_workspace` in a previous step.
+      https://circleci.com/docs/2.0/configuration-reference/#attach_workspace
 
   docker-context:
     type: string
@@ -160,13 +162,13 @@ steps:
             docker_layer_caching: <<parameters.remote-docker-dlc>>
 
   - when:
-      condition: <<parameters.persistence>>
+      condition: <<parameters.use-workspace>>
       parameters:
-        attach-location:
+        attach-at:
           type: string
       steps:
         - attach_workspace:
-              at: <<parameters.attach-location>>
+              at: <<parameters.attach-at>>
 
   - when:
       condition: <<parameters.deploy>>

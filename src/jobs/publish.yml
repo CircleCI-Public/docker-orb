@@ -17,10 +17,22 @@ parameters:
       Setup a remote Docker engine for Docker commands? Only required
       if using a Docker-based executor
 
+  remote-docker-dlc:
+    type: boolean
+    default: false
+    description: >
+     Enable docker layer caching if using remote Docker engine.
+     Defaults to false.
+
   dockerfile:
     type: string
     default: Dockerfile
     description: Name of dockerfile to use, defaults to Dockerfile
+
+  readme:
+    type: string
+    default: README.md
+    description: Name of the file containing the image description to update, defaults to README.md
 
   path:
     type: string
@@ -39,8 +51,8 @@ parameters:
     type: boolean
     default: false
     description: >
-     If linting Dockerfile, treat linting warnings as errors (would trigger
-     an exist code and fail the CircleCI job)?
+      If linting Dockerfile, treat linting warnings as errors (would trigger
+      an exist code and fail the CircleCI job)?
 
   image:
     type: string
@@ -49,13 +61,20 @@ parameters:
   tag:
     type: string
     default: $CIRCLE_SHA1
-    description: Image tag, defaults to the value of $CIRCLE_SHA1
+    description: Comma-separated list of image tags, defaults to the value of $CIRCLE_SHA1
 
   registry:
     type: string
     default: docker.io
     description: >
       Name of registry to use, defaults to docker.io
+
+  use-docker-credentials-store:
+    type: boolean
+    default: false
+    description: >
+      Configure Docker to use a credentials store.
+      This option is only supported on Ubuntu/Debian platforms.
 
   extra_build_args:
     type: string
@@ -91,6 +110,11 @@ parameters:
     type: boolean
     default: true
 
+  update-description:
+    description: Update the image description on Docker Hub?
+    type: boolean
+    default: false # Defaults to false for backwards compatibility.
+
   docker-username:
     type: env_var_name
     default: DOCKER_LOGIN
@@ -108,26 +132,32 @@ parameters:
     default: false
     description: >
       add a folder/files from a previous step
-  
+
   attach-location:
     type: string
     default: ./
     description: >
       attach_workspace location
 
+  docker-context:
+    type: string
+    default: .
+    description: >
+      Path to the directory containing your build context,
+      defaults to . (working directory)
 
 steps:
   - checkout
 
   - when:
-      name: Run after_checkout lifecycle hook steps
       condition: <<parameters.after_checkout>>
       steps: <<parameters.after_checkout>>
 
   - when:
       condition: <<parameters.use-remote-docker>>
       steps:
-        - setup_remote_docker
+        - setup_remote_docker:
+            docker_layer_caching: <<parameters.remote-docker-dlc>>
 
   - when:
       condition: <<parameters.persistence>>
@@ -136,7 +166,7 @@ steps:
           type: string
       steps:
         - attach_workspace:
-              at: <<parameters.attach-location>> 
+              at: <<parameters.attach-location>>
 
   - when:
       condition: <<parameters.deploy>>
@@ -145,15 +175,16 @@ steps:
             registry: <<parameters.registry>>
             docker-username: <<parameters.docker-username>>
             docker-password: <<parameters.docker-password>>
+            use-docker-credentials-store: <<parameters.use-docker-credentials-store>>
 
   - when:
-      name: Run before_build lifecycle hook steps
       condition: <<parameters.before_build>>
       steps: <<parameters.before_build>>
 
   - build:
       dockerfile: <<parameters.dockerfile>>
       path: <<parameters.path>>
+      docker-context: <<parameters.docker-context>>
       registry: <<parameters.registry>>
       image: <<parameters.image>>
       tag: <<parameters.tag>>
@@ -163,7 +194,6 @@ steps:
       treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>
 
   - when:
-      name: Run after_build lifecycle hook steps
       condition: <<parameters.after_build>>
       steps: <<parameters.after_build>>
 
@@ -174,3 +204,14 @@ steps:
             registry: <<parameters.registry>>
             image: <<parameters.image>>
             tag: <<parameters.tag>>
+
+  - when:
+      condition: <<parameters.update-description>>
+      steps:
+        - update-description:
+            readme: <<parameters.readme>>
+            path: <<parameters.path>>
+            registry: <<parameters.registry>>
+            image: <<parameters.image>>
+            docker-username: <<parameters.docker-username>>
+            docker-password: <<parameters.docker-password>>

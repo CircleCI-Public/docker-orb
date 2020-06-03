@@ -26,28 +26,8 @@ steps:
 
         # grab docker-compose version
         if [[ <<parameters.version>> == "latest" ]]; then
-          # extract latest version from GitHub releases API
-          declare -i INDEX=0
-
-          while :
-          do
-            INDEX_VERSION=$(curl --silent --show-error --location --fail --retry 3 \
-              https://api.github.com/repos/docker/compose/releases | \
-              jq --argjson index "$INDEX" '.[$index].name')
-
-            # filter out betas & release candidates
-            if [[ $(echo "$INDEX_VERSION" | grep -v beta | grep -v rc) ]]; then
-
-              # strip leading/trailing quotes
-              # can't use substring expression < 0 on macOS
-              DOCKER_COMPOSE_VERSION="${INDEX_VERSION:1:$((${#INDEX_VERSION} - 1 - 1))}"
-
-              echo "Latest stable version of docker-compose is $DOCKER_COMPOSE_VERSION"
-              break
-            else
-              INDEX=INDEX+1
-            fi
-          done
+          DOCKER_COMPOSE_VERSION=$(curl -Ls --fail --retry 3 -o /dev/null -w %{url_effective} "https://github.com/docker/compose/releases/latest" | sed 's:.*/::')
+          echo "Latest stable version of docker-compose is $DOCKER_COMPOSE_VERSION"
         else
           DOCKER_COMPOSE_VERSION=<<parameters.version>>
           echo "Selected version of docker-compose is $DOCKER_COMPOSE_VERSION"
@@ -86,30 +66,41 @@ steps:
             --silent --show-error --location --fail --retry 3 \
             "$DOCKER_COMPOSE_BINARY_URL"
 
-          # just try doing it this way since some of the actual checksum files are malformatted anyway
-          DOCKER_COMPOSE_RELEASE_BODY=$(curl \
-            --silent --show-error --location --fail --retry 3 \
-            "https://api.github.com/repos/docker/compose/releases/tags/$DOCKER_COMPOSE_VERSION" | \
-            jq '.body')
+          curl --output docker-compose.sha256 \
+          --silent --show-error --location --fail --retry 3 \
+          "$DOCKER_COMPOSE_SHASUM_URL"
 
-          if [[ $(echo $DOCKER_COMPOSE_RELEASE_BODY | \
-            grep -o -e "\`................................................................\` | \`docker-compose-$PLATFORM-x86_64") ]]; then
+          set +e
+          grep "docker-compose-$PLATFORM-x86_64" docker-compose.sha256 | sha256sum -c -
+          SHASUM_SUCCESS=$?
+          set -e
 
-            SHASUM_STRING=$(echo $DOCKER_COMPOSE_RELEASE_BODY | \
-              grep -o -e "\`................................................................\` | \`docker-compose-$PLATFORM-x86_64" | \
-              sed -E 's/`|\|//g')
-          elif [[ $(echo $DOCKER_COMPOSE_RELEASE_BODY | \
-            grep -o -e "\`docker-compose-$PLATFORM-x86_64\` | \`................................................................") ]]; then
+          if [[ "$SHASUM_SUCCESS" -ne "0" ]]; then
+            # in case of malformatted checksum file, use checksum in release description
+            DOCKER_COMPOSE_RELEASE_BODY=$(curl \
+              --silent --show-error --location --fail --retry 3 \
+              "https://api.github.com/repos/docker/compose/releases/tags/$DOCKER_COMPOSE_VERSION" | \
+              jq '.body')
 
-            SHASUM_STRING=$(echo $DOCKER_COMPOSE_RELEASE_BODY | \
-              grep -o -e "\`docker-compose-$PLATFORM-x86_64\` | \`................................................................" | \
-              sed -E 's/`|\|//g')
+            if [[ $(echo $DOCKER_COMPOSE_RELEASE_BODY | \
+              grep -o -e "\`................................................................\` | \`docker-compose-$PLATFORM-x86_64") ]]; then
+
+              SHASUM_STRING=$(echo $DOCKER_COMPOSE_RELEASE_BODY | \
+                grep -o -e "\`................................................................\` | \`docker-compose-$PLATFORM-x86_64" | \
+                sed -E 's/`|\|//g')
+            elif [[ $(echo $DOCKER_COMPOSE_RELEASE_BODY | \
+              grep -o -e "\`docker-compose-$PLATFORM-x86_64\` | \`................................................................") ]]; then
+
+              SHASUM_STRING=$(echo $DOCKER_COMPOSE_RELEASE_BODY | \
+                grep -o -e "\`docker-compose-$PLATFORM-x86_64\` | \`................................................................" | \
+                sed -E 's/`|\|//g')
+            fi
+
+            SHASUM=$(echo "$SHASUM_STRING" | sed -E "s/docker-compose-$PLATFORM-x86_64| //g")
+
+            # verify shasum
+            echo "$SHASUM  docker-compose-$PLATFORM-x86_64" | sha256sum -c
           fi
-
-          SHASUM=$(echo "$SHASUM_STRING" | sed -E "s/docker-compose-$PLATFORM-x86_64| //g")
-
-          # verify shasum
-          echo "$SHASUM  docker-compose-$PLATFORM-x86_64" | sha256sum -c
 
           # install docker-compose
           $SUDO mv "docker-compose-$PLATFORM-x86_64" <<parameters.install-dir>>/docker-compose

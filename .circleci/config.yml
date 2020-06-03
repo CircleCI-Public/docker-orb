@@ -3,9 +3,20 @@ version: 2.1
 orbs:
   build-tools: circleci/build-tools@2.5.0
   docker: circleci/docker@dev:alpha
-  jq: circleci/jq@1.9.0
+  jq: circleci/jq@2.0
   node: circleci/node@1.1.3
-  orb-tools: circleci/orb-tools@8.27.3
+  orb-tools: circleci/orb-tools@9.0
+
+# Pipeline parameters
+parameters:
+  # These pipeline parameters are required by the "trigger-integration-tests-workflow"
+  # job, by default.
+  run-integration-tests:
+    type: boolean
+    default: false
+  dev-orb-version:
+    type: string
+    default: "dev:alpha"
 
 jobs:
   test:
@@ -90,53 +101,98 @@ jobs:
           images: cimg/base:stable,cimg/base:not_exists,cimg/go:stable
           ignore-docker-pull-error: true
 
-integration-dev_filters: &integration-dev_filters
-  branches:
-    ignore: /.*/
-  tags:
-    only: /integration-.*/
+  test-check-command:
+    parameters:
+      executor:
+        type: executor
+      docker-username:
+        type: env_var_name
+      docker-password:
+        type: env_var_name
+      use-docker-credentials-store:
+        type: boolean
+    executor: <<parameters.executor>>
 
-integration-master_filters: &integration-master_filters
-  branches:
-    ignore: /.*/
-  tags:
-    only: /master-.*/
+    steps:
+      - docker/check:
+          docker-username: <<parameters.docker-username>>
+          docker-password: <<parameters.docker-password>>
+          use-docker-credentials-store: <<parameters.use-docker-credentials-store>>
 
-prod-deploy_requires: &prod-deploy_requires
+  test-credentials-store:
+    parameters:
+      executor:
+        type: executor
+      helper-name:
+        type: enum
+        enum: ["", "pass", "osxkeychain"]
+        default: ""
+      docker-username:
+        type: env_var_name
+      docker-password:
+        type: env_var_name
+    executor: <<parameters.executor>>
+
+    steps:
+      - docker/install-docker-credential-helper:
+          helper-name: <<parameters.helper-name>>
+      - docker/configure-docker-credentials-store:
+          helper-name: <<parameters.helper-name>>
+      - run:
+          name: Test login
+          command: |
+            LOGIN_RESULT=$(echo "$<<parameters.docker-password>>" \
+            | docker login -u "$<<parameters.docker-username>>" --password-stdin)
+            set -x
+            echo "$LOGIN_RESULT" | grep "Login Succeeded"
+            set +x
+            if echo "$LOGIN_RESULT" | grep -q "WARNING"; then
+            echo "Error - warning found in login result"
+            exit 1
+            fi
+
+promotion_requires: &promotion_requires
   [
-    hadolint-master,
-    publish-machine-master,
-    publish-docker-cache-from-master,
-    publish-docker-cache-not-found-master,
-    test-pull-master,
-    latest-alpine-master,
-    older-alpine-master,
-    latest-machine-master,
-    older-machine-master,
-    latest-mac-master,
-    older-mac-master,
-    latest-docker-master,
-    older-docker-master,
-    latest-ci-docker-master,
-    older-ci-docker-master,
-    latest-alpine-altogether-master,
-    older-alpine-altogether-master,
-    latest-machine-altogether-master,
-    older-machine-altogether-master,
-    latest-mac-altogether-master,
-    older-mac-altogether-master,
-    latest-docker-altogether-master,
-    older-docker-altogether-master,
-    latest-ci-docker-altogether-master,
-    older-ci-docker-altogether-master,
-    latest-oracle-master,
-    older-oracle-master,
-    latest-oracle-altogether-master,
-    older-oracle-altogether-master
+    hadolint,
+    test-check-command-docker,
+    test-check-command-machine,
+    test-check-command-macos,
+    test-credentials-store-docker,
+    test-credentials-store-machine,
+    test-credentials-store-macos,
+    publish-machine,
+    publish-docker-cache,
+    publish-docker-cache-not-found,
+    test-pull,
+    latest-alpine,
+    older-alpine,
+    latest-machine,
+    older-machine,
+    latest-mac,
+    older-mac,
+    latest-docker,
+    older-docker,
+    latest-ci-docker,
+    older-ci-docker,
+    latest-alpine-altogether,
+    older-alpine-altogether,
+    latest-machine-altogether,
+    older-machine-altogether,
+    latest-mac-altogether,
+    older-mac-altogether,
+    latest-docker-altogether,
+    older-docker-altogether,
+    latest-ci-docker-altogether,
+    older-ci-docker-altogether,
+    latest-oracle,
+    older-oracle,
+    latest-oracle-altogether,
+    older-oracle-altogether
   ]
 
 workflows:
   lint_pack-validate_publish-dev:
+    unless: << pipeline.parameters.run-integration-tests >>
     jobs:
       - orb-tools/lint
 
@@ -148,306 +204,90 @@ workflows:
           context: orb-publishing
           requires: [orb-tools/pack]
 
-      - orb-tools/trigger-integration-workflow:
+      - orb-tools/trigger-integration-tests-workflow:
           name: trigger-integration-dev
           context: orb-publishing
-          ssh-fingerprints: d9:97:a8:58:12:13:40:59:48:96:f8:10:be:b8:ba:07
           requires: [orb-tools/publish-dev]
-          filters:
-            branches:
-              ignore: master
-
-      - orb-tools/trigger-integration-workflow:
-          name: trigger-integration-master
-          context: orb-publishing
-          cleanup-tags: true
-          ssh-fingerprints: d9:97:a8:58:12:13:40:59:48:96:f8:10:be:b8:ba:07
-          tag: master
-          requires: [orb-tools/publish-dev]
-          filters:
-            branches:
-              only: master
-
-  integration-tests_dev:
-    jobs:
-      # hadolint
-      - docker/hadolint:
-          name: hadolint-dev
-          ignore-rules: DL4005,DL3008,DL3009,DL3015
-          trusted-registries: docker.io,my-company.com:5000
-          dockerfiles: test.Dockerfile,test2.Dockerfile
-          filters: *integration-dev_filters
-
-      # build/publish
-      - docker/publish:
-          name: publish-machine-dev
-          context: orb-publishing
-          dockerfile: test.Dockerfile
-          image: circlecipublic/docker-orb-test
-          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          filters: *integration-dev_filters
-
-      - docker/publish:
-          name: publish-docker-dev
-          executor: docker/docker
-          context: orb-publishing
-          use-remote-docker: true
-          dockerfile: test.Dockerfile
-          image: circlecipublic/docker-orb-test
-          tag: dev-$CIRCLE_SHA1
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          filters: *integration-dev_filters
-
-      - docker/publish:
-          name: publish-docker-cache-from-dev
-          requires:
-            - publish-docker-dev
-          executor: docker/docker
-          context: orb-publishing
-          use-remote-docker: true
-          dockerfile: test.Dockerfile
-          image: circlecipublic/docker-orb-test
-          tag: dev-$CIRCLE_SHA1
-          cache_from: circlecipublic/docker-orb-test:dev-$CIRCLE_SHA1
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          filters: *integration-dev_filters
-
-      - docker/publish:
-          name: publish-docker-cache-not-found-dev
-          executor: docker/docker
-          context: orb-publishing
-          use-remote-docker: true
-          dockerfile: test.Dockerfile
-          image: circlecipublic/docker-orb-test
-          tag: dev-$CIRCLE_SHA1-2
-          cache_from: circlecipublic/docker-orb-test:not-exists
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          filters: *integration-dev_filters
-
-      - test-pull:
-          name: test-pull-dev
-          filters: *integration-dev_filters
-
-      # alpine
-      - test:
-          name: latest-alpine-dev
-          executor: orb-tools/alpine
-          filters: *integration-dev_filters
-          pre-steps: [run: apk add gnupg]
-
-      - test:
-          name: older-alpine-dev
-          executor: orb-tools/alpine
-          docker-version: v18.09.4
-          docker-compose-version: 1.17.1
-          dockerize-version: v0.4.0
-          goss-version: v0.3.2
-          filters: *integration-dev_filters
-          pre-steps: [run: apk add gnupg]
-
-      - test:
-          name: latest-alpine-altogether-dev
-          executor: orb-tools/alpine
-          test-all-in-one-command: true
-          filters: *integration-dev_filters
-          pre-steps: [run: apk add gnupg]
-
-      - test:
-          name: older-alpine-altogether-dev
-          executor: orb-tools/alpine
-          test-all-in-one-command: true
-          docker-version: v18.09.4
-          docker-compose-version: 1.17.1
-          dockerize-version: v0.4.0
-          goss-version: v0.3.3
-          filters: *integration-dev_filters
-          pre-steps: [run: apk add gnupg]
-
-      # machine
-      - test:
-          name: latest-machine-dev
-          executor: orb-tools/machine
-          filters: *integration-dev_filters
-
-      - test:
-          name: older-machine-dev
-          executor: orb-tools/machine
-          docker-version: v17.09.0-ce
-          docker-compose-version: 1.20.0
-          dockerize-version: v0.2.0
-          goss-version: v0.3.4
-          filters: *integration-dev_filters
-
-      - test:
-          name: latest-machine-altogether-dev
-          executor: orb-tools/machine
-          test-all-in-one-command: true
-          filters: *integration-dev_filters
-
-      - test:
-          name: older-machine-altogether-dev
-          executor: orb-tools/machine
-          test-all-in-one-command: true
-          docker-version: v17.09.0-ce
-          docker-compose-version: 1.20.0
-          dockerize-version: v0.2.0
-          goss-version: v0.3.5
-          filters: *integration-dev_filters
-
-      # mac
-      - test:
-          name: latest-mac-dev
-          executor: orb-tools/macos
-          install-goss: false
-          filters: *integration-dev_filters
-
-      - test:
-          name: older-mac-dev
-          executor: orb-tools/macos
-          docker-version: v17.12.1-ce
-          docker-compose-version: 1.21.2
-          dockerize-version: v0.5.0
-          install-goss: false
-          filters: *integration-dev_filters
-
-      - test:
-          name: latest-mac-altogether-dev
-          executor: orb-tools/macos
-          test-all-in-one-command: true
-          install-goss: false
-          filters: *integration-dev_filters
-
-      - test:
-          name: older-mac-altogether-dev
-          executor: orb-tools/macos
-          test-all-in-one-command: true
-          docker-version: v17.12.1-ce
-          docker-compose-version: 1.21.2
-          dockerize-version: v0.5.0
-          install-goss: false
-          filters: *integration-dev_filters
-
-      # docker
-      - test:
-          name: latest-docker-dev
-          executor: orb-tools/node
-          filters: *integration-dev_filters
-
-      - test:
-          name: older-docker-dev
-          executor: orb-tools/node
-          docker-version: v18.09.3
-          docker-compose-version: 1.22.0
-          dockerize-version: v0.6.0
-          goss-version: v0.3.6
-          filters: *integration-dev_filters
-
-      - test:
-          name: latest-docker-altogether-dev
-          executor: orb-tools/node
-          test-all-in-one-command: true
-          filters: *integration-dev_filters
-
-      - test:
-          name: older-docker-altogether-dev
-          executor: orb-tools/node
-          test-all-in-one-command: true
-          docker-version: v18.09.3
-          docker-compose-version: 1.22.0
-          dockerize-version: v0.6.0
-          goss-version: v0.3.5
-          filters: *integration-dev_filters
-
-      # ci-docker
-      - test:
-          name: latest-ci-docker-dev
-          executor: orb-tools/node-cci
-          filters: *integration-dev_filters
-
-      - test:
-          name: older-ci-docker-dev
-          executor: orb-tools/node-cci
-          docker-version: v18.06.2-ce
-          docker-compose-version: 1.23.1
-          dockerize-version: v0.3.0
-          goss-version: v0.3.4
-          filters: *integration-dev_filters
-
-      - test:
-          name: latest-ci-docker-altogether-dev
-          executor: orb-tools/node-cci
-          test-all-in-one-command: true
-          filters: *integration-dev_filters
-
-      - test:
-          name: older-ci-docker-altogether-dev
-          executor: orb-tools/node-cci
-          test-all-in-one-command: true
-          docker-version: v18.06.2-ce
-          docker-compose-version: 1.23.1
-          dockerize-version: v0.3.0
-          goss-version: v0.3.3
-          filters: *integration-dev_filters
-
-      # oracle
-      - test:
-          name: latest-oracle-dev
-          executor: orb-tools/oracle
-          filters: *integration-dev_filters
-
-      - test:
-          name: older-oracle-dev
-          executor: orb-tools/oracle
-          docker-version: v18.06.2-ce
-          docker-compose-version: 1.23.1
-          dockerize-version: v0.3.0
-          goss-version: v0.3.2
-          filters: *integration-dev_filters
-
-      - test:
-          name: latest-oracle-altogether-dev
-          executor: orb-tools/oracle
-          test-all-in-one-command: true
-          filters: *integration-dev_filters
-
-      - test:
-          name: older-oracle-altogether-dev
-          executor: orb-tools/oracle
-          test-all-in-one-command: true
-          docker-version: v18.06.2-ce
-          docker-compose-version: 1.23.1
-          dockerize-version: v0.3.0
-          goss-version: v0.3.1
-          filters: *integration-dev_filters
 
   integration-tests_prod-release:
+    when: << pipeline.parameters.run-integration-tests >>
     jobs:
       # hadolint
       - docker/hadolint:
-          name: hadolint-master
+          name: hadolint
           ignore-rules: DL4005,DL3008,DL3009,DL3015
           trusted-registries: docker.io,my-company.com:5000
           dockerfiles: test.Dockerfile,test2.Dockerfile
-          filters: *integration-master_filters
+
+      # check command
+      - test-check-command:
+          name: test-check-command-docker
+          executor: docker/docker
+          context: orb-publishing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: false
+
+      - test-check-command:
+          name: test-check-command-machine
+          executor: orb-tools/machine
+          context: orb-publishing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
+
+      - test-check-command:
+          name: test-check-command-macos
+          executor: orb-tools/macos
+          context: orb-publishing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
+          pre-steps:
+            - docker/install-docker
+
+      # login with credentials store does not result in warning
+      - test-credentials-store:
+          name: test-credentials-store-docker
+          executor: docker/docker
+          context: orb-publishing
+          helper-name: pass
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+
+      - test-credentials-store:
+          name: test-credentials-store-machine
+          executor: orb-tools/machine
+          context: orb-publishing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+
+      - test-credentials-store:
+          name: test-credentials-store-macos
+          executor: orb-tools/macos
+          context: orb-publishing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          pre-steps:
+            - docker/install-docker
 
       # build/publish
       - docker/publish:
-          name: publish-machine-master
+          name: publish-machine
           context: orb-publishing
           dockerfile: test.Dockerfile
           image: circlecipublic/docker-orb-test
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
-          filters: *integration-master_filters
+          use-docker-credentials-store: true
+          pre-steps:
+            # Test that it's OK to invoke the commands twice
+            - docker/install-docker-credential-helper
+            - docker/configure-docker-credentials-store
 
       - docker/publish:
-          name: publish-docker-master
+          name: publish-docker
           executor: docker/docker
           context: orb-publishing
           use-remote-docker: true
@@ -456,12 +296,12 @@ workflows:
           tag: $CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
-          filters: *integration-master_filters
+          use-docker-credentials-store: true
 
       - docker/publish:
-          name: publish-docker-cache-from-master
+          name: publish-docker-cache
           requires:
-            - publish-docker-master
+            - publish-docker
           executor: docker/docker
           context: orb-publishing
           use-remote-docker: true
@@ -471,10 +311,14 @@ workflows:
           cache_from: circlecipublic/docker-orb-test:$CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
-          filters: *integration-master_filters
+          pre-steps:
+            - docker/install-docker-credential-helper:
+                release-tag: v0.6.3
+            - docker/configure-docker-credentials-store:
+                helper-name: pass
 
       - docker/publish:
-          name: publish-docker-cache-not-found-master
+          name: publish-docker-cache-not-found
           executor: docker/docker
           context: orb-publishing
           use-remote-docker: true
@@ -484,242 +328,199 @@ workflows:
           cache_from: circlecipublic/docker-orb-test:not-exists
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
-          filters: *integration-master_filters
 
-      - test-pull:
-          name: test-pull-master
-          filters: *integration-master_filters
+      - docker/publish:
+          name: publish-docker-update-description
+          executor: docker/docker
+          context: orb-publishing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: circlecipublic/docker-orb-test
+          tag: $CIRCLE_SHA1
+          cache_from: circlecipublic/docker-orb-test:$CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          update-description: true
+
+      - test-pull
 
       # alpine
       - test:
-          name: latest-alpine-master
+          name: latest-alpine
           executor: orb-tools/alpine
-          filters: *integration-master_filters
           pre-steps: [run: apk add gnupg]
 
       - test:
-          name: older-alpine-master
+          name: older-alpine
           executor: orb-tools/alpine
           docker-version: v18.09.4
           docker-compose-version: 1.17.1
           dockerize-version: v0.4.0
           goss-version: v0.3.2
-          filters: *integration-master_filters
           pre-steps: [run: apk add gnupg]
 
       - test:
-          name: latest-alpine-altogether-master
+          name: latest-alpine-altogether
           executor: orb-tools/alpine
           test-all-in-one-command: true
-          filters: *integration-master_filters
           pre-steps: [run: apk add gnupg]
 
       - test:
-          name: older-alpine-altogether-master
+          name: older-alpine-altogether
           executor: orb-tools/alpine
           test-all-in-one-command: true
           docker-version: v18.09.4
           docker-compose-version: 1.17.1
           dockerize-version: v0.4.0
           goss-version: v0.3.3
-          filters: *integration-master_filters
           pre-steps: [run: apk add gnupg]
 
       # machine
       - test:
-          name: latest-machine-master
+          name: latest-machine
           executor: orb-tools/machine
-          filters: *integration-master_filters
 
       - test:
-          name: older-machine-master
+          name: older-machine
           executor: orb-tools/machine
           docker-version: v17.09.0-ce
           docker-compose-version: 1.20.0
           dockerize-version: v0.2.0
           goss-version: v0.3.4
-          filters: *integration-master_filters
 
       - test:
-          name: latest-machine-altogether-master
+          name: latest-machine-altogether
           executor: orb-tools/machine
           test-all-in-one-command: true
-          filters: *integration-master_filters
 
       - test:
-          name: older-machine-altogether-master
+          name: older-machine-altogether
           executor: orb-tools/machine
           test-all-in-one-command: true
           docker-version: v17.09.0-ce
           docker-compose-version: 1.20.0
           dockerize-version: v0.2.0
           goss-version: v0.3.5
-          filters: *integration-master_filters
 
       # mac
       - test:
-          name: latest-mac-master
+          name: latest-mac
           executor: orb-tools/macos
           install-goss: false
-          filters: *integration-master_filters
 
       - test:
-          name: older-mac-master
+          name: older-mac
           executor: orb-tools/macos
           docker-version: v17.12.1-ce
           docker-compose-version: 1.21.2
           dockerize-version: v0.5.0
           install-goss: false
-          filters: *integration-master_filters
 
       - test:
-          name: latest-mac-altogether-master
+          name: latest-mac-altogether
           executor: orb-tools/macos
           test-all-in-one-command: true
           install-goss: false
-          filters: *integration-master_filters
 
       - test:
-          name: older-mac-altogether-master
+          name: older-mac-altogether
           executor: orb-tools/macos
           test-all-in-one-command: true
           docker-version: v17.12.1-ce
           docker-compose-version: 1.21.2
           dockerize-version: v0.5.0
           install-goss: false
-          filters: *integration-master_filters
 
       # docker
       - test:
-          name: latest-docker-master
+          name: latest-docker
           executor: orb-tools/node
-          filters: *integration-master_filters
 
       - test:
-          name: older-docker-master
+          name: older-docker
           executor: orb-tools/node
           docker-version: v18.09.3
           docker-compose-version: 1.22.0
           dockerize-version: v0.6.0
           goss-version: v0.3.6
-          filters: *integration-master_filters
 
       - test:
-          name: latest-docker-altogether-master
+          name: latest-docker-altogether
           executor: orb-tools/node
           test-all-in-one-command: true
-          filters: *integration-master_filters
 
       - test:
-          name: older-docker-altogether-master
+          name: older-docker-altogether
           executor: orb-tools/node
           test-all-in-one-command: true
           docker-version: v18.09.3
           docker-compose-version: 1.22.0
           dockerize-version: v0.6.0
           goss-version: v0.3.5
-          filters: *integration-master_filters
 
       # ci-docker
       - test:
-          name: latest-ci-docker-master
+          name: latest-ci-docker
           executor: orb-tools/node-cci
-          filters: *integration-master_filters
 
       - test:
-          name: older-ci-docker-master
+          name: older-ci-docker
           executor: orb-tools/node-cci
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
           goss-version: v0.3.4
-          filters: *integration-master_filters
 
       - test:
-          name: latest-ci-docker-altogether-master
+          name: latest-ci-docker-altogether
           executor: orb-tools/node-cci
           test-all-in-one-command: true
-          filters: *integration-master_filters
 
       - test:
-          name: older-ci-docker-altogether-master
+          name: older-ci-docker-altogether
           executor: orb-tools/node-cci
           test-all-in-one-command: true
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
           goss-version: v0.3.3
-          filters: *integration-master_filters
 
       # oracle
       - test:
-          name: latest-oracle-master
+          name: latest-oracle
           executor: orb-tools/oracle
-          filters: *integration-master_filters
 
       - test:
-          name: older-oracle-master
+          name: older-oracle
           executor: orb-tools/oracle
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
           goss-version: v0.3.2
-          filters: *integration-master_filters
 
       - test:
-          name: latest-oracle-altogether-master
+          name: latest-oracle-altogether
           executor: orb-tools/oracle
           test-all-in-one-command: true
-          filters: *integration-master_filters
 
       - test:
-          name: older-oracle-altogether-master
+          name: older-oracle-altogether
           executor: orb-tools/oracle
           test-all-in-one-command: true
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
           goss-version: v0.3.1
-          filters: *integration-master_filters
 
-      # patch, minor, or major publishing
-      - orb-tools/dev-promote-prod:
-          name: dev-promote-patch
-          ssh-fingerprints: d9:97:a8:58:12:13:40:59:48:96:f8:10:be:b8:ba:07
-          context: orb-publishing
+      - orb-tools/dev-promote-prod-from-commit-subject:
           orb-name: circleci/docker
-          cleanup-tags: true
-          requires: *prod-deploy_requires
+          context: orb-publishing
+          add-pr-comment: true
+          bot-token-variable: GHI_TOKEN
+          bot-user: cpe-bot
+          fail-if-semver-not-indicated: true
+          publish-version-tag: false
+          requires: *promotion_requires
           filters:
             branches:
-              ignore: /.*/
-            tags:
-              only: /master-patch.*/
-
-      - orb-tools/dev-promote-prod:
-          name: dev-promote-minor
-          ssh-fingerprints: d9:97:a8:58:12:13:40:59:48:96:f8:10:be:b8:ba:07
-          context: orb-publishing
-          orb-name: circleci/docker
-          cleanup-tags: true
-          release: minor
-          requires: *prod-deploy_requires
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /master-minor.*/
-
-      - orb-tools/dev-promote-prod:
-          name: dev-promote-major
-          ssh-fingerprints: d9:97:a8:58:12:13:40:59:48:96:f8:10:be:b8:ba:07
-          context: orb-publishing
-          orb-name: circleci/docker
-          cleanup-tags: true
-          release: major
-          requires: *prod-deploy_requires
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /master-major.*/
+              only: master

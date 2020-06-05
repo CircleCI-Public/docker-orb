@@ -102,9 +102,6 @@ steps:
 
   - when:
       condition: <<parameters.use-workspace>>
-      parameters:
-        attach-at:
-          type: string
       steps:
         - attach_workspace:
               at: <<parameters.attach-at>>

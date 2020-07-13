@@ -1,8 +1,47 @@
 version: 2.1
 
+promotion_requires: &promotion_requires
+  [
+    hadolint,
+    test-check-command-docker,
+    test-check-command-machine,
+    test-check-command-macos,
+    test-credentials-store-docker,
+    test-credentials-store-machine,
+    test-credentials-store-macos,
+    publish-machine,
+    publish-docker-cache,
+    publish-docker-cache-not-found,
+    test-pull,
+    latest-alpine,
+    older-alpine,
+    latest-machine,
+    older-machine,
+    latest-mac,
+    older-mac,
+    latest-docker,
+    older-docker,
+    latest-ci-docker,
+    older-ci-docker,
+    latest-alpine-altogether,
+    older-alpine-altogether,
+    latest-machine-altogether,
+    older-machine-altogether,
+    latest-mac-altogether,
+    older-mac-altogether,
+    latest-docker-altogether,
+    older-docker-altogether,
+    latest-ci-docker-altogether,
+    older-ci-docker-altogether,
+    latest-oracle,
+    older-oracle,
+    latest-oracle-altogether,
+    older-oracle-altogether
+  ]
+
 orbs:
   build-tools: circleci/build-tools@2.5.0
-  docker: circleci/docker@dev:alpha
+  docker: circleci/docker@<<pipeline.parameters.dev-orb-version>>
   jq: circleci/jq@2.0
   node: circleci/node@1.1.3
   orb-tools: circleci/orb-tools@9.0
@@ -150,45 +189,6 @@ jobs:
             echo "Error - warning found in login result"
             exit 1
             fi
-
-promotion_requires: &promotion_requires
-  [
-    hadolint,
-    test-check-command-docker,
-    test-check-command-machine,
-    test-check-command-macos,
-    test-credentials-store-docker,
-    test-credentials-store-machine,
-    test-credentials-store-macos,
-    publish-machine,
-    publish-docker-cache,
-    publish-docker-cache-not-found,
-    test-pull,
-    latest-alpine,
-    older-alpine,
-    latest-machine,
-    older-machine,
-    latest-mac,
-    older-mac,
-    latest-docker,
-    older-docker,
-    latest-ci-docker,
-    older-ci-docker,
-    latest-alpine-altogether,
-    older-alpine-altogether,
-    latest-machine-altogether,
-    older-machine-altogether,
-    latest-mac-altogether,
-    older-mac-altogether,
-    latest-docker-altogether,
-    older-docker-altogether,
-    latest-ci-docker-altogether,
-    older-ci-docker-altogether,
-    latest-oracle,
-    older-oracle,
-    latest-oracle-altogether,
-    older-oracle-altogether
-  ]
 
 workflows:
   lint_pack-validate_publish-dev:

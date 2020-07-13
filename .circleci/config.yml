@@ -207,6 +207,7 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
+      - setup_remote_docker
       - docker/build:
           dockerfile: test.Dockerfile
           image: circlecipublic/docker-orb-test

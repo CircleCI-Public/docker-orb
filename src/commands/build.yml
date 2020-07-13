@@ -68,17 +68,11 @@ parameters:
     description: >
       Extra output for orb developers
 
-  use-workspace:
-    type: boolean
-    default: false
-    description: >
-      Mount folder/files that were `persist_to_workspace` in a previous step.
-      https://circleci.com/docs/2.0/configuration-reference/#persist_to_workspace
-
   attach-at:
     type: string
-    default: ./
+    default: ""
     description: >
+      Provide a path if you wish to attach a workspace. Use `./` for the working directory.
       `attach_workspace` attached location - where to mount folder/files that were `persist_to_workspace` in a previous step.
       https://circleci.com/docs/2.0/configuration-reference/#attach_workspace
 
@@ -101,7 +95,7 @@ steps:
             debug: <<parameters.debug>>
 
   - when:
-      condition: <<parameters.use-workspace>>
+      condition: <<parameters.attach-at>>
       steps:
         - attach_workspace:
               at: <<parameters.attach-at>>

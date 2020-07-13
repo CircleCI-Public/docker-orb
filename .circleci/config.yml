@@ -206,6 +206,7 @@ jobs:
     docker:
       - image: cimg/base:stable
     steps:
+      - checkout
       - docker/build:
           dockerfile: test.Dockerfile
           image: circlecipublic/docker-orb-test

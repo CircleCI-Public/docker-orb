@@ -1,8 +1,48 @@
 version: 2.1
 
+promotion_requires: &promotion_requires
+  [
+    hadolint,
+    test-check-command-docker,
+    test-check-command-machine,
+    test-check-command-macos,
+    test-credentials-store-docker,
+    test-credentials-store-machine,
+    test-credentials-store-macos,
+    publish-machine,
+    publish-docker-cache,
+    publish-docker-cache-not-found,
+    test-pull,
+    latest-alpine,
+    older-alpine,
+    latest-machine,
+    older-machine,
+    latest-mac,
+    older-mac,
+    latest-docker,
+    older-docker,
+    latest-ci-docker,
+    older-ci-docker,
+    latest-alpine-altogether,
+    older-alpine-altogether,
+    latest-machine-altogether,
+    older-machine-altogether,
+    latest-mac-altogether,
+    older-mac-altogether,
+    latest-docker-altogether,
+    older-docker-altogether,
+    latest-ci-docker-altogether,
+    older-ci-docker-altogether,
+    latest-oracle,
+    older-oracle,
+    latest-oracle-altogether,
+    older-oracle-altogether,
+    test-build-command-workspace
+  ]
+
 orbs:
   build-tools: circleci/build-tools@2.5.0
-  docker: circleci/docker@dev:alpha
+  docker: circleci/docker@<<pipeline.parameters.dev-orb-version>>
   jq: circleci/jq@2.0
   node: circleci/node@1.1.3
   orb-tools: circleci/orb-tools@9.0
@@ -100,7 +140,6 @@ jobs:
       - docker/pull:
           images: cimg/base:stable,cimg/base:not_exists,cimg/go:stable
           ignore-docker-pull-error: true
-
   test-check-command:
     parameters:
       executor:
@@ -118,7 +157,6 @@ jobs:
           docker-username: <<parameters.docker-username>>
           docker-password: <<parameters.docker-password>>
           use-docker-credentials-store: <<parameters.use-docker-credentials-store>>
-
   test-credentials-store:
     parameters:
       executor:
@@ -151,59 +189,55 @@ jobs:
             exit 1
             fi
 
-promotion_requires: &promotion_requires
-  [
-    hadolint,
-    test-check-command-docker,
-    test-check-command-machine,
-    test-check-command-macos,
-    test-credentials-store-docker,
-    test-credentials-store-machine,
-    test-credentials-store-macos,
-    publish-machine,
-    publish-docker-cache,
-    publish-docker-cache-not-found,
-    test-pull,
-    latest-alpine,
-    older-alpine,
-    latest-machine,
-    older-machine,
-    latest-mac,
-    older-mac,
-    latest-docker,
-    older-docker,
-    latest-ci-docker,
-    older-ci-docker,
-    latest-alpine-altogether,
-    older-alpine-altogether,
-    latest-machine-altogether,
-    older-machine-altogether,
-    latest-mac-altogether,
-    older-mac-altogether,
-    latest-docker-altogether,
-    older-docker-altogether,
-    latest-ci-docker-altogether,
-    older-ci-docker-altogether,
-    latest-oracle,
-    older-oracle,
-    latest-oracle-altogether,
-    older-oracle-altogether
-  ]
+  test-create-workspace:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - run:
+          name: Description
+          command: |
+            echo "This step simply creates a file and saves it to a workspace. This tests the attach_at parameter in the build command."
+            echo "true" > verify.txt
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - verify.txt
+  test-build-command-workspace:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/build:
+          dockerfile: test.Dockerfile
+          image: circlecipublic/docker-orb-test
+          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
+          attach-at: "./"
+      - run:
+          name: Check for workspace
+          command: |
+            echo "Ensuring workspace was attached."
+            if test -f "./verify.txt"; then
+              echo "Success"
+            else
+              echo "Error"
+              pwd
+              ls
+              exit 1
+            fi
+
 
 workflows:
   lint_pack-validate_publish-dev:
     unless: << pipeline.parameters.run-integration-tests >>
     jobs:
       - orb-tools/lint
-
       - orb-tools/pack:
           requires: [orb-tools/lint]
-
       - orb-tools/publish-dev:
           orb-name: circleci/docker
           context: orb-publishing
           requires: [orb-tools/pack]
-
       - orb-tools/trigger-integration-tests-workflow:
           name: trigger-integration-dev
           context: orb-publishing
@@ -218,7 +252,6 @@ workflows:
           ignore-rules: DL4005,DL3008,DL3009,DL3015
           trusted-registries: docker.io,my-company.com:5000
           dockerfiles: test.Dockerfile,test2.Dockerfile
-
       # check command
       - test-check-command:
           name: test-check-command-docker
@@ -227,7 +260,6 @@ workflows:
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           use-docker-credentials-store: false
-
       - test-check-command:
           name: test-check-command-machine
           executor: orb-tools/machine
@@ -235,7 +267,6 @@ workflows:
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           use-docker-credentials-store: true
-
       - test-check-command:
           name: test-check-command-macos
           executor: orb-tools/macos
@@ -245,7 +276,6 @@ workflows:
           use-docker-credentials-store: true
           pre-steps:
             - docker/install-docker
-
       # login with credentials store does not result in warning
       - test-credentials-store:
           name: test-credentials-store-docker
@@ -254,14 +284,12 @@ workflows:
           helper-name: pass
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
-
       - test-credentials-store:
           name: test-credentials-store-machine
           executor: orb-tools/machine
           context: orb-publishing
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
-
       - test-credentials-store:
           name: test-credentials-store-macos
           executor: orb-tools/macos
@@ -270,7 +298,6 @@ workflows:
           docker-password: DOCKER_PASS
           pre-steps:
             - docker/install-docker
-
       # build/publish
       - docker/publish:
           name: publish-machine
@@ -285,7 +312,6 @@ workflows:
             # Test that it's OK to invoke the commands twice
             - docker/install-docker-credential-helper
             - docker/configure-docker-credentials-store
-
       - docker/publish:
           name: publish-docker
           executor: docker/docker
@@ -297,7 +323,6 @@ workflows:
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           use-docker-credentials-store: true
-
       - docker/publish:
           name: publish-docker-cache
           requires:
@@ -316,7 +341,6 @@ workflows:
                 release-tag: v0.6.3
             - docker/configure-docker-credentials-store:
                 helper-name: pass
-
       - docker/publish:
           name: publish-docker-cache-not-found
           executor: docker/docker
@@ -328,7 +352,6 @@ workflows:
           cache_from: circlecipublic/docker-orb-test:not-exists
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
-
       - docker/publish:
           name: publish-docker-update-description
           executor: docker/docker
@@ -341,15 +364,12 @@ workflows:
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           update-description: true
-
       - test-pull
-
       # alpine
       - test:
           name: latest-alpine
           executor: orb-tools/alpine
           pre-steps: [run: apk add gnupg]
-
       - test:
           name: older-alpine
           executor: orb-tools/alpine
@@ -358,13 +378,11 @@ workflows:
           dockerize-version: v0.4.0
           goss-version: v0.3.2
           pre-steps: [run: apk add gnupg]
-
       - test:
           name: latest-alpine-altogether
           executor: orb-tools/alpine
           test-all-in-one-command: true
           pre-steps: [run: apk add gnupg]
-
       - test:
           name: older-alpine-altogether
           executor: orb-tools/alpine
@@ -374,12 +392,10 @@ workflows:
           dockerize-version: v0.4.0
           goss-version: v0.3.3
           pre-steps: [run: apk add gnupg]
-
       # machine
       - test:
           name: latest-machine
           executor: orb-tools/machine
-
       - test:
           name: older-machine
           executor: orb-tools/machine
@@ -387,12 +403,10 @@ workflows:
           docker-compose-version: 1.20.0
           dockerize-version: v0.2.0
           goss-version: v0.3.4
-
       - test:
           name: latest-machine-altogether
           executor: orb-tools/machine
           test-all-in-one-command: true
-
       - test:
           name: older-machine-altogether
           executor: orb-tools/machine
@@ -401,13 +415,11 @@ workflows:
           docker-compose-version: 1.20.0
           dockerize-version: v0.2.0
           goss-version: v0.3.5
-
       # mac
       - test:
           name: latest-mac
           executor: orb-tools/macos
           install-goss: false
-
       - test:
           name: older-mac
           executor: orb-tools/macos
@@ -415,13 +427,11 @@ workflows:
           docker-compose-version: 1.21.2
           dockerize-version: v0.5.0
           install-goss: false
-
       - test:
           name: latest-mac-altogether
           executor: orb-tools/macos
           test-all-in-one-command: true
           install-goss: false
-
       - test:
           name: older-mac-altogether
           executor: orb-tools/macos
@@ -430,12 +440,10 @@ workflows:
           docker-compose-version: 1.21.2
           dockerize-version: v0.5.0
           install-goss: false
-
       # docker
       - test:
           name: latest-docker
           executor: orb-tools/node
-
       - test:
           name: older-docker
           executor: orb-tools/node
@@ -443,12 +451,10 @@ workflows:
           docker-compose-version: 1.22.0
           dockerize-version: v0.6.0
           goss-version: v0.3.6
-
       - test:
           name: latest-docker-altogether
           executor: orb-tools/node
           test-all-in-one-command: true
-
       - test:
           name: older-docker-altogether
           executor: orb-tools/node
@@ -457,12 +463,10 @@ workflows:
           docker-compose-version: 1.22.0
           dockerize-version: v0.6.0
           goss-version: v0.3.5
-
       # ci-docker
       - test:
           name: latest-ci-docker
           executor: orb-tools/node-cci
-
       - test:
           name: older-ci-docker
           executor: orb-tools/node-cci
@@ -470,12 +474,10 @@ workflows:
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
           goss-version: v0.3.4
-
       - test:
           name: latest-ci-docker-altogether
           executor: orb-tools/node-cci
           test-all-in-one-command: true
-
       - test:
           name: older-ci-docker-altogether
           executor: orb-tools/node-cci
@@ -484,12 +486,10 @@ workflows:
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
           goss-version: v0.3.3
-
       # oracle
       - test:
           name: latest-oracle
           executor: orb-tools/oracle
-
       - test:
           name: older-oracle
           executor: orb-tools/oracle
@@ -497,12 +497,10 @@ workflows:
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
           goss-version: v0.3.2
-
       - test:
           name: latest-oracle-altogether
           executor: orb-tools/oracle
           test-all-in-one-command: true
-
       - test:
           name: older-oracle-altogether
           executor: orb-tools/oracle
@@ -511,7 +509,10 @@ workflows:
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
           goss-version: v0.3.1
-
+      - test-create-workspace
+      - test-build-command-workspace:
+          requires:
+            - test-create-workspace
       - orb-tools/dev-promote-prod-from-commit-subject:
           orb-name: circleci/docker
           context: orb-publishing

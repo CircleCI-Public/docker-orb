@@ -368,12 +368,16 @@ workflows:
       # alpine
       - test:
           name: latest-alpine
-          executor: orb-tools/alpine
+          executor:
+            docker:
+              - image: alpine          
           pre-steps: [run: apk add gnupg]
           docker-compose-version: "1.25.4-r2"
       - test:
           name: older-alpine
-          executor: orb-tools/alpine
+          executor:
+            docker:
+              - image: alpine
           docker-version: v18.09.4
           docker-compose-version: 1.17.1
           dockerize-version: v0.4.0
@@ -381,13 +385,17 @@ workflows:
           pre-steps: [run: apk add gnupg]
       - test:
           name: latest-alpine-altogether
-          executor: orb-tools/alpine
+          executor:
+            docker:
+              - image: alpine
           test-all-in-one-command: true
           pre-steps: [run: apk add gnupg]
           docker-compose-version: "1.25.4-r2"
       - test:
           name: older-alpine-altogether
-          executor: orb-tools/alpine
+          executor:
+            docker:
+              - image: alpine
           test-all-in-one-command: true
           docker-version: v18.09.4
           docker-compose-version: 1.17.1

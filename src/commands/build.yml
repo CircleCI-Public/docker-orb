@@ -76,14 +76,19 @@ parameters:
       `attach_workspace` attached location - where to mount folder/files that were `persist_to_workspace` in a previous step.
       https://circleci.com/docs/2.0/configuration-reference/#attach_workspace
 
-
-
   docker-context:
     type: string
     default: .
     description: >
       Path to the directory containing your build context,
       defaults to . (working directory)
+
+  no_output_timeout:
+    type: string
+    default: "10m"
+    description: >
+      Pass through a default timeout if your Docker build does not output
+      anything for more than 10 minutes.
 
 steps:
   - when:
@@ -105,6 +110,7 @@ steps:
       steps:
         - run:
             name: <<parameters.step-name>>
+            no_output_timeout: << parameters.no_output_timeout >>
             command: |
               echo "<<parameters.cache_from>>" | sed -n 1'p' | tr ',' '\n' | while read image; do
                 echo "Pulling ${image}";
@@ -128,6 +134,7 @@ steps:
       steps:
         - run:
             name: <<parameters.step-name>>
+            no_output_timeout: << parameters.no_output_timeout >>
             command: |
               docker_tag_args=""
 

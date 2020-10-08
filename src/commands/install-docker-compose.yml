@@ -46,7 +46,7 @@ steps:
 
         # docker-compose binary won't run on alpine, install via pip
         if cat /etc/issue | grep Alpine >> /dev/null 2>&1; then
-          $SUDO apk add docker-compose@"$DOCKER_COMPOSE_VERSION"
+          $SUDO apk add docker-compose="$DOCKER_COMPOSE_VERSION"
         else
           # get binary/shasum download URL for specified version
           if uname -a | grep Darwin >> /dev/null 2>&1; then

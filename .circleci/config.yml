@@ -370,7 +370,7 @@ workflows:
           name: latest-alpine
           executor: orb-tools/alpine
           pre-steps: [run: apk add gnupg]
-          docker-compose-version: "1.27.4-r0"
+          docker-compose-version: "1.25.4-r2"
       - test:
           name: older-alpine
           executor: orb-tools/alpine
@@ -384,7 +384,7 @@ workflows:
           executor: orb-tools/alpine
           test-all-in-one-command: true
           pre-steps: [run: apk add gnupg]
-          docker-compose-version: "1.27.4-r0"
+          docker-compose-version: "1.25.4-r2"
       - test:
           name: older-alpine-altogether
           executor: orb-tools/alpine

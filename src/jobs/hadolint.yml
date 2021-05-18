@@ -66,7 +66,10 @@ parameters:
       - large
       - xlarge
 
-executor: hadolint
+executor:
+  name: hadolint
+  tag: <<parameters.hadolint-tag>>
+  resource-class: <<parameters.executor-class>>
 
 steps:
   - bt/install-ci-tools

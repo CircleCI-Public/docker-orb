@@ -47,6 +47,25 @@ parameters:
       `docker.io,my-company.com:5000`); if set, return an error if
       Dockerfiles use any images from registries not included in this list
 
+  hadolint-tag:
+    type: string
+    default: latest-debian
+    description: >
+      Specific Hadolint image (make sure to use a `debian` tag, otherwise image
+      will not be usable on CircleCI):
+      https://hub.docker.com/r/hadolint/hadolint/tags
+    
+  executor-class:
+    type: enum
+    default: small
+    description: Resource class to use for the hadolint executor
+    enum:
+      - small
+      - medium
+      - medium+
+      - large
+      - xlarge
+
 executor: hadolint
 
 steps:

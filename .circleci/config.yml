@@ -516,6 +516,7 @@ workflows:
       - orb-tools/dev-promote-prod-from-commit-subject:
           orb-name: circleci/docker
           context: orb-publisher
+          add-pr-comment: false
           fail-if-semver-not-indicated: true
           publish-version-tag: false
           requires: *promotion_requires

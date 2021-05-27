@@ -48,6 +48,7 @@ steps:
         if cat /etc/issue | grep Alpine >> /dev/null 2>&1; then
           $SUDO apk update
           $SUDO apk add gcc libc-dev libffi-dev openssl-dev make python3-dev py-pip
+          $SUDO pip install --upgrade pip
           $SUDO python3 -m pip install docker-compose=="$DOCKER_COMPOSE_VERSION"
         else
           # get binary/shasum download URL for specified version

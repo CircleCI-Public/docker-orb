@@ -369,7 +369,7 @@ workflows:
       - test:
           name: latest-alpine
           executor: orb-tools/alpine
-          pre-steps: [run: apk add gnupg]
+          pre-steps: [run: pip install --upgrade pip, run: apk add gnupg]
       - test:
           name: older-alpine
           executor: orb-tools/alpine
@@ -377,12 +377,12 @@ workflows:
           docker-compose-version: 1.17.1
           dockerize-version: v0.4.0
           goss-version: v0.3.2
-          pre-steps: [run: apk add gnupg]
+          pre-steps: [run: pip install --upgrade pip, run: apk add gnupg]
       - test:
           name: latest-alpine-altogether
           executor: orb-tools/alpine
           test-all-in-one-command: true
-          pre-steps: [run: apk add gnupg]
+          pre-steps: [run: pip install --upgrade pip, run: apk add gnupg]
       - test:
           name: older-alpine-altogether
           executor: orb-tools/alpine
@@ -391,7 +391,7 @@ workflows:
           docker-compose-version: 1.17.1
           dockerize-version: v0.4.0
           goss-version: v0.3.3
-          pre-steps: [run: apk add gnupg]
+          pre-steps: [run: pip install --upgrade pip, run: apk add gnupg]
       # machine
       - test:
           name: latest-machine

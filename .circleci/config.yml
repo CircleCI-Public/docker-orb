@@ -58,6 +58,11 @@ parameters:
     type: string
     default: "dev:alpha"
 
+executors:
+  alpine:
+    docker:
+      - image: alpine:latest
+
 jobs:
   test:
     parameters:
@@ -368,30 +373,30 @@ workflows:
       # alpine
       - test:
           name: latest-alpine
-          executor: orb-tools/alpine
-          pre-steps: [run: pip install --upgrade pip, run: apk add gnupg]
+          executor: alpine
+          pre-steps: [run: apk add gnupg]
       - test:
           name: older-alpine
-          executor: orb-tools/alpine
+          executor: alpine
           docker-version: v18.09.4
           docker-compose-version: 1.17.1
           dockerize-version: v0.4.0
           goss-version: v0.3.2
-          pre-steps: [run: pip install --upgrade pip, run: apk add gnupg]
+          pre-steps: [run: apk add gnupg]
       - test:
           name: latest-alpine-altogether
-          executor: orb-tools/alpine
+          executor: alpine
           test-all-in-one-command: true
-          pre-steps: [run: pip install --upgrade pip, run: apk add gnupg]
+          pre-steps: [run: apk add gnupg]
       - test:
           name: older-alpine-altogether
-          executor: orb-tools/alpine
+          executor: alpine
           test-all-in-one-command: true
           docker-version: v18.09.4
           docker-compose-version: 1.17.1
           dockerize-version: v0.4.0
           goss-version: v0.3.3
-          pre-steps: [run: pip install --upgrade pip, run: apk add gnupg]
+          pre-steps: [run: apk add gnupg]
       # machine
       - test:
           name: latest-machine

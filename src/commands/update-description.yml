@@ -51,5 +51,6 @@ steps:
         STATUS=$(curl -s -o /dev/null -w %{http_code} -X PATCH -H "$HEADER" --data-urlencode full_description@$DESCRIPTION $URL)
         if [ $STATUS -ne 200 ]; then
           echo "Could not update image description"
+          echo "Error code: $STATUS"
           exit 1
         fi

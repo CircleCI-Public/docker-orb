@@ -210,7 +210,7 @@ jobs:
       - setup_remote_docker
       - docker/build:
           dockerfile: test.Dockerfile
-          image: circlecipublic/docker-orb-test
+          image: cpeorbtesting/docker-orb-test
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
           attach-at: "./"
       - run:
@@ -236,11 +236,11 @@ workflows:
           requires: [orb-tools/lint]
       - orb-tools/publish-dev:
           orb-name: circleci/docker
-          context: orb-publishing
+          context: orb-publisher
           requires: [orb-tools/pack]
       - orb-tools/trigger-integration-tests-workflow:
           name: trigger-integration-dev
-          context: orb-publishing
+          context: orb-publisher
           requires: [orb-tools/publish-dev]
 
   integration-tests_prod-release:
@@ -256,21 +256,21 @@ workflows:
       - test-check-command:
           name: test-check-command-docker
           executor: docker/docker
-          context: orb-publishing
+          context: CPE-orb-docker-testing
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           use-docker-credentials-store: false
       - test-check-command:
           name: test-check-command-machine
           executor: orb-tools/machine
-          context: orb-publishing
+          context: CPE-orb-docker-testing
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           use-docker-credentials-store: true
       - test-check-command:
           name: test-check-command-macos
           executor: orb-tools/macos
-          context: orb-publishing
+          context: CPE-orb-docker-testing
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           use-docker-credentials-store: true
@@ -280,20 +280,20 @@ workflows:
       - test-credentials-store:
           name: test-credentials-store-docker
           executor: docker/docker
-          context: orb-publishing
+          context: CPE-orb-docker-testing
           helper-name: pass
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
       - test-credentials-store:
           name: test-credentials-store-machine
           executor: orb-tools/machine
-          context: orb-publishing
+          context: CPE-orb-docker-testing
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
       - test-credentials-store:
           name: test-credentials-store-macos
           executor: orb-tools/macos
-          context: orb-publishing
+          context: CPE-orb-docker-testing
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           pre-steps:
@@ -301,9 +301,9 @@ workflows:
       # build/publish
       - docker/publish:
           name: publish-machine
-          context: orb-publishing
+          context: CPE-orb-docker-testing
           dockerfile: test.Dockerfile
-          image: circlecipublic/docker-orb-test
+          image: cpeorbtesting/docker-orb-test
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
@@ -315,10 +315,10 @@ workflows:
       - docker/publish:
           name: publish-docker
           executor: docker/docker
-          context: orb-publishing
+          context: CPE-orb-docker-testing
           use-remote-docker: true
           dockerfile: test.Dockerfile
-          image: circlecipublic/docker-orb-test
+          image: cpeorbtesting/docker-orb-test
           tag: $CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
@@ -328,12 +328,12 @@ workflows:
           requires:
             - publish-docker
           executor: docker/docker
-          context: orb-publishing
+          context: CPE-orb-docker-testing
           use-remote-docker: true
           dockerfile: test.Dockerfile
-          image: circlecipublic/docker-orb-test
+          image: cpeorbtesting/docker-orb-test
           tag: $CIRCLE_SHA1
-          cache_from: circlecipublic/docker-orb-test:$CIRCLE_SHA1
+          cache_from: cpeorbtesting/docker-orb-test:$CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           pre-steps:
@@ -344,23 +344,23 @@ workflows:
       - docker/publish:
           name: publish-docker-cache-not-found
           executor: docker/docker
-          context: orb-publishing
+          context: CPE-orb-docker-testing
           use-remote-docker: true
           dockerfile: test.Dockerfile
-          image: circlecipublic/docker-orb-test
+          image: cpeorbtesting/docker-orb-test
           tag: $CIRCLE_SHA1-2
-          cache_from: circlecipublic/docker-orb-test:not-exists
+          cache_from: cpeorbtesting/docker-orb-test:not-exists
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
       - docker/publish:
           name: publish-docker-update-description
           executor: docker/docker
-          context: orb-publishing
+          context: CPE-orb-docker-testing
           use-remote-docker: true
           dockerfile: test.Dockerfile
-          image: circlecipublic/docker-orb-test
+          image: cpeorbtesting/docker-orb-test
           tag: $CIRCLE_SHA1
-          cache_from: circlecipublic/docker-orb-test:$CIRCLE_SHA1
+          cache_from: cpeorbtesting/docker-orb-test:$CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           update-description: true
@@ -515,10 +515,8 @@ workflows:
             - test-create-workspace
       - orb-tools/dev-promote-prod-from-commit-subject:
           orb-name: circleci/docker
-          context: orb-publishing
-          add-pr-comment: true
-          bot-token-variable: GHI_TOKEN
-          bot-user: cpe-bot
+          context: orb-publisher
+          add-pr-comment: false
           fail-if-semver-not-indicated: true
           publish-version-tag: false
           requires: *promotion_requires

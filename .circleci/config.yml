@@ -364,6 +364,18 @@ workflows:
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           update-description: true
+      - docker/publish:
+          name: publish-docker_use_buildkit
+          executor: docker/docker
+          context: CPE-orb-docker-testing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: cpeorbtesting/docker-orb-test
+          tag: $CIRCLE_SHA1-buildkit
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
+          use_buildkit: true
       - test-pull
       # alpine
       - test:

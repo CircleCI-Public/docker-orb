@@ -112,7 +112,7 @@ steps:
               at: <<parameters.attach-at>>
 
   - when:
-      condition: <<paraters.user_buildkit>>
+      condition: <<paraters.use_buildkit>>
       steps:
         - run: echo 'export DOCKER_BUILDKIT=1' >> $BASH_ENV
 

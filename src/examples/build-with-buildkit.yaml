@@ -12,4 +12,4 @@ usage:
       jobs:
         - docker/publish:
             image:  $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
-            use-buildkit: true
+            use_buildkit: true

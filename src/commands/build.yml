@@ -90,7 +90,7 @@ parameters:
       Pass through a default timeout if your Docker build does not output
       anything for more than 10 minutes.
 
-  use_buildkit:
+  use-buildkit:
     type: boolean
     default: false
     description: >
@@ -112,7 +112,7 @@ steps:
               at: <<parameters.attach-at>>
 
   - when:
-      condition: <<paraters.use_buildkit>>
+      condition: <<parameters.use-buildkit>>
       steps:
         - run: echo 'export DOCKER_BUILDKIT=1' >> $BASH_ENV
 

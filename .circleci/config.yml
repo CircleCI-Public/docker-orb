@@ -365,7 +365,7 @@ workflows:
           docker-password: DOCKER_PASS
           update-description: true
       - docker/publish:
-          name: publish-docker_use_buildkit
+          name: publish-docker_use-buildkit
           executor: docker/docker
           context: CPE-orb-docker-testing
           use-remote-docker: true
@@ -375,7 +375,7 @@ workflows:
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           use-docker-credentials-store: true
-          use_buildkit: true
+          use-buildkit: true
       - test-pull
       # alpine
       - test:

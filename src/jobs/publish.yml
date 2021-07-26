@@ -54,6 +54,12 @@ parameters:
       If linting Dockerfile, treat linting warnings as errors (would trigger
       an exist code and fail the CircleCI job)?
 
+  use-buildkit:
+    type: boolean
+    default: false
+    description: >
+      Use the modern BuildKit architecture available in docker 18.09 and later.
+
   image:
     type: string
     description: Name of image to build
@@ -143,12 +149,6 @@ parameters:
       Path to the directory containing your build context,
       defaults to . (working directory)
 
-  use_buildkit:
-    type: boolean
-    default: false
-    description: >
-      Use the modern BuildKit architecture available in docker 18.09 and later.
-
 steps:
   - checkout
 
@@ -192,7 +192,7 @@ steps:
       extra_build_args: <<parameters.extra_build_args>>
       lint-dockerfile: <<parameters.lint-dockerfile>>
       treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>
-      use_buildkit: <<parameters.use_buildkit>>
+      use-buildkit: <<parameters.use-buildkit>>
 
   - when:
       condition: <<parameters.after_build>>

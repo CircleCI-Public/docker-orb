@@ -143,6 +143,12 @@ parameters:
       Path to the directory containing your build context,
       defaults to . (working directory)
 
+  use_buildkit:
+    type: boolean
+    default: false
+    description: >
+      Use the modern BuildKit architecture available in docker 18.09 and later.
+
 steps:
   - checkout
 
@@ -186,6 +192,7 @@ steps:
       extra_build_args: <<parameters.extra_build_args>>
       lint-dockerfile: <<parameters.lint-dockerfile>>
       treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>
+      use_buildkit: <<parameters.use_buildkit>>
 
   - when:
       condition: <<parameters.after_build>>

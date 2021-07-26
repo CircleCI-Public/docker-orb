@@ -90,6 +90,12 @@ parameters:
       Pass through a default timeout if your Docker build does not output
       anything for more than 10 minutes.
 
+  use_buildkit:
+    type: boolean
+    default: false
+    description: >
+      Use the modern BuildKit architecture available in docker 18.09 and later.
+
 steps:
   - when:
       condition: <<parameters.lint-dockerfile>>
@@ -104,6 +110,11 @@ steps:
       steps:
         - attach_workspace:
               at: <<parameters.attach-at>>
+
+  - when:
+      condition: <<paraters.user_buildkit>>
+      steps:
+        - run: echo 'export DOCKER_BUILDKIT=1' >> $BASH_ENV
 
   - when:
       condition: <<parameters.cache_from>>

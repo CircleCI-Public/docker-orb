@@ -135,7 +135,7 @@ steps:
                 docker_tag_args="$docker_tag_args -t <<parameters.registry>>/<<parameters.image>>:${tag}"
               done
 
-              docker build <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
+              docker build <<#parameters.use-buildkit>>--progress=plain<</parameters.use-buildkit>> <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
                 --cache-from <<parameters.cache_from>> \
                 -f <<parameters.path>>/<<parameters.dockerfile>> \
                 $docker_tag_args \

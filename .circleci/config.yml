@@ -96,7 +96,6 @@ jobs:
 
     steps:
       - checkout
-      - build-tools/install-ci-tools
       - jq/install
 
       - unless:

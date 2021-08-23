@@ -96,7 +96,6 @@ jobs:
 
     steps:
       - checkout
-      - build-tools/install-ci-tools
       - jq/install
 
       - unless:
@@ -249,7 +248,7 @@ workflows:
       # hadolint
       - docker/hadolint:
           name: hadolint
-          ignore-rules: DL4005,DL3008,DL3009,DL3015
+          ignore-rules: DL4005,DL3008,DL3009,DL3015,DL3059
           trusted-registries: docker.io,my-company.com:5000
           dockerfiles: test.Dockerfile:test2.Dockerfile
       # check command

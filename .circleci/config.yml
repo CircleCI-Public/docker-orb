@@ -45,7 +45,7 @@ orbs:
   docker: circleci/docker@<<pipeline.parameters.dev-orb-version>>
   jq: circleci/jq@2.0
   node: circleci/node@1.1.3
-  orb-tools: circleci/orb-tools@9.0
+  orb-tools: circleci/orb-tools@10.0.5
 
 # Pipeline parameters
 parameters:

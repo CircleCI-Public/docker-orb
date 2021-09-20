@@ -45,7 +45,27 @@ orbs:
   docker: circleci/docker@<<pipeline.parameters.dev-orb-version>>
   jq: circleci/jq@2.0
   node: circleci/node@1.1.3
-  orb-tools: circleci/orb-tools@9.0
+  orb-tools: circleci/orb-tools@10.0.5
+
+executors: 
+  macos:
+    macos:
+      xcode: "12.5.1"
+  node-cimg:
+    docker:
+      - image: cimg/node:16.8.0
+  node:
+    docker:
+      - image: node:latest
+  oracle:
+    docker:
+      - image: 'openjdk:12-oracle'
+  alpine:
+    docker:
+      - image: cibuilds/base
+  machine:
+    machine:
+      image: ubuntu-2004:202107-02
 
 # Pipeline parameters
 parameters:
@@ -128,7 +148,7 @@ jobs:
                 goss-version: <<parameters.goss-version>>
                 debug: <<parameters.debug>>
   test-pull:
-    executor: orb-tools/node-cci
+    executor: node-cimg
 
     steps:
       - setup_remote_docker
@@ -261,14 +281,14 @@ workflows:
           use-docker-credentials-store: false
       - test-check-command:
           name: test-check-command-machine
-          executor: orb-tools/machine
+          executor: machine
           context: CPE-orb-docker-testing
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           use-docker-credentials-store: true
       - test-check-command:
           name: test-check-command-macos
-          executor: orb-tools/macos
+          executor: macos
           context: CPE-orb-docker-testing
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
@@ -285,13 +305,13 @@ workflows:
           docker-password: DOCKER_PASS
       - test-credentials-store:
           name: test-credentials-store-machine
-          executor: orb-tools/machine
+          executor: machine
           context: CPE-orb-docker-testing
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
       - test-credentials-store:
           name: test-credentials-store-macos
-          executor: orb-tools/macos
+          executor: macos
           context: CPE-orb-docker-testing
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
@@ -367,11 +387,11 @@ workflows:
       # alpine
       - test:
           name: latest-alpine
-          executor: orb-tools/alpine
+          executor: alpine
           pre-steps: [run: apk add gnupg]
       - test:
           name: older-alpine
-          executor: orb-tools/alpine
+          executor: alpine
           docker-version: v18.09.4
           docker-compose-version: 1.17.1
           dockerize-version: v0.4.0
@@ -379,12 +399,12 @@ workflows:
           pre-steps: [run: apk add gnupg]
       - test:
           name: latest-alpine-altogether
-          executor: orb-tools/alpine
+          executor: alpine
           test-all-in-one-command: true
           pre-steps: [run: apk add gnupg]
       - test:
           name: older-alpine-altogether
-          executor: orb-tools/alpine
+          executor: alpine
           test-all-in-one-command: true
           docker-version: v18.09.4
           docker-compose-version: 1.17.1
@@ -394,21 +414,21 @@ workflows:
       # machine
       - test:
           name: latest-machine
-          executor: orb-tools/machine
+          executor: machine
       - test:
           name: older-machine
-          executor: orb-tools/machine
+          executor: machine
           docker-version: v17.09.0-ce
           docker-compose-version: 1.20.0
           dockerize-version: v0.2.0
           goss-version: v0.3.4
       - test:
           name: latest-machine-altogether
-          executor: orb-tools/machine
+          executor: machine
           test-all-in-one-command: true
       - test:
           name: older-machine-altogether
-          executor: orb-tools/machine
+          executor: machine
           test-all-in-one-command: true
           docker-version: v17.09.0-ce
           docker-compose-version: 1.20.0
@@ -417,23 +437,23 @@ workflows:
       # mac
       - test:
           name: latest-mac
-          executor: orb-tools/macos
+          executor: macos
           install-goss: false
       - test:
           name: older-mac
-          executor: orb-tools/macos
+          executor: macos
           docker-version: v17.12.1-ce
           docker-compose-version: 1.21.2
           dockerize-version: v0.5.0
           install-goss: false
       - test:
           name: latest-mac-altogether
-          executor: orb-tools/macos
+          executor: macos
           test-all-in-one-command: true
           install-goss: false
       - test:
           name: older-mac-altogether
-          executor: orb-tools/macos
+          executor: macos
           test-all-in-one-command: true
           docker-version: v17.12.1-ce
           docker-compose-version: 1.21.2
@@ -442,21 +462,21 @@ workflows:
       # docker
       - test:
           name: latest-docker
-          executor: orb-tools/node
+          executor: node
       - test:
           name: older-docker
-          executor: orb-tools/node
+          executor: node
           docker-version: v18.09.3
           docker-compose-version: 1.22.0
           dockerize-version: v0.6.0
           goss-version: v0.3.6
       - test:
           name: latest-docker-altogether
-          executor: orb-tools/node
+          executor: node
           test-all-in-one-command: true
       - test:
           name: older-docker-altogether
-          executor: orb-tools/node
+          executor: node
           test-all-in-one-command: true
           docker-version: v18.09.3
           docker-compose-version: 1.22.0
@@ -465,21 +485,21 @@ workflows:
       # ci-docker
       - test:
           name: latest-ci-docker
-          executor: orb-tools/node-cci
+          executor: node-cimg
       - test:
           name: older-ci-docker
-          executor: orb-tools/node-cci
+          executor: node-cimg
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
           goss-version: v0.3.4
       - test:
           name: latest-ci-docker-altogether
-          executor: orb-tools/node-cci
+          executor: node-cimg
           test-all-in-one-command: true
       - test:
           name: older-ci-docker-altogether
-          executor: orb-tools/node-cci
+          executor: node-cimg
           test-all-in-one-command: true
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
@@ -488,21 +508,21 @@ workflows:
       # oracle
       - test:
           name: latest-oracle
-          executor: orb-tools/oracle
+          executor: oracle
       - test:
           name: older-oracle
-          executor: orb-tools/oracle
+          executor: oracle
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
           goss-version: v0.3.2
       - test:
           name: latest-oracle-altogether
-          executor: orb-tools/oracle
+          executor: oracle
           test-all-in-one-command: true
       - test:
           name: older-oracle-altogether
-          executor: orb-tools/oracle
+          executor: oracle
           test-all-in-one-command: true
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1

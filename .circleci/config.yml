@@ -13,8 +13,8 @@ promotion_requires: &promotion_requires
     publish-docker-cache,
     publish-docker-cache-not-found,
     test-pull,
-    latest-alpine,
-    older-alpine,
+    # latest-alpine,
+    # older-alpine,
     latest-machine,
     older-machine,
     latest-mac,
@@ -23,8 +23,8 @@ promotion_requires: &promotion_requires
     older-docker,
     latest-ci-docker,
     older-ci-docker,
-    latest-alpine-altogether,
-    older-alpine-altogether,
+    # latest-alpine-altogether,
+    # older-alpine-altogether,
     latest-machine-altogether,
     older-machine-altogether,
     latest-mac-altogether,
@@ -60,9 +60,6 @@ executors:
   oracle:
     docker:
       - image: 'openjdk:12-oracle'
-  alpine:
-    docker:
-      - image: cibuilds/base
   machine:
     machine:
       image: ubuntu-2004:202107-02
@@ -385,32 +382,32 @@ workflows:
           update-description: true
       - test-pull
       # alpine
-      - test:
-          name: latest-alpine
-          executor: alpine
-          pre-steps: [run: apk add gnupg]
-      - test:
-          name: older-alpine
-          executor: alpine
-          docker-version: v18.09.4
-          docker-compose-version: 1.17.1
-          dockerize-version: v0.4.0
-          goss-version: v0.3.2
-          pre-steps: [run: apk add gnupg]
-      - test:
-          name: latest-alpine-altogether
-          executor: alpine
-          test-all-in-one-command: true
-          pre-steps: [run: apk add gnupg]
-      - test:
-          name: older-alpine-altogether
-          executor: alpine
-          test-all-in-one-command: true
-          docker-version: v18.09.4
-          docker-compose-version: 1.17.1
-          dockerize-version: v0.4.0
-          goss-version: v0.3.3
-          pre-steps: [run: apk add gnupg]
+      # - test:
+      #     name: latest-alpine
+      #     executor: alpine
+      #     pre-steps: [run: apk add gnupg]
+      # - test:
+      #     name: older-alpine
+      #     executor: alpine
+      #     docker-version: v18.09.4
+      #     docker-compose-version: 1.17.1
+      #     dockerize-version: v0.4.0
+      #     goss-version: v0.3.2
+      #     pre-steps: [run: apk add gnupg]
+      # - test:
+      #     name: latest-alpine-altogether
+      #     executor: alpine
+      #     test-all-in-one-command: true
+      #     pre-steps: [run: apk add gnupg]
+      # - test:
+      #     name: older-alpine-altogether
+      #     executor: alpine
+      #     test-all-in-one-command: true
+      #     docker-version: v18.09.4
+      #     docker-compose-version: 1.17.1
+      #     dockerize-version: v0.4.0
+      #     goss-version: v0.3.3
+      #     pre-steps: [run: apk add gnupg]
       # machine
       - test:
           name: latest-machine

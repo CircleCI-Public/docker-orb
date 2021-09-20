@@ -47,7 +47,7 @@ orbs:
   node: circleci/node@1.1.3
   orb-tools: circleci/orb-tools@10.0.5
 
-executors: 
+executors:
   macos:
     macos:
       xcode: "12.5.1"

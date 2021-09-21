@@ -13,26 +13,22 @@ promotion_requires: &promotion_requires
     publish-docker-cache,
     publish-docker-cache-not-found,
     test-pull,
-    # latest-alpine,
-    # older-alpine,
+    latest-base,
+    older-base,
     latest-machine,
     older-machine,
     latest-mac,
     older-mac,
     latest-docker,
     older-docker,
-    latest-ci-docker,
-    older-ci-docker,
-    # latest-alpine-altogether,
-    # older-alpine-altogether,
+    latest-base-altogether,
+    older-base-altogether,
     latest-machine-altogether,
     older-machine-altogether,
     latest-mac-altogether,
     older-mac-altogether,
     latest-docker-altogether,
     older-docker-altogether,
-    latest-ci-docker-altogether,
-    older-ci-docker-altogether,
     latest-oracle,
     older-oracle,
     latest-oracle-altogether,
@@ -50,16 +46,16 @@ orbs:
 executors:
   macos:
     macos:
-      xcode: "12.5.1"
-  node-cimg:
-    docker:
-      - image: cimg/node:16.8.0
+      xcode: 12.5.1
   node:
     docker:
-      - image: node:latest
+      - image: cimg/node:lts
+  base:
+    docker:
+      - image: cimg/base:stable
   oracle:
     docker:
-      - image: 'openjdk:12-oracle'
+      - image: cimg/openjdk:16.0.2
   machine:
     machine:
       image: ubuntu-2004:202107-02
@@ -145,7 +141,7 @@ jobs:
                 goss-version: <<parameters.goss-version>>
                 debug: <<parameters.debug>>
   test-pull:
-    executor: node-cimg
+    executor: node
 
     steps:
       - setup_remote_docker
@@ -457,16 +453,39 @@ workflows:
           dockerize-version: v0.5.0
           install-goss: false
       # docker
+      # ci-docker
+      - test:
+          name: latest-base
+          executor: base
+      - test:
+          name: older-base
+          executor: base
+          docker-version: v18.06.2-ce
+          docker-compose-version: 1.23.1
+          dockerize-version: v0.3.0
+          goss-version: v0.3.4
+      - test:
+          name: latest-base-altogether
+          executor: base
+          test-all-in-one-command: true
+      - test:
+          name: older-base-altogether
+          executor: base
+          test-all-in-one-command: true
+          docker-version: v18.06.2-ce
+          docker-compose-version: 1.23.1
+          dockerize-version: v0.3.0
+          goss-version: v0.3.3
       - test:
           name: latest-docker
           executor: node
       - test:
           name: older-docker
           executor: node
-          docker-version: v18.09.3
-          docker-compose-version: 1.22.0
-          dockerize-version: v0.6.0
-          goss-version: v0.3.6
+          docker-version: v18.06.2-ce
+          docker-compose-version: 1.23.1
+          dockerize-version: v0.3.0
+          goss-version: v0.3.4
       - test:
           name: latest-docker-altogether
           executor: node
@@ -474,29 +493,6 @@ workflows:
       - test:
           name: older-docker-altogether
           executor: node
-          test-all-in-one-command: true
-          docker-version: v18.09.3
-          docker-compose-version: 1.22.0
-          dockerize-version: v0.6.0
-          goss-version: v0.3.5
-      # ci-docker
-      - test:
-          name: latest-ci-docker
-          executor: node-cimg
-      - test:
-          name: older-ci-docker
-          executor: node-cimg
-          docker-version: v18.06.2-ce
-          docker-compose-version: 1.23.1
-          dockerize-version: v0.3.0
-          goss-version: v0.3.4
-      - test:
-          name: latest-ci-docker-altogether
-          executor: node-cimg
-          test-all-in-one-command: true
-      - test:
-          name: older-ci-docker-altogether
-          executor: node-cimg
           test-all-in-one-command: true
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1

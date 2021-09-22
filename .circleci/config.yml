@@ -29,10 +29,10 @@ promotion_requires: &promotion_requires
     older-mac-altogether,
     latest-docker-altogether,
     older-docker-altogether,
-    latest-oracle,
-    older-oracle,
-    latest-oracle-altogether,
-    older-oracle-altogether,
+    latest-openjdk,
+    older-openjdk,
+    latest-openjdk-altogether,
+    older-openjdk-altogether,
     test-build-command-workspace
   ]
 
@@ -53,7 +53,7 @@ executors:
   base:
     docker:
       - image: cimg/base:stable
-  oracle:
+  openjdk:
     docker:
       - image: cimg/openjdk:16.0.2
   machine:
@@ -498,24 +498,24 @@ workflows:
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
           goss-version: v0.3.3
-      # oracle
+      # openjdk
       - test:
-          name: latest-oracle
-          executor: oracle
+          name: latest-openjdk
+          executor: openjdk
       - test:
-          name: older-oracle
-          executor: oracle
+          name: older-openjdk
+          executor: openjdk
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
           goss-version: v0.3.2
       - test:
-          name: latest-oracle-altogether
-          executor: oracle
+          name: latest-openjdk-altogether
+          executor: openjdk
           test-all-in-one-command: true
       - test:
-          name: older-oracle-altogether
-          executor: oracle
+          name: older-openjdk-altogether
+          executor: openjdk
           test-all-in-one-command: true
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1

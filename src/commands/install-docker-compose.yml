@@ -26,7 +26,7 @@ steps:
 
         # grab docker-compose version
         if [[ <<parameters.version>> == "latest" ]]; then
-          DOCKER_COMPOSE_VERSION=$(curl -Ls --fail --retry 3 -o /dev/null -w %{url_effective} "https://github.com/docker/compose/releases/latest" | sed 's:.*/::')
+          DOCKER_COMPOSE_VERSION=$(curl -s --fail --retry 3 "https://github.com/docker/compose/releases/" | grep -Eoi '<a [^>]+>' | grep -Eo 'href="[^\"]+"'| grep x86_64 | head -1 | awk -F'/' '{print $6}')
           echo "Latest stable version of docker-compose is $DOCKER_COMPOSE_VERSION"
         else
           DOCKER_COMPOSE_VERSION=<<parameters.version>>

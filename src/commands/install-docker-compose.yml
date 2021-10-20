@@ -57,7 +57,7 @@ steps:
             PLATFORM=Darwin
             HOMEBREW_NO_AUTO_UPDATE=1 brew install coreutils
           else
-            PLATFORM=Linux
+            PLATFORM=linux
           fi
 
           DOCKER_COMPOSE_BINARY_URL="https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-$PLATFORM-x86_64"

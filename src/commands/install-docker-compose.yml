@@ -65,9 +65,13 @@ steps:
           DOCKER_COMPOSE_SHASUM_URL="$DOCKER_COMPOSE_BINARY_URL.sha256"
 
           # download binary and shasum
-          curl -O --silent --show-error --location --fail --retry 3 "$DOCKER_COMPOSE_BINARY_URL"
+          curl -O \
+            --silent --show-error --location --fail --retry 3 \
+            "$DOCKER_COMPOSE_BINARY_URL"
 
-          curl --output docker-compose.sha256 --silent --show-error --location --fail --retry 3 "$DOCKER_COMPOSE_SHASUM_URL"
+          curl --output docker-compose.sha256 \
+           --silent --show-error --location --fail --retry 3 \
+           "$DOCKER_COMPOSE_SHASUM_URL"
 
           set +e
           grep "docker-compose-$PLATFORM-x86_64" docker-compose.sha256 | sha256sum -c -

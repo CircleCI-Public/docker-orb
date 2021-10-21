@@ -69,7 +69,7 @@ steps:
             --silent --show-error --location --fail --retry 3 \
             "$DOCKER_COMPOSE_BINARY_URL"
 
-          curl --output docker-compose.sha256 \
+          curl -O \
            --silent --show-error --location --fail --retry 3 \
            "$DOCKER_COMPOSE_SHASUM_URL"
 

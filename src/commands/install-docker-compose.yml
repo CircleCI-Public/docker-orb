@@ -74,7 +74,7 @@ steps:
            "$DOCKER_COMPOSE_SHASUM_URL"
 
           set +e
-          grep "docker-compose-$PLATFORM-x86_64" docker-compose.sha256 | sha256sum -c -
+          grep "docker-compose-$PLATFORM-x86_64" docker-compose-$PLATFORM-x86_64.sha256 | sha256sum -c -
           SHASUM_SUCCESS=$?
           set -e
 

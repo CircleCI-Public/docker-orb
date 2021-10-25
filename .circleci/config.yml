@@ -58,6 +58,11 @@ parameters:
     type: string
     default: "dev:alpha"
 
+executors:
+  macos:
+    macos:
+      xcode: 10.3.0
+
 jobs:
   test:
     parameters:
@@ -268,7 +273,8 @@ workflows:
           use-docker-credentials-store: true
       - test-check-command:
           name: test-check-command-macos
-          executor: orb-tools/macos
+          # executor: orb-tools/mac
+          executor: macos
           context: CPE-orb-docker-testing
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
@@ -291,7 +297,8 @@ workflows:
           docker-password: DOCKER_PASS
       - test-credentials-store:
           name: test-credentials-store-macos
-          executor: orb-tools/macos
+          # executor: orb-tools/macos
+          executor: macos
           context: CPE-orb-docker-testing
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
@@ -417,23 +424,27 @@ workflows:
       # mac
       - test:
           name: latest-mac
-          executor: orb-tools/macos
+          # executor: orb-tools/macos
+          executor: macos
           install-goss: false
       - test:
           name: older-mac
-          executor: orb-tools/macos
+          # executor: orb-tools/macos
+          executor: macos
           docker-version: v17.12.1-ce
           docker-compose-version: 1.21.2
           dockerize-version: v0.5.0
           install-goss: false
       - test:
           name: latest-mac-altogether
-          executor: orb-tools/macos
+          # executor: orb-tools/macos
+          executor: macos
           test-all-in-one-command: true
           install-goss: false
       - test:
           name: older-mac-altogether
-          executor: orb-tools/macos
+          # executor: orb-tools/macos
+          executor: macos
           test-all-in-one-command: true
           docker-version: v17.12.1-ce
           docker-compose-version: 1.21.2

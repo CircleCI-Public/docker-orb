@@ -62,6 +62,9 @@ executors:
   macos:
     macos:
       xcode: 10.3.0
+  openjdk: 
+    docker:
+      - image: cimg/openjdk:16.0.2
 
 jobs:
   test:
@@ -273,7 +276,6 @@ workflows:
           use-docker-credentials-store: true
       - test-check-command:
           name: test-check-command-macos
-          # executor: orb-tools/mac
           executor: macos
           context: CPE-orb-docker-testing
           docker-username: DOCKER_USER
@@ -297,7 +299,6 @@ workflows:
           docker-password: DOCKER_PASS
       - test-credentials-store:
           name: test-credentials-store-macos
-          # executor: orb-tools/macos
           executor: macos
           context: CPE-orb-docker-testing
           docker-username: DOCKER_USER
@@ -424,12 +425,10 @@ workflows:
       # mac
       - test:
           name: latest-mac
-          # executor: orb-tools/macos
           executor: macos
           install-goss: false
       - test:
           name: older-mac
-          # executor: orb-tools/macos
           executor: macos
           docker-version: v17.12.1-ce
           docker-compose-version: 1.21.2
@@ -437,13 +436,11 @@ workflows:
           install-goss: false
       - test:
           name: latest-mac-altogether
-          # executor: orb-tools/macos
           executor: macos
           test-all-in-one-command: true
           install-goss: false
       - test:
           name: older-mac-altogether
-          # executor: orb-tools/macos
           executor: macos
           test-all-in-one-command: true
           docker-version: v17.12.1-ce
@@ -499,21 +496,21 @@ workflows:
       # oracle
       - test:
           name: latest-oracle
-          executor: orb-tools/oracle
+          executor: openjdk
       - test:
           name: older-oracle
-          executor: orb-tools/oracle
+          executor: openjdk
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
           goss-version: v0.3.2
       - test:
           name: latest-oracle-altogether
-          executor: orb-tools/oracle
+          executor: openjdk
           test-all-in-one-command: true
       - test:
           name: older-oracle-altogether
-          executor: orb-tools/oracle
+          executor: openjdk
           test-all-in-one-command: true
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1

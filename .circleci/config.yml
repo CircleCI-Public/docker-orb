@@ -62,7 +62,7 @@ executors:
   macos:
     macos:
       xcode: 10.3.0
-  openjdk: 
+  openjdk:
     docker:
       - image: cimg/openjdk:16.0.2
 

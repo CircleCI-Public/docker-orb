@@ -46,4 +46,4 @@ steps:
       command: |
         echo "$<<parameters.docker-password>>" \
           | docker login -u "$<<parameters.docker-username>>" \
-              --password-stdin <<parameters.registry>>
+              --password-stdin

@@ -121,7 +121,7 @@ steps:
 
               IFS="," read -ra DOCKER_TAGS \<<< "<< parameters.tag >>"
               for tag in "${DOCKER_TAGS[@]}"; do
-                docker_tag_args="$docker_tag_args -t <<parameters.registry>>/<<parameters.image>>:${tag}"
+                docker_tag_args="$docker_tag_args -t <<parameters.image>>:${tag}"
               done
 
               docker build <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
@@ -140,7 +140,7 @@ steps:
 
               IFS="," read -ra DOCKER_TAGS \<<< "<< parameters.tag >>"
               for tag in "${DOCKER_TAGS[@]}"; do
-                docker_tag_args="$docker_tag_args -t <<parameters.registry>>/<<parameters.image>>:${tag}"
+                docker_tag_args="$docker_tag_args -t <<parameters.image>>:${tag}"
               done
 
               docker build <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \

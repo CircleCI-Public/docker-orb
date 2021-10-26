@@ -54,7 +54,7 @@ steps:
         else
           # get binary/shasum download URL for specified version
           if uname -a | grep Darwin >> /dev/null 2>&1; then
-            PLATFORM=Darwin
+            PLATFORM=darwin
             HOMEBREW_NO_AUTO_UPDATE=1 brew install coreutils
           else
             PLATFORM=linux

@@ -33,10 +33,10 @@ promotion_requires: &promotion_requires
     older-docker-altogether,
     latest-ci-docker-altogether,
     older-ci-docker-altogether,
-    latest-oracle,
-    older-oracle,
-    latest-oracle-altogether,
-    older-oracle-altogether,
+    latest-openjdk,
+    older-openjdk,
+    latest-openjdk-altogether,
+    older-openjdk-altogether,
     test-build-command-workspace
   ]
 
@@ -493,23 +493,23 @@ workflows:
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
           goss-version: v0.3.3
-      # oracle
+      # openjdk
       - test:
-          name: latest-oracle
+          name: latest-openjdk
           executor: openjdk
       - test:
-          name: older-oracle
+          name: older-openjdk
           executor: openjdk
           docker-version: v18.06.2-ce
           docker-compose-version: 1.23.1
           dockerize-version: v0.3.0
           goss-version: v0.3.2
       - test:
-          name: latest-oracle-altogether
+          name: latest-openjdk-altogether
           executor: openjdk
           test-all-in-one-command: true
       - test:
-          name: older-oracle-altogether
+          name: older-openjdk-altogether
           executor: openjdk
           test-all-in-one-command: true
           docker-version: v18.06.2-ce

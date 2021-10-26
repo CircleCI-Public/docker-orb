@@ -59,10 +59,9 @@ steps:
           else
             PLATFORM=linux
           fi
-
+          
           DOCKER_COMPOSE_BASE_URL="https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION"
           DOCKER_COMPOSE_SHASUM_URL="$DOCKER_COMPOSE_BASE_URL/$FILENAME.sha256"
-          
           # download binary and shasum
           curl -O \
             --silent --show-error --location --fail --retry 3 \

@@ -22,7 +22,7 @@ steps:
   - run:
       name: Install docker-compose
       command: |
-        if [[ $(whoami | grep 'root') == "root" ]] then
+        if [[ $(whoami | grep 'root') == "root" ]]; then
           SUDO=""
         elif [[ $EUID == 0 ]]; then
           SUDO=""

@@ -64,7 +64,7 @@ executors:
       xcode: 10.3.0
   openjdk:
     docker:
-      - image: cimg/openjdk:16.0.2
+      - image: cimg/openjdk:16.0.2 ##Change to base image
 
 jobs:
   test:

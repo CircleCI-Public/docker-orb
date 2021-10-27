@@ -22,7 +22,18 @@ steps:
   - run:
       name: Install docker-compose
       command: |
-        if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+        if [[ $(whoami | grep 'root') == "root" ]] then
+          SUDO=""
+        elif [[ $EUID == 0 ]]; then
+          SUDO=""
+        else
+          SUDO="sudo"
+        fi
+
+        if cat /etc/issue | grep Alpine >> /dev/null 2>&1; then
+          $SUDO apk update
+          $SUDO apk add curl
+        fi
 
         # grab docker-compose version
         if [[ <<parameters.version>> == "latest" ]]; then
@@ -45,13 +56,13 @@ steps:
         fi
 
         # docker-compose binary won't run on alpine, install via pip
-        if cat /etc/issue | grep Alpine >> /dev/null 2>&1; then
-          $SUDO apk update
-          $SUDO apk add gcc libc-dev libffi-dev openssl-dev make python3-dev py-pip
-          export CRYPTOGRAPHY_DONT_BUILD_RUST=1
-          $SUDO pip install --upgrade pip
-          $SUDO python3 -m pip install docker-compose=="$DOCKER_COMPOSE_VERSION"
-        else
+        # if cat /etc/issue | grep Alpine >> /dev/null 2>&1; then
+        #   $SUDO apk update
+        #   $SUDO apk add gcc libc-dev libffi-dev openssl-dev make python3-dev py-pip
+        #   export CRYPTOGRAPHY_DONT_BUILD_RUST=1
+        #   $SUDO pip install --upgrade pip
+        #   $SUDO python3 -m pip install docker-compose=="$DOCKER_COMPOSE_VERSION"
+        # else
           # get binary/shasum download URL for specified version
           if uname -a | grep Darwin >> /dev/null 2>&1; then
             PLATFORM=darwin
@@ -107,7 +118,7 @@ steps:
           # install docker-compose
           $SUDO mv "$FILENAME" <<parameters.install-dir>>/docker-compose
           $SUDO chmod +x <<parameters.install-dir>>/docker-compose
-        fi
+        # fi
 
         # verify version
         echo "$(docker-compose --version) has been installed to $(which docker-compose)"

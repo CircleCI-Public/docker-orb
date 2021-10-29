@@ -29,6 +29,7 @@ steps:
           SUDO=""
         fi
 
+        # installing curl if linux distribution is Alpine
         if cat /etc/issue | grep Alpine >> /dev/null 2>&1; then
           $SUDO apk update
           $SUDO apk add curl

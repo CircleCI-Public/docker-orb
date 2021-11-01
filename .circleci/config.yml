@@ -1,44 +1,44 @@
 version: 2.1
 
-promotion_requires: &promotion_requires
-  [
-    hadolint,
-    test-check-command-docker,
-    test-check-command-machine,
-    test-check-command-macos,
-    test-credentials-store-docker,
-    test-credentials-store-machine,
-    test-credentials-store-macos,
-    publish-machine,
-    publish-docker-cache,
-    publish-docker-cache-not-found,
-    test-pull,
-    latest-alpine,
-    # older-alpine,
-    latest-machine,
-    # older-machine,
-    latest-mac,
-    older-mac,
-    latest-docker,
-    older-docker,
-    latest-ci-docker,
-    older-ci-docker,
-    latest-alpine-altogether,
-    # older-alpine-altogether,
-    latest-machine-altogether,
-    # older-machine-altogether,
-    latest-mac-altogether,
-    older-mac-altogether,
-    latest-docker-altogether,
-    older-docker-altogether,
-    latest-ci-docker-altogether,
-    older-ci-docker-altogether,
-    latest-openjdk,
-    older-openjdk,
-    latest-openjdk-altogether,
-    older-openjdk-altogether,
-    test-build-command-workspace
-  ]
+# promotion_requires: &promotion_requires
+#   [
+#     hadolint,
+#     test-check-command-docker,
+#     test-check-command-machine,
+#     test-check-command-macos,
+#     test-credentials-store-docker,
+#     test-credentials-store-machine,
+#     test-credentials-store-macos,
+#     publish-machine,
+#     publish-docker-cache,
+#     publish-docker-cache-not-found,
+#     test-pull,
+#     latest-alpine,
+#     # older-alpine,
+#     latest-machine,
+#     # older-machine,
+#     latest-mac,
+#     older-mac,
+#     latest-docker,
+#     older-docker,
+#     latest-ci-docker,
+#     older-ci-docker,
+#     latest-alpine-altogether,
+#     # older-alpine-altogether,
+#     latest-machine-altogether,
+#     # older-machine-altogether,
+#     latest-mac-altogether,
+#     older-mac-altogether,
+#     latest-docker-altogether,
+#     older-docker-altogether,
+#     latest-ci-docker-altogether,
+#     older-ci-docker-altogether,
+#     latest-openjdk,
+#     older-openjdk,
+#     latest-openjdk-altogether,
+#     older-openjdk-altogether,
+#     test-build-command-workspace
+#   ]
 
 orbs:
   build-tools: circleci/build-tools@3.0.0
@@ -118,7 +118,7 @@ jobs:
       - jq/install
       - docker/install-docker-tools
   test-pull:
-    executor: docker-stable
+    executor: docker-latest
     steps:
       - setup_remote_docker
 

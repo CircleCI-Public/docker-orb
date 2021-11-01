@@ -62,9 +62,24 @@ executors:
   macos-old:
     macos:
       xcode: 10.3.0
-  docker-stable:
+  macos-latest:
+    macos:
+      xcode: 13.1.0
+  docker-old:
     docker:
-      - image: cimg/base:stable ##Change to base image
+      - image: cimg/base:2020.08-20.04
+  docker-latest:
+    docker:
+      - image: cimg/base:stable
+  machine-old:
+    machine:
+      image: ubuntu-1604:201903-01
+  machine-latest:
+    machine:
+      image: ubuntu-2004:202107-02
+  alpine-latest:
+    docker:
+      - image: alpine:latest
 
 jobs:
   test-install-docker-tools:
@@ -91,10 +106,6 @@ jobs:
       goss-version:
         type: string
         default: latest
-
-      test-all-in-one-command:
-        type: boolean
-        default: false
 
       debug:
         type: boolean
@@ -229,23 +240,23 @@ workflows:
             trusted-registries: docker.io,my-company.com:5000
             dockerfiles: test.Dockerfile:test2.Dockerfile
         # check command
-        # # - test-check-command:
-        # #     name: test-check-command-docker
-        # #     executor: docker/docker
-        # #     context: CPE-orb-docker-testing
-        # #     docker-username: DOCKER_USER
-        # #     docker-password: DOCKER_PASS
-        # #     use-docker-credentials-store: false
-        # - test-check-command:
-        #     name: test-check-command-machine
-        #     executor: orb-tools/machine
-        #     context: CPE-orb-docker-testing
-        #     docker-username: DOCKER_USER
-        #     docker-password: DOCKER_PASS
-        #     use-docker-credentials-store: true
+        - test-check-command:
+            name: test-check-command-docker
+            executor: docker-latest
+            context: CPE-orb-docker-testing
+            docker-username: DOCKER_USER
+            docker-password: DOCKER_PASS
+            use-docker-credentials-store: false
+        - test-check-command:
+            name: test-check-command-machine
+            executor: machine-latest
+            context: CPE-orb-docker-testing
+            docker-username: DOCKER_USER
+            docker-password: DOCKER_PASS
+            use-docker-credentials-store: true
         - test-check-command:
             name: test-check-command-macos
-            executor: macos-old
+            executor: macos-latest
             context: CPE-orb-docker-testing
             docker-username: DOCKER_USER
             docker-password: DOCKER_PASS
@@ -253,22 +264,22 @@ workflows:
             pre-steps:
               - docker/install-docker
         # login with credentials store does not result in warning
-        # - test-credentials-store:
-        #     name: test-credentials-store-docker
-        #     executor: docker/docker
-        #     context: CPE-orb-docker-testing
-        #     helper-name: pass
-        #     docker-username: DOCKER_USER
-        #     docker-password: DOCKER_PASS
-        # - test-credentials-store:
-        #     name: test-credentials-store-machine
-        #     executor: orb-tools/machine
-        #     context: CPE-orb-docker-testing
-        #     docker-username: DOCKER_USER
-        #     docker-password: DOCKER_PASS
+        - test-credentials-store:
+            name: test-credentials-store-docker
+            executor: docker/docker
+            context: CPE-orb-docker-testing
+            helper-name: pass
+            docker-username: DOCKER_USER
+            docker-password: DOCKER_PASS
+        - test-credentials-store:
+            name: test-credentials-store-machine
+            executor: orb-tools/machine
+            context: CPE-orb-docker-testing
+            docker-username: DOCKER_USER
+            docker-password: DOCKER_PASS
         - test-credentials-store:
             name: test-credentials-store-macos
-            executor: macos-old
+            executor: macos-latest
             context: CPE-orb-docker-testing
             docker-username: DOCKER_USER
             docker-password: DOCKER_PASS
@@ -290,7 +301,7 @@ workflows:
               - docker/configure-docker-credentials-store
         - docker/publish:
             name: publish-docker
-            executor: docker/docker
+            executor: docker-latest
             context: CPE-orb-docker-testing
             use-remote-docker: true
             dockerfile: test.Dockerfile
@@ -303,7 +314,7 @@ workflows:
             name: publish-docker-cache
             requires:
               - publish-docker
-            executor: docker/docker
+            executor: docker-latest
             context: CPE-orb-docker-testing
             use-remote-docker: true
             dockerfile: test.Dockerfile
@@ -314,7 +325,7 @@ workflows:
             docker-password: DOCKER_PASS
             pre-steps:
               - docker/install-docker-credential-helper:
-                  release-tag: v0.6.3
+                  # release-tag: v0.6.3
               - docker/configure-docker-credentials-store:
                   helper-name: pass
         - docker/publish:
@@ -330,7 +341,7 @@ workflows:
             docker-password: DOCKER_PASS
         - docker/publish:
             name: publish-docker-update-description
-            executor: docker/docker
+            executor: docker-latest
             context: CPE-orb-docker-testing
             use-remote-docker: true
             dockerfile: test.Dockerfile
@@ -342,4 +353,9 @@ workflows:
             update-description: true
         - test-pull
         - test-install-docker-tools:
-            executor: macos-old
+            name: test-install-docker-tools-docker-latest
+            executor: docker-latest
+        - test-install-docker-tools:
+            name: test-install-docker-tools-docker-old
+            executor: docker-old
+

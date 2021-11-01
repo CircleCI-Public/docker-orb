@@ -146,7 +146,7 @@ jobs:
           docker-username: <<parameters.docker-username>>
           docker-password: <<parameters.docker-password>>
           use-docker-credentials-store: <<parameters.use-docker-credentials-store>>
-  
+
   test-credentials-store:
     parameters:
       executor:
@@ -192,7 +192,7 @@ jobs:
           root: ./
           paths:
             - verify.txt
-  
+
   test-build-command-workspace:
     docker:
       - image: cimg/base:stable

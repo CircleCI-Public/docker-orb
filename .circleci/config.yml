@@ -266,14 +266,14 @@ workflows:
         # login with credentials store does not result in warning
         - test-credentials-store:
             name: test-credentials-store-docker
-            executor: docker/docker
+            executor: docker-latest
             context: CPE-orb-docker-testing
             helper-name: pass
             docker-username: DOCKER_USER
             docker-password: DOCKER_PASS
         - test-credentials-store:
             name: test-credentials-store-machine
-            executor: orb-tools/machine
+            executor: machine-latest
             context: CPE-orb-docker-testing
             docker-username: DOCKER_USER
             docker-password: DOCKER_PASS

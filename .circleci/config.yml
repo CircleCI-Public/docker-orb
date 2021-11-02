@@ -127,7 +127,7 @@ jobs:
             - run:
                 command: echo "IT GETS HERE"
             - docker/install-docker-tools:
-                install-goss-dgoss: false
+                install-goss-dgoss: << parameters.install-goss >>
 
   test-pull:
     executor: docker-latest

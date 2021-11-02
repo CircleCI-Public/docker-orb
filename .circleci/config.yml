@@ -126,6 +126,8 @@ jobs:
           steps:
             - docker/install-docker-tools:
                 install-goss-dgoss: false
+            - run: 
+                command: echo "IT GETS HERE"
 
   test-pull:
     executor: docker-latest
@@ -376,5 +378,5 @@ workflows:
           install-goss: false
       - test-install-docker-tools:
           name: test-install-docker-tools-macos-old
-          install-goss: false
           executor: macos-old
+          install-goss: false

@@ -79,7 +79,7 @@ executors:
       image: ubuntu-2004:202107-02
   alpine-latest:
     docker:
-      - image: alpine:latest
+      - image: orb-tools/alpine
 
 jobs:
   test:
@@ -396,10 +396,12 @@ workflows:
       - test-install-docker-tools:
           name: test-install-docker-tools-machine-old
           executor: machine-old
-      # - test-install-docker-tools:
-      #     name: test-install-docker-tools-alpine-latest
-      #     executor: alpine-latest
-      #     pre-steps: [run: apk add gnupg, run: apk add curl]
+      - test-install-docker-tools:
+          name: test-install-docker-tools-alpine-latest
+          executor: alpine-latest
+          pre-steps: [run: apk add gnupg, run: apk add curl]
+
+      # testing each install command individually 
       - test:
           name: test-docker-latest
           executor: docker-latest
@@ -420,4 +422,17 @@ workflows:
       - test:
           name: test-machine-old
           executor: machine-old
-
+      - test-create-workspace
+      - test-build-command-workspace:
+          requires:
+            - test-create-workspace
+      - orb-tools/dev-promote-prod-from-commit-subject:
+          orb-name: circleci/docker
+          context: orb-publisher
+          add-pr-comment: false
+          fail-if-semver-not-indicated: true
+          publish-version-tag: false
+          requires: *promotion_requires
+          filters:
+            branches:
+              only: master

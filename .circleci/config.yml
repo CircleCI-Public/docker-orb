@@ -23,7 +23,6 @@ promotion_requires: &promotion_requires
     test-docker-latest,
     test-docker-old,
     test-macos-latest,
-    older-ci-docker,
     test-macos-old,
     test-machine-latest
     test-machine-old

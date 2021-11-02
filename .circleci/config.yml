@@ -363,8 +363,8 @@ workflows:
         - test-install-docker-tools:
             name: test-install-docker-tools-macos-latest
             executor: macos-latest
-            install-goss: false
+            install-goss-gdoss: false
         - test-install-docker-tools:
             name: test-install-docker-tools-macos-old
             executor: macos-old
-            install-goss: false
+            install-goss-gdoss: false

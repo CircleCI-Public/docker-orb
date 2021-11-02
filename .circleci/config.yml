@@ -396,10 +396,28 @@ workflows:
       - test-install-docker-tools:
           name: test-install-docker-tools-machine-old
           executor: machine-old
-      - test-install-docker-tools:
-          name: test-install-docker-tools-alpine-latest
-          executor: alpine-latest
-          pre-steps: [run: apk add gnupg, run: apk add curl]
+      # - test-install-docker-tools:
+      #     name: test-install-docker-tools-alpine-latest
+      #     executor: alpine-latest
+      #     pre-steps: [run: apk add gnupg, run: apk add curl]
       - test:
           name: test-docker-latest
           executor: docker-latest
+      - test:
+          name: test-docker-old
+          executor: docker-old
+      - test:
+          name: test-macos-latest
+          executor: macos-latest
+          install-goss: false
+      - test:
+          name: test-macos-old
+          executor: macos-old
+          install-goss: false
+      - test:
+          name: test-machine-latest
+          executor: machine-latest
+      - test:
+          name: test-machine-old
+          executor: machine-old
+

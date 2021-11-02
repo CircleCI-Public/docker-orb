@@ -116,6 +116,7 @@ jobs:
     steps:
       - checkout
       - jq/install
+          version: jq-1.6
       - docker/install-docker-tools:
           install-goss-dgoss: << parameters.install-goss >>
 
@@ -379,5 +380,5 @@ workflows:
           executor: machine-old
       - test-install-docker-tools:
           name: test-install-docker-tools-alpine-latest
-          executor: orb-tools/alpine
+          executor: alpine-latest
           pre-steps: [run: apk add gnupg, run: apk add curl]

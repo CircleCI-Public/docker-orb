@@ -117,6 +117,12 @@ jobs:
       - checkout
       - jq/install
       - docker/install-docker-tools
+      - unless: 
+          condition: << parameters.install-goss >>
+          steps:
+            - docker/install-docker-tools:
+                install-goss-dgoss: false
+
   test-pull:
     executor: docker-latest
     steps:
@@ -363,8 +369,9 @@ workflows:
         - test-install-docker-tools:
             name: test-install-docker-tools-macos-latest
             executor: macos-latest
-            install-goss-gdoss: false
+            install-goss: false
         - test-install-docker-tools:
             name: test-install-docker-tools-macos-old
+            install-goss: false
             executor: macos-old
-            install-goss-gdoss: false
+            

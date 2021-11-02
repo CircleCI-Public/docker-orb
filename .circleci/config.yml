@@ -380,4 +380,4 @@ workflows:
       - test-install-docker-tools:
           name: test-install-docker-tools-aline-latest
           executor: alpine-latest
-          pre-steps: [run: apk add gnupg]
+          pre-steps: [run: apk add gnupg, run: apk add curl]

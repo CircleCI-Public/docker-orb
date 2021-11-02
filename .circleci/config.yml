@@ -82,6 +82,25 @@ executors:
       - image: alpine:latest
 
 jobs:
+  test:
+    parameters:
+      executor:
+        type: executor
+
+      install-goss:
+        type: boolean
+        default: true
+
+    executor: << parameters.executor >>
+    steps:
+      - docker/install-docker
+      - docker/install-docker-compose
+      - docker/install-dockerize
+      - when:
+          condition: << parameters.install-goss >>
+          steps:
+            - docker/install-goss
+
   test-install-docker-tools:
     parameters:
       executor:
@@ -116,7 +135,6 @@ jobs:
     steps:
       - checkout
       - jq/install
-          version: jq-1.6
       - docker/install-docker-tools:
           install-goss-dgoss: << parameters.install-goss >>
 
@@ -382,3 +400,6 @@ workflows:
           name: test-install-docker-tools-alpine-latest
           executor: alpine-latest
           pre-steps: [run: apk add gnupg, run: apk add curl]
+      - test:
+          name: test-docker-latest
+          executor: docker-latest

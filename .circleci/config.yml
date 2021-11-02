@@ -117,7 +117,7 @@ jobs:
       - checkout
       - jq/install
       - docker/install-docker-tools
-      - unless: 
+      - unless:
           condition: << parameters.install-goss >>
           steps:
             - docker/install-docker-tools:
@@ -239,139 +239,138 @@ workflows:
           context: orb-publisher
           requires: [orb-tools/publish-dev]
   integration-tests_prod-release:
-      when: << pipeline.parameters.run-integration-tests >>
-      jobs:
-        # hadolint
-        - docker/hadolint:
-            name: hadolint
-            ignore-rules: DL4005,DL3008,DL3009,DL3015,DL3059
-            trusted-registries: docker.io,my-company.com:5000
-            dockerfiles: test.Dockerfile:test2.Dockerfile
-        # check command
-        - test-check-command:
-            name: test-check-command-docker
-            executor: docker-latest
-            context: CPE-orb-docker-testing
-            docker-username: DOCKER_USER
-            docker-password: DOCKER_PASS
-            use-docker-credentials-store: false
-        - test-check-command:
-            name: test-check-command-machine
-            executor: machine-latest
-            context: CPE-orb-docker-testing
-            docker-username: DOCKER_USER
-            docker-password: DOCKER_PASS
-            use-docker-credentials-store: true
-        - test-check-command:
-            name: test-check-command-macos
-            executor: macos-latest
-            context: CPE-orb-docker-testing
-            docker-username: DOCKER_USER
-            docker-password: DOCKER_PASS
-            use-docker-credentials-store: true
-            pre-steps:
-              - docker/install-docker
-        # login with credentials store does not result in warning
-        - test-credentials-store:
-            name: test-credentials-store-docker
-            executor: docker-latest
-            context: CPE-orb-docker-testing
-            helper-name: pass
-            docker-username: DOCKER_USER
-            docker-password: DOCKER_PASS
-        - test-credentials-store:
-            name: test-credentials-store-machine
-            executor: machine-latest
-            context: CPE-orb-docker-testing
-            docker-username: DOCKER_USER
-            docker-password: DOCKER_PASS
-        - test-credentials-store:
-            name: test-credentials-store-macos
-            executor: macos-latest
-            context: CPE-orb-docker-testing
-            docker-username: DOCKER_USER
-            docker-password: DOCKER_PASS
-            pre-steps:
-              - docker/install-docker
-        # build/publish
-        - docker/publish:
-            name: publish-machine
-            context: CPE-orb-docker-testing
-            dockerfile: test.Dockerfile
-            image: cpeorbtesting/docker-orb-test
-            tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
-            docker-username: DOCKER_USER
-            docker-password: DOCKER_PASS
-            use-docker-credentials-store: true
-            pre-steps:
-              # Test that it's OK to invoke the commands twice
-              - docker/install-docker-credential-helper
-              - docker/configure-docker-credentials-store
-        - docker/publish:
-            name: publish-docker
-            executor: docker-latest
-            context: CPE-orb-docker-testing
-            use-remote-docker: true
-            dockerfile: test.Dockerfile
-            image: cpeorbtesting/docker-orb-test
-            tag: $CIRCLE_SHA1
-            docker-username: DOCKER_USER
-            docker-password: DOCKER_PASS
-            use-docker-credentials-store: true
-        - docker/publish:
-            name: publish-docker-cache
-            requires:
-              - publish-docker
-            executor: docker-latest
-            context: CPE-orb-docker-testing
-            use-remote-docker: true
-            dockerfile: test.Dockerfile
-            image: cpeorbtesting/docker-orb-test
-            tag: $CIRCLE_SHA1
-            cache_from: cpeorbtesting/docker-orb-test:$CIRCLE_SHA1
-            docker-username: DOCKER_USER
-            docker-password: DOCKER_PASS
-            pre-steps:
-              - docker/install-docker-credential-helper:
-                  # release-tag: v0.6.3
-              - docker/configure-docker-credentials-store:
-                  helper-name: pass
-        - docker/publish:
-            name: publish-docker-cache-not-found
-            executor: docker/docker
-            context: CPE-orb-docker-testing
-            use-remote-docker: true
-            dockerfile: test.Dockerfile
-            image: cpeorbtesting/docker-orb-test
-            tag: $CIRCLE_SHA1-2
-            cache_from: cpeorbtesting/docker-orb-test:not-exists
-            docker-username: DOCKER_USER
-            docker-password: DOCKER_PASS
-        - docker/publish:
-            name: publish-docker-update-description
-            executor: docker-latest
-            context: CPE-orb-docker-testing
-            use-remote-docker: true
-            dockerfile: test.Dockerfile
-            image: cpeorbtesting/docker-orb-test
-            tag: $CIRCLE_SHA1
-            cache_from: cpeorbtesting/docker-orb-test:$CIRCLE_SHA1
-            docker-username: DOCKER_USER
-            docker-password: DOCKER_PASS
-            update-description: true
-        - test-pull
-        - test-install-docker-tools:
-            name: test-install-docker-tools-docker-latest
-            executor: docker-latest
-        - test-install-docker-tools:
-            name: test-install-docker-tools-docker-old
-            executor: docker-old
-        - test-install-docker-tools:
-            name: test-install-docker-tools-macos-latest
-            executor: macos-latest
-            install-goss: false
-        - test-install-docker-tools:
-            name: test-install-docker-tools-macos-old
-            install-goss: false
-            executor: macos-old
-            
+    when: << pipeline.parameters.run-integration-tests >>
+    jobs:
+      # hadolint
+      - docker/hadolint:
+          name: hadolint
+          ignore-rules: DL4005,DL3008,DL3009,DL3015,DL3059
+          trusted-registries: docker.io,my-company.com:5000
+          dockerfiles: test.Dockerfile:test2.Dockerfile
+      # check command
+      - test-check-command:
+          name: test-check-command-docker
+          executor: docker-latest
+          context: CPE-orb-docker-testing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: false
+      - test-check-command:
+          name: test-check-command-machine
+          executor: machine-latest
+          context: CPE-orb-docker-testing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
+      - test-check-command:
+          name: test-check-command-macos
+          executor: macos-latest
+          context: CPE-orb-docker-testing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
+          pre-steps:
+            - docker/install-docker
+      # login with credentials store does not result in warning
+      - test-credentials-store:
+          name: test-credentials-store-docker
+          executor: docker-latest
+          context: CPE-orb-docker-testing
+          helper-name: pass
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+      - test-credentials-store:
+          name: test-credentials-store-machine
+          executor: machine-latest
+          context: CPE-orb-docker-testing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+      - test-credentials-store:
+          name: test-credentials-store-macos
+          executor: macos-latest
+          context: CPE-orb-docker-testing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          pre-steps:
+            - docker/install-docker
+      # build/publish
+      - docker/publish:
+          name: publish-machine
+          context: CPE-orb-docker-testing
+          dockerfile: test.Dockerfile
+          image: cpeorbtesting/docker-orb-test
+          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
+          pre-steps:
+            # Test that it's OK to invoke the commands twice
+            - docker/install-docker-credential-helper
+            - docker/configure-docker-credentials-store
+      - docker/publish:
+          name: publish-docker
+          executor: docker-latest
+          context: CPE-orb-docker-testing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: cpeorbtesting/docker-orb-test
+          tag: $CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
+      - docker/publish:
+          name: publish-docker-cache
+          requires:
+            - publish-docker
+          executor: docker-latest
+          context: CPE-orb-docker-testing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: cpeorbtesting/docker-orb-test
+          tag: $CIRCLE_SHA1
+          cache_from: cpeorbtesting/docker-orb-test:$CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          pre-steps:
+            - docker/install-docker-credential-helper:
+                # release-tag: v0.6.3
+            - docker/configure-docker-credentials-store:
+                helper-name: pass
+      - docker/publish:
+          name: publish-docker-cache-not-found
+          executor: docker/docker
+          context: CPE-orb-docker-testing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: cpeorbtesting/docker-orb-test
+          tag: $CIRCLE_SHA1-2
+          cache_from: cpeorbtesting/docker-orb-test:not-exists
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+      - docker/publish:
+          name: publish-docker-update-description
+          executor: docker-latest
+          context: CPE-orb-docker-testing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: cpeorbtesting/docker-orb-test
+          tag: $CIRCLE_SHA1
+          cache_from: cpeorbtesting/docker-orb-test:$CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          update-description: true
+      - test-pull
+      - test-install-docker-tools:
+          name: test-install-docker-tools-docker-latest
+          executor: docker-latest
+      - test-install-docker-tools:
+          name: test-install-docker-tools-docker-old
+          executor: docker-old
+      - test-install-docker-tools:
+          name: test-install-docker-tools-macos-latest
+          executor: macos-latest
+          install-goss: false
+      - test-install-docker-tools:
+          name: test-install-docker-tools-macos-old
+          install-goss: false
+          executor: macos-old

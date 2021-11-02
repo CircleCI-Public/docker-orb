@@ -19,7 +19,6 @@ promotion_requires: &promotion_requires
     test-install-docker-tools-macos-old,
     test-install-docker-tools-machine-latest,
     test-install-docker-tools-machine-old,
-    test-install-docker-tools-alpine-latest,
     test-docker-latest,
     test-docker-old,
     test-macos-latest,
@@ -66,9 +65,6 @@ executors:
   machine-latest:
     machine:
       image: ubuntu-2004:202107-02
-  alpine-latest:
-    docker:
-      - image: orb-tools/alpine
 
 jobs:
   test:
@@ -385,10 +381,6 @@ workflows:
       - test-install-docker-tools:
           name: test-install-docker-tools-machine-old
           executor: machine-old
-      - test-install-docker-tools:
-          name: test-install-docker-tools-alpine-latest
-          executor: alpine-latest
-          pre-steps: [run: apk add gnupg, run: apk add curl]
 
       # testing each install command individually
       - test:

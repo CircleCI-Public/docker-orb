@@ -377,3 +377,6 @@ workflows:
       - test-install-docker-tools:
           name: test-install-docker-tools-machine-old
           executor: machine-old
+      - test-install-docker-tools:
+          name: test-install-docker-tools-aline-latest
+          executor: alpine-latest

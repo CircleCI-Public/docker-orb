@@ -124,10 +124,10 @@ jobs:
       - unless:
           condition: << parameters.install-goss >>
           steps:
-            - docker/install-docker-tools:
-                install-goss-dgoss: false
             - run:
                 command: echo "IT GETS HERE"
+            - docker/install-docker-tools:
+                install-goss-dgoss: false
 
   test-pull:
     executor: docker-latest
@@ -372,11 +372,12 @@ workflows:
       - test-install-docker-tools:
           name: test-install-docker-tools-docker-old
           executor: docker-old
-      - test-install-docker-tools:
-          name: test-install-docker-tools-macos-latest
-          executor: macos-latest
           install-goss: false
-      - test-install-docker-tools:
-          name: test-install-docker-tools-macos-old
-          executor: macos-old
-          install-goss: false
+      # - test-install-docker-tools:
+      #     name: test-install-docker-tools-macos-latest
+      #     executor: macos-latest
+      #     install-goss: false
+      # - test-install-docker-tools:
+      #     name: test-install-docker-tools-macos-old
+      #     executor: macos-old
+      #     install-goss: false

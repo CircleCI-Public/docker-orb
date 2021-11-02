@@ -356,18 +356,25 @@ workflows:
           docker-password: DOCKER_PASS
           update-description: true
       - test-pull
+      #testing docker/install-docker-tools command
       - test-install-docker-tools:
           name: test-install-docker-tools-docker-latest
           executor: docker-latest
       - test-install-docker-tools:
           name: test-install-docker-tools-docker-old
           executor: docker-old
+      - test-install-docker-tools:
+          name: test-install-docker-tools-macos-latest
+          executor: macos-latest
           install-goss: false
-      # - test-install-docker-tools:
-      #     name: test-install-docker-tools-macos-latest
-      #     executor: macos-latest
-      #     install-goss: false
-      # - test-install-docker-tools:
-      #     name: test-install-docker-tools-macos-old
-      #     executor: macos-old
-      #     install-goss: false
+      - test-install-docker-tools:
+          name: test-install-docker-tools-macos-old
+          executor: macos-old
+          install-goss: false
+      - test-install-docker-tools:
+          name: test-install-docker-tools-machine-latest
+          executor: machine-latest
+      - test-install-docker-tools:
+          name: test-install-docker-tools-machine-old
+          executor: machine-old
+          

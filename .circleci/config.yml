@@ -391,7 +391,7 @@ workflows:
           executor: alpine-latest
           pre-steps: [run: apk add gnupg, run: apk add curl]
 
-      # testing each install command individually 
+      # testing each install command individually
       - test:
           name: test-docker-latest
           executor: docker-latest

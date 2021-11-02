@@ -126,7 +126,7 @@ jobs:
           steps:
             - docker/install-docker-tools:
                 install-goss-dgoss: false
-            - run: 
+            - run:
                 command: echo "IT GETS HERE"
 
   test-pull:

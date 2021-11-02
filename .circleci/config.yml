@@ -378,6 +378,6 @@ workflows:
           name: test-install-docker-tools-machine-old
           executor: machine-old
       - test-install-docker-tools:
-          name: test-install-docker-tools-aline-latest
-          executor: alpine-latest
+          name: test-install-docker-tools-alpine-latest
+          executor: orb-tools/alpine
           pre-steps: [run: apk add gnupg, run: apk add curl]

@@ -24,8 +24,8 @@ promotion_requires: &promotion_requires
     test-docker-old,
     test-macos-latest,
     test-macos-old,
-    test-machine-latest
-    test-machine-old
+    test-machine-latest,
+    test-machine-old,
     test-build-command-workspace
   ]
 

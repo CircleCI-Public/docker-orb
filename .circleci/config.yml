@@ -116,18 +116,8 @@ jobs:
     steps:
       - checkout
       - jq/install
-      - docker/install-docker-tools
-      - when:
-          condition: << parameters.install-goss >>
-          steps:
-            - docker/install-docker-tools
-      - unless:
-          condition: << parameters.install-goss >>
-          steps:
-            - run:
-                command: echo "IT GETS HERE"
-            - docker/install-docker-tools:
-                install-goss-dgoss: << parameters.install-goss >>
+      - docker/install-docker-tools:
+          install-goss-dgoss: << parameters.install-goss >>
 
   test-pull:
     executor: docker-latest

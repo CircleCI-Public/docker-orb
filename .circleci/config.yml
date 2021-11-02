@@ -117,6 +117,10 @@ jobs:
       - checkout
       - jq/install
       - docker/install-docker-tools
+      - when:
+          condition: << parameters.install-goss >>
+          steps:
+            - docker/install-docker-tools
       - unless:
           condition: << parameters.install-goss >>
           steps:

@@ -29,8 +29,8 @@ parameters:
     type: boolean
     default: false
     description: >
-      If linting Dockerfile, treat linting warnings as errors (would trigger
-      an exist code and fail the CircleCI job)?
+      If linting Dockerfile, treat linting warnings as errors? (would trigger
+      an exit code and fail the CircleCI job)
 
   registry:
     type: string

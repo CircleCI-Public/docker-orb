@@ -184,7 +184,7 @@ jobs:
       dockerfile:
         type: string
         default: test.Dockerfile
-    executor: docker-latest
+    executor: docker/machine
     steps:
       - docker/dockerlint:
           debug: <<parameters.debug>>

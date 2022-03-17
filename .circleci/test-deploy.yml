@@ -376,7 +376,10 @@ workflows:
             # test-credentials-store-macos,
             # test-docker-latest,
             # test-docker-old,
-            # test-install-docker-tools-<< matrix.executor >>,
+            test-install-docker-tools-machine-old,
+            test-install-docker-tools-machine-latest,
+            test-install-docker-tools-docker-old,
+            test-install-docker-tools-docker-latest,
             # test-<< matrix.executor >>,
             # test-pull
           ]

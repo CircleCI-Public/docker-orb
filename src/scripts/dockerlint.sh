@@ -8,7 +8,7 @@
 #   npm install -g dockerlint > /dev/null 2>&1 || "$SUDO" npm install -g dockerlint > /dev/null 2>&1
 # fi
 
-cat "$PARAM_DOCKERFILE"
+echo "$PARAM_DOCKERFILE"
 
 if [ "$PARAM_TREAT_WARNING_AS_ERRORS" = true ]; then
   dockerlint -p "$PARAM_DOCKERFILE"

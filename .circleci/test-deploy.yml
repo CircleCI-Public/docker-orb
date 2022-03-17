@@ -19,8 +19,8 @@ promotion_requires: &promotion_requires
     test-credentials-store-macos,
     test-docker-latest,
     test-docker-old,
-    test-install-docker-tools,
-    test,
+    test-install-docker-tools-<< matrix.executor >>,
+    test-<< matrix.executor >,
     test-pull
   ]
 

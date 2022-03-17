@@ -359,26 +359,26 @@ workflows:
           vcs-type: << pipeline.project.type >>
           pub-type: production
           requires: [
-            hadolint,
+            # hadolint,
             orb-tools/lint,
             orb-tools/pack,
             orb-tools/review,
-            publish-docker-cache-not-found,
-            publish-docker-cache,
-            publish-docker-update-description,
-            publish-machine,
-            test-build-command-workspace,
-            test-check-command-docker,
-            test-check-command-machine,
-            test-check-command-macos,
-            test-credentials-store-docker,
-            test-credentials-store-machine,
-            test-credentials-store-macos,
-            test-docker-latest,
-            test-docker-old,
+            # publish-docker-cache-not-found,
+            # publish-docker-cache,
+            # publish-docker-update-description,
+            # publish-machine,
+            # test-build-command-workspace,
+            # test-check-command-docker,
+            # test-check-command-machine,
+            # test-check-command-macos,
+            # test-credentials-store-docker,
+            # test-credentials-store-machine,
+            # test-credentials-store-macos,
+            # test-docker-latest,
+            # test-docker-old,
             test-install-docker-tools,
             # test-<< matrix.executor >>,
-            test-pull
+            # test-pull
           ]
           context: orb-publisher
           filters:

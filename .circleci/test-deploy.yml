@@ -183,12 +183,13 @@ jobs:
         default: false
       dockerfile:
         type: string
-        default: "test.Dockerfile"
+        default: test.Dockerfile
     executor: docker-latest
     steps:
-      docker/dockerlint:
-        debug: <<parameters.debug>>
-        dockerfile: <<parameters.dockerfile>>
+      - docker/dockerlint:
+          debug: <<parameters.debug>>
+          dockerfile: <<parameters.dockerfile>>
+
 workflows:
   test-deploy:
     jobs:
@@ -201,7 +202,6 @@ workflows:
       - test-dockerlint:
           name: dockerlint
           debug: true
-          dockerfile: test.Dockerfile
           filters: *filters
       - test-pull:
           filters: *filters
@@ -386,6 +386,7 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+
 executors:
   macos-old:
     macos:

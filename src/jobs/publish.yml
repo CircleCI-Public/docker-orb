@@ -144,6 +144,8 @@ parameters:
       defaults to . (working directory)
 
 steps:
+  - run: ls -a
+
   - checkout
 
   - when:

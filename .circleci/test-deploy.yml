@@ -177,8 +177,7 @@ jobs:
               exit 1
             fi
   test-dockerlint:
-    docker: 
-      - image: redcoolbeans/dockerlint
+    executor: docker-latest 
     parameters:
       debug:
         type: boolean

@@ -21,6 +21,4 @@ cat "$PARAM_DOCKER_CONFIG_PATH" |
     >/tmp/docker-config-credsstore-update.json
 cat /tmp/docker-config-credsstore-update.json > "$PARAM_DOCKER_CONFIG_PATH"
 
-cat "$PARAM_DOCKER_CONFIG_PATH"
-
 rm /tmp/docker-config-credsstore-update.json

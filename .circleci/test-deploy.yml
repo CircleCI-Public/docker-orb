@@ -185,6 +185,10 @@ workflows:
           trusted-registries: docker.io,my-company.com:5000
           dockerfiles: test.Dockerfile:test2.Dockerfile
           filters: *filters
+      - docker/dockerlint:
+          debug: true
+          dockerfile: test.Dockerfile
+          name: dockerlint
       - test-pull:
           filters: *filters
       - test-create-workspace:

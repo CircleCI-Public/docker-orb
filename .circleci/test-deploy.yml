@@ -320,7 +320,7 @@ workflows:
 
       # begin test-install-docker-tools
       - test-install-docker-tools:
-          name: test-install-docker-tools
+          name: test-install-docker-tools-<< matrix.executor >>
           matrix:
             parameters:
               executor: [docker-latest, docker-old, machine-latest, machine-old]
@@ -376,7 +376,7 @@ workflows:
             # test-credentials-store-macos,
             # test-docker-latest,
             # test-docker-old,
-            test-install-docker-tools,
+            test-install-docker-tools-<< matrix.executor >>,
             # test-<< matrix.executor >>,
             # test-pull
           ]

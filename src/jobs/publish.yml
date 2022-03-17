@@ -144,7 +144,9 @@ parameters:
       defaults to . (working directory)
 
 steps:
-  - run: ls -a
+  - run: 
+      name: List all files
+      command: ls -a
 
   - checkout
 

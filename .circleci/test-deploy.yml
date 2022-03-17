@@ -184,7 +184,8 @@ jobs:
       dockerfile:
         type: string
         default: test.Dockerfile
-    executor: redcoolbeans/dockerlint
+    docker: 
+      image: redcoolbeans/dockerlint
     steps:
       - docker/dockerlint:
           debug: <<parameters.debug>>

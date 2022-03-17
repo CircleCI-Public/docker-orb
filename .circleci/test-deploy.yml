@@ -20,7 +20,7 @@ promotion_requires: &promotion_requires
     test-docker-latest,
     test-docker-old,
     test-install-docker-tools-<< matrix.executor >>,
-    test-<< matrix.executor >>,
+    # test-<< matrix.executor >>,
     test-pull
   ]
 
@@ -325,27 +325,27 @@ workflows:
             parameters:
               executor: [docker-latest, docker-old, machine-latest, machine-old]
           filters: *filters
-      - test-install-docker-tools:
-          name: test-install-docker-tools-<< matrix.executor >>
-          matrix:
-            parameters:
-              executor: [macos-latest, macos-old]
-          install-goss: false
-          filters: *filters
+      # - test-install-docker-tools:
+      #     name: test-install-docker-tools-<< matrix.executor >>
+      #     matrix:
+      #       parameters:
+      #         executor: [macos-latest, macos-old]
+      #     install-goss: false
+      #     filters: *filters
       # end test-install-docker-tools
       
       # begin test
-      - test:
-          name: test-<< matrix.executor >>
-          matrix:
-            parameters:
-              executor: [docker-latest, docker-old, machine-latest, machine-old]
-      - test:
-          name: test-<< matrix.executor >>
-          matrix:
-            parameters:
-              executor: [macos-latest, macos-old]
-          install-goss: false
+      # - test:
+      #     name: test-<< matrix.executor >>
+      #     matrix:
+      #       parameters:
+      #         executor: [docker-latest, docker-old, machine-latest, machine-old]
+      # - test:
+      #     name: test-<< matrix.executor >>
+      #     matrix:
+      #       parameters:
+      #         executor: [macos-latest, macos-old]
+      #     install-goss: false
       # end test
 
       - orb-tools/lint:
@@ -358,7 +358,28 @@ workflows:
           orb-name: circleci/docker
           vcs-type: << pipeline.project.type >>
           pub-type: production
-          requires: *promotion_requires
+          requires: [
+            hadolint,
+            orb-tools/lint,
+            orb-tools/pack,
+            orb-tools/review,
+            publish-docker-cache-not-found,
+            publish-docker-cache,
+            publish-docker-update-description,
+            publish-machine,
+            test-build-command-workspace,
+            test-check-command-docker,
+            test-check-command-machine,
+            test-check-command-macos,
+            test-credentials-store-docker,
+            test-credentials-store-machine,
+            test-credentials-store-macos,
+            test-docker-latest,
+            test-docker-old,
+            test-install-docker-tools-<< matrix.executor >>,
+            # test-<< matrix.executor >>,
+            test-pull
+          ]
           context: orb-publisher
           filters:
             branches:

@@ -3,6 +3,7 @@ version: 2.1
 promotion_requires: &promotion_requires
   [
     hadolint,
+    orb-tools/pack,
     test-check-command-docker,
     test-check-command-machine,
     test-check-command-macos,
@@ -354,6 +355,8 @@ workflows:
           filters: *filters
       # end test
 
+      - orb-tools/pack:
+          filters: *filters
       - orb-tools/publish:
           orb-name: circleci/docker
           vcs-type: << pipeline.project.type >>

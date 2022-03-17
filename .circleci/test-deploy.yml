@@ -176,6 +176,19 @@ jobs:
               ls
               exit 1
             fi
+  test-dockerlint:
+    parameters:
+      debug:
+        type: boolean
+        default: false
+      dockerfile:
+        type: string
+        default: "test.Dockerfile"
+    executor: docker-latest
+    steps:
+      docker/dockerlint:
+        debug: <<parameters.debug>>
+        dockerfile: <<parameters.dockerfile>>
 workflows:
   test-deploy:
     jobs:
@@ -185,10 +198,11 @@ workflows:
           trusted-registries: docker.io,my-company.com:5000
           dockerfiles: test.Dockerfile:test2.Dockerfile
           filters: *filters
-      - docker/dockerlint:
+      - test-dockerlint:
+          name: dockerlint
           debug: true
           dockerfile: test.Dockerfile
-          name: dockerlint
+          filters: *filters
       - test-pull:
           filters: *filters
       - test-create-workspace:

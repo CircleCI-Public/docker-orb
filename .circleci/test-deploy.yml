@@ -187,6 +187,7 @@ jobs:
         type: string
         default: "test.Dockerfile"
     steps:
+      - checkout
       - docker/dockerlint:
           debug: <<parameters.debug>>
           dockerfile: <<parameters.dockerfile>>

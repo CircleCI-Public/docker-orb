@@ -27,7 +27,7 @@ steps:
   - run:
       name: Lint Dockerfile at <<parameters.dockerfile>>
       environemnt:
-        PARAM_DEBUG: <<parameters.debug>> 
+        PARAM_DEBUG: <<parameters.debug>>
         PARAM_TREAT_WARNING_AS_ERRORS: <<parameters.treat-warnings-as-errors>>
         PARAM_DOCKERFILE: <<parameters.dockerfile>>
       command: <<include(scripts/dockerlint.sh)>>

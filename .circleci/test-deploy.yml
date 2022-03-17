@@ -190,7 +190,6 @@ jobs:
       - docker/dockerlint:
           debug: <<parameters.debug>>
           dockerfile: <<parameters.dockerfile>>
-          treat-warnings-as-errors: true
 
 workflows:
   test-deploy:

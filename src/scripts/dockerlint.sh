@@ -9,7 +9,7 @@ else
 fi
 
 if [ "$PARAM_TREAT_WARNING_AS_ERRORS" = true ]; then
-  dockerlint -p "$PARAM_DOCKERFILE"
+  dockerlint -p -f "$PARAM_DOCKERFILE"
 else
-  dockerlint "$PARAM_DOCKERFILE"
+  dockerlint -f "$PARAM_DOCKERFILE"
 fi

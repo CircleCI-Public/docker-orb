@@ -320,11 +320,13 @@ workflows:
 
       # begin test-install-docker-tools
       - test-install-docker-tools:
+          name: test-install-docker-tools-<< matrix.executor >>
           matrix:
             parameters:
               executor: [docker-latest, docker-old, machine-latest, machine-old]
           filters: *filters
       - test-install-docker-tools:
+          name: test-install-docker-tools-<< matrix.executor >>
           matrix:
             parameters:
               executor: [macos-latest, macos-old]
@@ -334,10 +336,12 @@ workflows:
       
       # begin test
       - test:
+          name: test-<< matrix.executor >>
           matrix:
             parameters:
               executor: [docker-latest, docker-old, machine-latest, machine-old]
       - test:
+          name: test-<< matrix.executor >>
           matrix:
             parameters:
               executor: [macos-latest, macos-old]

@@ -3,25 +3,29 @@ version: 2.1
 promotion_requires: &promotion_requires
   [
     hadolint,
-    orb-tools/lint,
-    orb-tools/pack,
-    orb-tools/review,
-    publish-docker-cache-not-found,
-    publish-docker-cache,
-    publish-docker-update-description,
-    publish-machine,
-    test-build-command-workspace,
     test-check-command-docker,
     test-check-command-machine,
     test-check-command-macos,
     test-credentials-store-docker,
     test-credentials-store-machine,
     test-credentials-store-macos,
+    publish-machine,
+    publish-docker-cache,
+    publish-docker-cache-not-found,
+    test-pull,
+    test-install-docker-tools-docker-latest,
+    test-install-docker-tools-docker-old,
+    test-install-docker-tools-macos-latest,
+    test-install-docker-tools-macos-old,
+    test-install-docker-tools-machine-latest,
+    test-install-docker-tools-machine-old,
     test-docker-latest,
     test-docker-old,
-    test-install-docker-tools-<< matrix.executor >>,
-    # test-<< matrix.executor >>,
-    test-pull
+    test-macos-latest,
+    test-macos-old,
+    test-machine-latest,
+    test-machine-old,
+    test-build-command-workspace
   ]
 
 filters: &filters
@@ -325,27 +329,29 @@ workflows:
             parameters:
               executor: [docker-latest, docker-old, machine-latest, machine-old]
           filters: *filters
-      # - test-install-docker-tools:
-      #     name: test-install-docker-tools-<< matrix.executor >>
-      #     matrix:
-      #       parameters:
-      #         executor: [macos-latest, macos-old]
-      #     install-goss: false
-      #     filters: *filters
+      - test-install-docker-tools:
+          name: test-install-docker-tools-<< matrix.executor >>
+          matrix:
+            parameters:
+              executor: [macos-latest, macos-old]
+          install-goss: false
+          filters: *filters
       # end test-install-docker-tools
       
       # begin test
-      # - test:
-      #     name: test-<< matrix.executor >>
-      #     matrix:
-      #       parameters:
-      #         executor: [docker-latest, docker-old, machine-latest, machine-old]
-      # - test:
-      #     name: test-<< matrix.executor >>
-      #     matrix:
-      #       parameters:
-      #         executor: [macos-latest, macos-old]
-      #     install-goss: false
+      - test:
+          name: test-<< matrix.executor >>
+          matrix:
+            parameters:
+              executor: [docker-latest, docker-old, machine-latest, machine-old]
+          filters: *filters
+      - test:
+          name: test-<< matrix.executor >>
+          matrix:
+            parameters:
+              executor: [macos-latest, macos-old]
+          install-goss: false
+          filters: *filters
       # end test
 
       - orb-tools/lint:
@@ -358,31 +364,7 @@ workflows:
           orb-name: circleci/docker
           vcs-type: << pipeline.project.type >>
           pub-type: production
-          requires: [
-            # hadolint,
-            orb-tools/lint,
-            orb-tools/pack,
-            orb-tools/review,
-            # publish-docker-cache-not-found,
-            # publish-docker-cache,
-            # publish-docker-update-description,
-            # publish-machine,
-            # test-build-command-workspace,
-            # test-check-command-docker,
-            # test-check-command-machine,
-            # test-check-command-macos,
-            # test-credentials-store-docker,
-            # test-credentials-store-machine,
-            # test-credentials-store-macos,
-            # test-docker-latest,
-            # test-docker-old,
-            test-install-docker-tools-machine-old,
-            test-install-docker-tools-machine-latest,
-            test-install-docker-tools-docker-old,
-            test-install-docker-tools-docker-latest,
-            # test-<< matrix.executor >>,
-            # test-pull
-          ]
+          requires: *promotion_requires
           context: orb-publisher
           filters:
             branches:

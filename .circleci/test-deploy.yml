@@ -177,6 +177,8 @@ jobs:
               exit 1
             fi
   test-dockerlint:
+    docker: 
+      - image: redcoolbeans/dockerlint
     parameters:
       debug:
         type: boolean
@@ -184,8 +186,6 @@ jobs:
       dockerfile:
         type: string
         default: test.Dockerfile
-    docker: 
-      image: redcoolbeans/dockerlint
     steps:
       - docker/dockerlint:
           debug: <<parameters.debug>>

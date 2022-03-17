@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 HELPER_NAME="$PARAM_HELPER_NAME"
-DOCKER_CONFIG_PATH="$(eval $PARAM_DOCKER_CONFIG_PATH)"
+DOCKER_CONFIG_PATH="`eval echo ${PARAM_DOCKER_CONFIG_PATH}`"
 
 if [ -z "${HELPER_NAME}" ]; then
   if uname | grep -q "Darwin"; then
@@ -11,7 +11,7 @@ if [ -z "${HELPER_NAME}" ]; then
   fi
 fi
 
-if [ ! -f "$DOCKER_CONFIG_PATH" ]; then
+if [ ! -e "$DOCKER_CONFIG_PATH" ]; then
   echo "${DOCKER_CONFIG_PATH} does not exist; initializing it..."
   mkdir -p "$(dirname "$DOCKER_CONFIG_PATH")"
   echo "{}" > "$DOCKER_CONFIG_PATH"

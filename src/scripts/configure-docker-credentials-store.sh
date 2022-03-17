@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 HELPER_NAME="$PARAM_HELPER_NAME"
-DOCKER_CONFIG_PATH="`eval echo ${PARAM_DOCKER_CONFIG_PATH}`"
+DOCKER_CONFIG_PATH="$(eval echo ${PARAM_DOCKER_CONFIG_PATH})"
 
 if [ -z "${HELPER_NAME}" ]; then
   if uname | grep -q "Darwin"; then

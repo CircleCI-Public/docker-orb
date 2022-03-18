@@ -185,11 +185,15 @@ jobs:
       dockerfile:
         type: string
         default: "test.Dockerfile"
+      treat-warnings-as-errors:
+        type: boolean
+        default: false
     steps:
       - checkout
       - docker/dockerlint:
           debug: <<parameters.debug>>
           dockerfile: <<parameters.dockerfile>>
+          treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>
 
 workflows:
   test-deploy:
@@ -203,6 +207,7 @@ workflows:
       - test-dockerlint:
           name: dockerlint
           debug: true
+          treat-warnings-as-errors: false
           filters: *filters
       - test-pull:
           filters: *filters

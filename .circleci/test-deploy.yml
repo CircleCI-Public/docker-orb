@@ -178,7 +178,7 @@ jobs:
             fi
   test-dockerlint:
     docker:
-      image: cimg/node:17.7.2
+      - image: cimg/node:17.7.2
     parameters:
       debug:
         type: boolean

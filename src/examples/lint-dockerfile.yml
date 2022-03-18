@@ -10,7 +10,8 @@ usage:
 
     jobs:
       lint:
-        executor: docker/machine
+        docker:
+          image: cimg/node:17.7.2
         steps:
           - checkout
 

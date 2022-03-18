@@ -177,7 +177,8 @@ jobs:
               exit 1
             fi
   test-dockerlint:
-    executor: docker-latest 
+    docker:
+      image: cimg/node:17.7.2
     parameters:
       debug:
         type: boolean

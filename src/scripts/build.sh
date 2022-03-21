@@ -12,7 +12,7 @@ if [ -z "$PARAM_CACHE_FROM" ]; then
   docker build "$PARAM_EXTRA_BUILD_ARGS" -f "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" $docker_tag_args "$PARAM_DOCKER_CONTEXT"
 
 else
-  echo "$PARAM_CACHE_FROM" | sed -n 1'p' | tr ',' '\n' | while read image; do
+  echo "$PARAM_CACHE_FROM" | sed -n 1'p' | tr ',' '\n' | while read -r image; do
     echo "Pulling ${image}";
     docker pull ${image} || true
   done

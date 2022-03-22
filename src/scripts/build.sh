@@ -9,8 +9,13 @@ parse_tags_to_docker_arg() {
   for tag in "${tags[@]}"; do
     local expanded_tag
     expanded_tag="$(eval echo ${tag})"
-    DOCKER_TAGS_ARG="${DOCKER_TAGS_ARG} -t cpeorbtesting/docker-orb-test:${expanded_tag}"
+    DOCKER_TAGS_ARG="${DOCKER_TAGS_ARG} --tag ${PARAM_REGISTRY}/${PARAM_IMAGE_NAME}:${expanded_tag}"
   done
+
+  readonly temp
+  temp="$(eval echo ${DOCKER_TAGS_ARG})"
+
+  echo "!!!!!!! ${temp}"
 }
 
 pull_images_from_cache() {
@@ -31,7 +36,7 @@ if [ -z "$PARAM_CACHE_FROM" ]; then
   # If inside double-quotes, the docker command will fail.
   docker build \
     "$PARAM_EXTRA_BUILD_ARGS" \
-    -f "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" \
+    --file "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" \
     ${DOCKER_TAGS_ARG} \
     "$PARAM_DOCKER_CONTEXT"
 
@@ -47,7 +52,7 @@ else
   docker build \
     "$PARAM_EXTRA_BUILD_ARGS" \
     --cache-from "$PARAM_CACHE_FROM" \
-    -f "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" \
+    --file "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" \
     ${DOCKER_TAGS_ARG} \
     "$PARAM_DOCKER_CONTEXT"
 fi

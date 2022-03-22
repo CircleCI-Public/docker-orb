@@ -13,11 +13,14 @@ parse_tags_to_docker_arg() {
 
   for tag in "${tags[@]}"; do
     if [ -z "$docker_arg" ]; then
-      docker_arg="-t $PARAM_REGISTRY/$PARAM_IMAGE:${tag}"
+      docker_arg="-t ${PARAM_REGISTRY}/${PARAM_IMAGE}:${tag}"
     else
-      docker_arg="$docker_arg -t $PARAM_REGISTRY/$PARAM_IMAGE:${tag}"
+      docker_arg="${docker_arg} -t ${PARAM_REGISTRY}/${PARAM_IMAGE}:${tag}"
     fi
   done
+
+  echo "!!!!"
+  echo "$PARAM_IMAGE"
 
   DOCKER_TAGS_ARG="$(eval echo ${docker_arg})"
 }
@@ -38,13 +41,10 @@ fi
 if [ -z "$PARAM_CACHE_FROM" ]; then
   # The variable "DOCKER_TAGS_ARG" has to be inside a "${}".
   # If inside double-quotes, the docker command will fail.
-
-  echo "!!!!!! ${DOCKER_TAGS_ARG}"
-
   docker build \
     "$PARAM_EXTRA_BUILD_ARGS" \
     --file "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" \
-    ${DOCKER_TAGS_ARG} \
+    "$DOCKER_TAGS_ARG" \
     "$PARAM_DOCKER_CONTEXT"
 
 else

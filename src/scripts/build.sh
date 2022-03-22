@@ -14,7 +14,11 @@ if [ -z "$PARAM_CACHE_FROM" ]; then
 
   echo "Running: ${COMMAND}"
 
-  docker build ${PARAM_EXTRA_BUILD_ARGS} -f "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" "$docker_tag_args" "$PARAM_DOCKER_CONTEXT"
+  if [ -z "$PARAM_EXTRA_BUILD_ARGS" ]; then
+    docker build -f "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" "$docker_tag_args" "$PARAM_DOCKER_CONTEXT"
+  else 
+    docker build ${PARAM_EXTRA_BUILD_ARGS} -f "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" "$docker_tag_args" "$PARAM_DOCKER_CONTEXT"
+  fi
 
 else
   echo "$PARAM_CACHE_FROM" | sed -n 1'p' | tr ',' '\n' | while read -r image; do

@@ -3,18 +3,24 @@
 DOCKER_TAGS_ARG=""
 
 parse_tags_to_docker_arg() {
-  # Split list of tags by comma.
-  IFS="," read -ra tags <<< "$PARAM_TAG"
+  # Set comma as delimiter.
+  IFS="," 
+
+  # Read the split words into an array based on comma delimiter
+  read -ra tags <<< "$PARAM_TAG"
+
+  local docker_arg
+  docker_arg=""
 
   for tag in "${tags[@]}"; do
-    local expanded_tag
-    expanded_tag="$(eval echo ${tag})"
-    DOCKER_TAGS_ARG="${DOCKER_TAGS_ARG} --tag ${PARAM_REGISTRY}/${PARAM_IMAGE_NAME}:${expanded_tag}"
+    if [ -z "$docker_arg" ]; then
+      docker_arg="--tag ${PARAM_REGISTRY}/${PARAM_IMAGE_NAME}:${tag}"
+    else
+      docker_arg="${docker_arg} --tag ${PARAM_REGISTRY}/${PARAM_IMAGE_NAME}:${tag}"
+    fi
   done
 
-  readonly temp="$(eval echo ${DOCKER_TAGS_ARG})"
-
-  echo "!!!!!!! ${temp}"
+  DOCKER_TAGS_ARG="$(eval echo ${docker_arg})"
 }
 
 pull_images_from_cache() {
@@ -33,6 +39,9 @@ fi
 if [ -z "$PARAM_CACHE_FROM" ]; then
   # The variable "DOCKER_TAGS_ARG" has to be inside a "${}".
   # If inside double-quotes, the docker command will fail.
+
+  echo "!!!!!! ${DOCKER_TAGS_ARG}"
+
   docker build \
     "$PARAM_EXTRA_BUILD_ARGS" \
     --file "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" \

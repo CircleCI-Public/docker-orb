@@ -6,16 +6,15 @@ if [ -z "$PARAM_CACHE_FROM" ]; then
   IFS="," read -ra DOCKER_TAGS <<< "$PARAM_TAG"
 
   for tag in "${DOCKER_TAGS[@]}"; do
-    docker_tag_args="${docker_tag_args} -t ${PARAM_REGISTRY}/${PARAM_IMAGE_NAME}:${tag}"
+    eval_tag="$(eval echo ${tag})"
+    docker_tag_args="${docker_tag_args} -t ${PARAM_REGISTRY}/${PARAM_IMAGE_NAME}:${eval_tag}"
   done
 
-  DOCKER_TAGS="$(eval echo ${docker_tag_args})"
-
-  COMMAND="docker build ${PARAM_EXTRA_BUILD_ARGS} -f ${PARAM_DOCKERFILE_PATH}/${PARAM_DOCKERFILE_NAME} ${DOCKER_TAGS} ${PARAM_DOCKER_CONTEXT}"
+  COMMAND="docker build ${PARAM_EXTRA_BUILD_ARGS} -f ${PARAM_DOCKERFILE_PATH}/${PARAM_DOCKERFILE_NAME} ${docker_tag_args} ${PARAM_DOCKER_CONTEXT}"
 
   echo "Running: ${COMMAND}"
 
-  docker build ${PARAM_EXTRA_BUILD_ARGS} -f "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" "$DOCKER_TAGS" "$PARAM_DOCKER_CONTEXT"
+  docker build ${PARAM_EXTRA_BUILD_ARGS} -f "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" "$docker_tag_args" "$PARAM_DOCKER_CONTEXT"
 
 else
   echo "$PARAM_CACHE_FROM" | sed -n 1'p' | tr ',' '\n' | while read -r image; do

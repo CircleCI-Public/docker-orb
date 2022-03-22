@@ -14,10 +14,7 @@ if [ -z "$PARAM_CACHE_FROM" ]; then
     COMMAND="docker build -f ${PARAM_DOCKERFILE_PATH}/${PARAM_DOCKERFILE_NAME} ${docker_tag_args} ${PARAM_DOCKER_CONTEXT}"
     echo "Running: ${COMMAND}"
     
-    docker build \
-      -f "${PARAM_DOCKERFILE_PAT}/${PARAM_DOCKERFILE_NAME}" \
-      "$docker_tag_args" \
-      "$PARAM_DOCKER_CONTEXT"
+    docker build -f ${PARAM_DOCKERFILE_PATH}/${PARAM_DOCKERFILE_NAME} ${docker_tag_args} ${PARAM_DOCKER_CONTEXT}
   else 
     COMMAND="docker build ${PARAM_EXTRA_BUILD_ARGS} -f ${PARAM_DOCKERFILE_PATH}/${PARAM_DOCKERFILE_NAME} ${docker_tag_args} ${PARAM_DOCKER_CONTEXT}"
     echo "Running: ${COMMAND}"

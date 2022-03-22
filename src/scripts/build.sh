@@ -19,9 +19,6 @@ parse_tags_to_docker_arg() {
     fi
   done
 
-  echo "!!!!"
-  echo "$PARAM_IMAGE"
-
   DOCKER_TAGS_ARG="$(eval echo ${docker_arg})"
 }
 
@@ -41,11 +38,7 @@ fi
 if [ -z "$PARAM_CACHE_FROM" ]; then
   # The variable "DOCKER_TAGS_ARG" has to be inside a "${}".
   # If inside double-quotes, the docker command will fail.
-  docker build \
-    "$PARAM_EXTRA_BUILD_ARGS" \
-    --file "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" \
-    "$DOCKER_TAGS_ARG" \
-    "$PARAM_DOCKER_CONTEXT"
+  docker build "$PARAM_EXTRA_BUILD_ARGS" --file "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" ${DOCKER_TAGS_ARG} "$PARAM_DOCKER_CONTEXT"
 
 else
   if ! pull_images_from_cache; then

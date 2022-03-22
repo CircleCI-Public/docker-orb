@@ -12,8 +12,7 @@ parse_tags_to_docker_arg() {
     DOCKER_TAGS_ARG="${DOCKER_TAGS_ARG} --tag ${PARAM_REGISTRY}/${PARAM_IMAGE_NAME}:${expanded_tag}"
   done
 
-  readonly temp
-  temp="$(eval echo ${DOCKER_TAGS_ARG})"
+  readonly temp="$(eval echo ${DOCKER_TAGS_ARG})"
 
   echo "!!!!!!! ${temp}"
 }

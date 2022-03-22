@@ -10,13 +10,12 @@ parse_tags_to_docker_arg() {
   read -ra tags <<< "$PARAM_TAG"
 
   local docker_arg
-  docker_arg=""
 
   for tag in "${tags[@]}"; do
     if [ -z "$docker_arg" ]; then
-      docker_arg="-t ${PARAM_REGISTRY}/${PARAM_IMAGE_NAME}:${tag}"
+      docker_arg="-t $PARAM_REGISTRY/$PARAM_IMAGE:${tag}"
     else
-      docker_arg="$docker_arg -t ${PARAM_REGISTRY}/${PARAM_IMAGE_NAME}:${tag}"
+      docker_arg="$docker_arg -t $PARAM_REGISTRY/$PARAM_IMAGE:${tag}"
     fi
   done
 

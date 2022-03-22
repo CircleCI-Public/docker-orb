@@ -114,7 +114,7 @@ steps:
         PARAM_DOCKERFILE_NAME: <<parameters.dockerfile>>
         PARAM_DOCKERFILE_PATH: <<parameters.path>>
         PARAM_EXTRA_BUILD_ARGS: <<parameters.extra_build_args>>
-        PARAM_IMAGE_NAME: <<parameters.image>>
+        PARAM_IMAGE: <<parameters.image>>
         PARAM_REGISTRY: <<parameters.registry>>
         PARAM_TAG: <<parameters.tag>>
       command: <<include(scripts/build.sh)>>

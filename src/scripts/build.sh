@@ -1,48 +1,44 @@
 #!/usr/bin/env bash
 
-if [ -z "$PARAM_CACHE_FROM" ]; then
-  docker_tag_args=""
+DOCKER_TAGS_ARG=""
 
+parse_tags_to_docker_arg() {
+  # Split list of tags by comma.
   IFS="," read -ra DOCKER_TAGS <<< "$PARAM_TAG"
 
   for tag in "${DOCKER_TAGS[@]}"; do
-    eval_tag="$(eval echo ${tag})"
-    docker_tag_args="${docker_tag_args} -t cpeorbtesting/docker-orb-test:${eval_tag}"
+    local expanded_tag="$(eval echo ${tag})"
+    DOCKER_TAGS_ARG="${DOCKER_TAGS_ARG} -t cpeorbtesting/docker-orb-test:${EXPANDED_TAG}"
   done
+}
 
-  if [ -z "$PARAM_EXTRA_BUILD_ARGS" ]; then
-    echo "!!!!!!"
-    echo "$docker_tag_args"
+pull_images_from_cache() {
+  echo "$PARAM_CACHE_FROM" | sed -n 1'p' | tr ',' '\n' | while read -r image; do
+    echo "Pulling ${image}";
+    docker pull ${image} || true
+  done
+}
 
-    COMMAND="docker build -f ${PARAM_DOCKERFILE_PATH}/${PARAM_DOCKERFILE_NAME} ${docker_tag_args} ${PARAM_DOCKER_CONTEXT}"
-    echo "Running: ${COMMAND}"
-    
-    docker build -f "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" ${docker_tag_args} "$PARAM_DOCKER_CONTEXT"
-  else
-    echo "I'm the else for extra args"
-    # COMMAND="docker build ${PARAM_EXTRA_BUILD_ARGS} -f ${PARAM_DOCKERFILE_PATH}/${PARAM_DOCKERFILE_NAME} ${docker_tag_args} ${PARAM_DOCKER_CONTEXT}"
-    # echo "Running: ${COMMAND}"
+parse_tags_to_docker_arg
 
-    # docker build "$PARAM_EXTRA_BUILD_ARGS" -f "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" "$docker_tag_args" "$PARAM_DOCKER_CONTEXT"
-  fi
+if [ -z "$PARAM_CACHE_FROM" ]; then
+  # The variable "DOCKER_TAGS_ARG" has to be inside a "${}".
+  # If inside double-quotes, the docker command will fail.
+  docker build \
+    "$PARAM_EXTRA_BUILD_ARGS" \
+    -f "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" \ 
+    ${DOCKER_TAGS_ARG} \
+    "$PARAM_DOCKER_CONTEXT"
 
 else
-    echo "I'm the else for cache"
-  # echo "$PARAM_CACHE_FROM" | sed -n 1'p' | tr ',' '\n' | while read -r image; do
-  #   echo "Pulling ${image}";
-  #   docker pull ${image} || true
-  # done
+  pull_images_from_cache
 
-  # docker_tag_args=""
-
-  # IFS="," read -ra DOCKER_TAGS <<< "$PARAM_TAG"
-
-  # for tag in "${DOCKER_TAGS[@]}"; do
-  #   docker_tag_args="${docker_tag_args} -t ${PARAM_REGISTRY}/${PARAM_IMAGE_NAME}:${tag}"
-  # done
-
-  # docker build "$PARAM_EXTRA_BUILD_ARGS" "$PARAM_EXTRA_BUILD_ARGS" --cache-from "$PARAM_CACHE_FROM" \
-  #   -f "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" \
-  #   $docker_tag_args \
-  #   "$PARAM_DOCKER_CONTEXT"
+  # The variable "DOCKER_TAGS_ARG" has to be inside a "${}".
+  # If inside double-quotes, the docker command will fail.
+  docker build \
+    "$PARAM_EXTRA_BUILD_ARGS" \
+    --cache-from "$PARAM_CACHE_FROM" \
+    -f "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" \
+    ${DOCKER_TAGS_ARG} \
+    "$PARAM_DOCKER_CONTEXT"
 fi

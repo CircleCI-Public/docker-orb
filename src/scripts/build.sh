@@ -15,7 +15,8 @@ if [ -z "$PARAM_CACHE_FROM" ]; then
     echo "Running: ${COMMAND}"
     
     docker build -f "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" "$docker_tag_args" "$PARAM_DOCKER_CONTEXT"
-  else 
+  else
+    echo "I'm the else for extra args"
     # COMMAND="docker build ${PARAM_EXTRA_BUILD_ARGS} -f ${PARAM_DOCKERFILE_PATH}/${PARAM_DOCKERFILE_NAME} ${docker_tag_args} ${PARAM_DOCKER_CONTEXT}"
     # echo "Running: ${COMMAND}"
 
@@ -23,6 +24,7 @@ if [ -z "$PARAM_CACHE_FROM" ]; then
   fi
 
 else
+    echo "I'm the else for cache"
   # echo "$PARAM_CACHE_FROM" | sed -n 1'p' | tr ',' '\n' | while read -r image; do
   #   echo "Pulling ${image}";
   #   docker pull ${image} || true

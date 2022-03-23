@@ -51,7 +51,7 @@ fi
 # http://mywiki.wooledge.org/BashFAQ/050#I_only_want_to_pass_options_if_the_runtime_data_needs_them
 docker build \
   ${PARAM_EXTRA_BUILD_ARGS:+"$PARAM_EXTRA_BUILD_ARGS"} \
-  ${PARAM_CACHE_FROM:+--cache_from="$PARAM_CACHE_FROM"} \
+  ${PARAM_CACHE_FROM:+--cache-from="$PARAM_CACHE_FROM"} \
   "--file=$PARAM_DOCKERFILE_PATH/$PARAM_DOCKERFILE_NAME" \
   "$DOCKER_TAGS_ARG" \
   "$PARAM_DOCKER_CONTEXT"

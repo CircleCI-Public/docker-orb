@@ -1,9 +1,9 @@
 if [ -n "$PARAM_IGNORE_RULES" ]; then
-  readonly ignore_rules=$(printf '%s' "--ignore ${PARAM_IGNORE_RULES//,/ --ignore }")
+  readonly ignore_rules=$(echo "--ignore ${PARAM_IGNORE_RULES//,/ --ignore }")
 fi
 
 if [ -n "$PARAM_TRUSTED_REGISTRIES" ]; then
-  readonly trusted_registries=$(printf '%s' "--trusted-registry ${PARAM_TRUSTED_REGISTRIES//,/ --trusted-registry }")
+  readonly trusted_registries=$(echo "--trusted-registry ${PARAM_TRUSTED_REGISTRIES//,/ --trusted-registry }")
 fi
 
 printf '%s\n' "Running hadolint with the following options..."

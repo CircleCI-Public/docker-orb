@@ -6,7 +6,7 @@ parse_tags_to_docker_arg() {
   # Set comma as the new delimiter for the scope of this function.
   local IFS="," 
 
-  # Read the split words into an array based on comma delimiter.
+  # Split tags into an array based on IFS delimiter.
   read -ra tags <<< "$PARAM_TAG"
 
   local docker_arg

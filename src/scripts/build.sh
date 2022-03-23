@@ -19,11 +19,13 @@ parse_tags_to_docker_arg() {
     fi
   done
 
-  DOCKER_TAGS_ARG="$(eval echo ${docker_arg})"
+  DOCKER_TAGS_ARG="$(eval echo $docker_arg)"
 }
 
 pull_images_from_cache() {
-  echo "$PARAM_CACHE_FROM" | sed -n 1'p' | tr ',' '\n' | while read -r image; do
+  local cache="$(eval echo $PARAM_CACHE_FROM)"
+
+  echo "$cache" | sed -n 1'p' | tr ',' '\n' | while read -r image; do
     echo "Pulling ${image}";
     docker pull ${image} || true
   done
@@ -36,15 +38,11 @@ if ! parse_tags_to_docker_arg; then
 fi
 
 if [ -z "$PARAM_CACHE_FROM" ]; then
-  # The variable "DOCKER_TAGS_ARG" has to be inside a "${}".
-  # If inside double-quotes, the docker command will fail.
-
-  COMMAND="docker build $PARAM_EXTRA_BUILD_ARGS $DOCKER_TAGS_ARG --file $PARAM_DOCKERFILE_PATH/$PARAM_DOCKERFILE_NAME $PARAM_DOCKER_CONTEXT"
-
-  echo "running:"
-  echo "$COMMAND"
-
-  docker build "$DOCKER_TAGS_ARG" --file "$PARAM_DOCKERFILE_PATH/$PARAM_DOCKERFILE_NAME" "$PARAM_DOCKER_CONTEXT"
+  docker build \
+    "$PARAM_EXTRA_BUILD_ARGS" \
+    "$DOCKER_TAGS_ARG" 
+    --file="$PARAM_DOCKERFILE_PATH/$PARAM_DOCKERFILE_NAME" \
+    "$PARAM_DOCKER_CONTEXT"
 
 else
   if ! pull_images_from_cache; then
@@ -53,11 +51,9 @@ else
     exit 1
   fi
 
-  # The variable "DOCKER_TAGS_ARG" has to be inside a "${}".
-  # If inside double-quotes, the docker command will fail.
   docker build \
     "$PARAM_EXTRA_BUILD_ARGS" \
-    --cache-from "$PARAM_CACHE_FROM" \
+    --cache-from="$PARAM_CACHE_FROM" \
     --file "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" \
     ${DOCKER_TAGS_ARG} \
     "$PARAM_DOCKER_CONTEXT"

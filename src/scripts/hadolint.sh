@@ -18,13 +18,7 @@ read -ra dockerfiles <<< "$PARAM_DOCKERFILES"
 IFS="$old_ifs"
 
 for dockerfile in "${dockerfiles[@]}"; do
-  printf '%s\n' "Running command"
-  printf '%s\n' "hadolint $ignore_rules $trusted_registries $dockerfile"
-
-  hadolint \
-    ${PARAM_IGNORE_RULES:+"$ignore_rules"} \
-    ${PARAM_TRUSTED_REGISTRIES:+"$trusted_registries"} \
-    $dockerfile
+  hadolint ${PARAM_TRUSTED_REGISTRIES:+"$trusted_registries"} ${PARAM_IGNORE_RULES:+"$ignore_rules"} $dockerfile
 
   printf '%s\n' "Success! $dockerfile linted; no issues found"
 done

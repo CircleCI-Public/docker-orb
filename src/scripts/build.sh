@@ -3,13 +3,11 @@
 DOCKER_TAGS_ARG=""
 
 parse_tags_to_docker_arg() {
-  # Backup original IFS and set comma as the new delimiter.
-  readonly old_ifs="$IFS"
-  IFS="," 
+  # Set comma as the new delimiter for the scope of this function.
+  local IFS="," 
 
-  # Read the split words into an array based on comma delimiter and rollback IFS.
+  # Read the split words into an array based on comma delimiter.
   read -ra tags <<< "$PARAM_TAG"
-  IFS="$old_ifs"
 
   local docker_arg
 

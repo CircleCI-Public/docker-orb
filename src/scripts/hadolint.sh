@@ -10,19 +10,19 @@ printf '%s\n' "Running hadolint with the following options..."
 printf '%s\n' "$ignore_rules"
 printf '%s\n' "$trusted_registries"
 
-readonly dockerfiles="$PARAM_DOCKERFILES"
 
 # use colon delimiters to create array
-arrDOCKERFILES=(${DOCKERFILES//:/ })
-let END=${#arrDOCKERFILES[@]}
+readonly old_ifs="$IFS"
+IFS=":"
 
-for ((i=0;i<END;i++)); do
-  DOCKERFILE="${arrDOCKERFILES[i]}"
+read -ra dockerfiles <<< "$PARAM_DOCKERFILES" 
+IFS="$old_ifs"
 
+for dockerfile in "${dockerfiles[@]}"; do
   hadolint \
     ${ignore_rules:+"$ignore_rules"} \
     ${trusted_registries:+"$trusted_registries"} \
-    $DOCKERFILE
+    $dockerfile
 
   printf '%s\n' "Success! $DOCKERFILE linted; no issues found"
 done

@@ -40,8 +40,9 @@ fi
 
 if [ -z "$PARAM_CACHE_FROM" ]; then
   docker build \
+    --file="$PARAM_DOCKERFILE_PATH/$PARAM_DOCKERFILE_NAME" \
     "$DOCKER_TAGS_ARG" \
-    --file "$PARAM_DOCKERFILE_PATH/$PARAM_DOCKERFILE_NAME" \
+    "$PARAM_EXTRA_BUILD_ARGS" \
     "$PARAM_DOCKER_CONTEXT"
 
 else

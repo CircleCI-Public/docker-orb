@@ -23,7 +23,8 @@ parse_tags_to_docker_arg() {
 }
 
 pull_images_from_cache() {
-  local cache="$(eval echo $PARAM_CACHE_FROM)"
+  local cache
+  cache="$(eval echo $PARAM_CACHE_FROM)"
 
   echo "$cache" | sed -n 1'p' | tr ',' '\n' | while read -r image; do
     echo "Pulling ${image}";
@@ -40,8 +41,8 @@ fi
 if [ -z "$PARAM_CACHE_FROM" ]; then
   docker build \
     "$PARAM_EXTRA_BUILD_ARGS" \
-    "$DOCKER_TAGS_ARG" 
-    --file="$PARAM_DOCKERFILE_PATH/$PARAM_DOCKERFILE_NAME" \
+    "--file=$PARAM_DOCKERFILE_PATH/$PARAM_DOCKERFILE_NAME" \
+    "$DOCKER_TAGS_ARG" \
     "$PARAM_DOCKER_CONTEXT"
 
 else
@@ -53,8 +54,8 @@ else
 
   docker build \
     "$PARAM_EXTRA_BUILD_ARGS" \
-    --cache-from="$PARAM_CACHE_FROM" \
-    --file "$PARAM_DOCKERFILE_PATH"/"$PARAM_DOCKERFILE_NAME" \
-    ${DOCKER_TAGS_ARG} \
+    "--cache-from=$PARAM_CACHE_FROM" \
+    "--file=$PARAM_DOCKERFILE_PATH/$PARAM_DOCKERFILE_NAME" \
+    "$DOCKER_TAGS_ARG" \
     "$PARAM_DOCKER_CONTEXT"
 fi

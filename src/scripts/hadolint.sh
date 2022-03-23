@@ -24,5 +24,5 @@ for dockerfile in "${dockerfiles[@]}"; do
     ${trusted_registries:+"$trusted_registries"} \
     $dockerfile
 
-  printf '%s\n' "Success! $DOCKERFILE linted; no issues found"
+  printf '%s\n' "Success! $dockerfile linted; no issues found"
 done

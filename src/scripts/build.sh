@@ -39,7 +39,10 @@ if ! parse_tags_to_docker_arg; then
 fi
 
 if [ -z "$PARAM_CACHE_FROM" ]; then
-  docker build "$DOCKER_TAGS_ARG" --file "$PARAM_DOCKERFILE_PATH/$PARAM_DOCKERFILE_NAME"  "$PARAM_DOCKER_CONTEXT"
+  docker build \
+    "$DOCKER_TAGS_ARG" \
+    --file "$PARAM_DOCKERFILE_PATH/$PARAM_DOCKERFILE_NAME" \
+    "$PARAM_DOCKER_CONTEXT"
 
 else
   if ! pull_images_from_cache; then

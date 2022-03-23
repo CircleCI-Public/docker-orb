@@ -3,11 +3,14 @@
 DOCKER_TAGS_ARG=""
 
 parse_tags_to_docker_arg() {
-  # Set comma as delimiter.
+  # Backup original IFS and set comma as the new delimiter.
+  readonly old_ifs
+  old_ifs="$IFS"
   IFS="," 
 
-  # Read the split words into an array based on comma delimiter
+  # Read the split words into an array based on comma delimiter and rollback IFS.
   read -ra tags <<< "$PARAM_TAG"
+  IFS="$old_ifs"
 
   local docker_arg
 
@@ -38,24 +41,18 @@ if ! parse_tags_to_docker_arg; then
   exit 1
 fi
 
-if [ -z "$PARAM_CACHE_FROM" ]; then
-  docker build \
-    --file="$PARAM_DOCKERFILE_PATH/$PARAM_DOCKERFILE_NAME" \
-    "$DOCKER_TAGS_ARG" \
-    "$PARAM_EXTRA_BUILD_ARGS" \
-    "$PARAM_DOCKER_CONTEXT"
-
-else
+if [ ! -z "$PARAM_CACHE_FROM" ]; then
   if ! pull_images_from_cache; then
     echo "Unable to pull images from the cache."
     echo "Check your \"cache_from\" parameter or refer to the docs and try again: https://circleci.com/developer/orbs/orb/circleci/docker."
     exit 1
   fi
-
-  docker build \
-    "$PARAM_EXTRA_BUILD_ARGS" \
-    "--cache-from=$PARAM_CACHE_FROM" \
-    "--file=$PARAM_DOCKERFILE_PATH/$PARAM_DOCKERFILE_NAME" \
-    "$DOCKER_TAGS_ARG" \
-    "$PARAM_DOCKER_CONTEXT"
 fi
+
+# http://mywiki.wooledge.org/BashFAQ/050#I_only_want_to_pass_options_if_the_runtime_data_needs_them
+docker build \
+  ${PARAM_EXTRA_BUILD_ARGS:+"$PARAM_EXTRA_BUILD_ARGS"} \
+  ${PARAM_CACHE_FROM:+--cache_from="$PARAM_CACHE_FROM"} \
+  "--file=$PARAM_DOCKERFILE_PATH/$PARAM_DOCKERFILE_NAME" \
+  "$DOCKER_TAGS_ARG" \
+  "$PARAM_DOCKER_CONTEXT"

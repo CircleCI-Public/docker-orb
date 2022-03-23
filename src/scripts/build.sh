@@ -41,7 +41,7 @@ if ! parse_tags_to_docker_arg; then
   exit 1
 fi
 
-if [ ! -z "$PARAM_CACHE_FROM" ]; then
+if [ -n "$PARAM_CACHE_FROM" ]; then
   if ! pull_images_from_cache; then
     echo "Unable to pull images from the cache."
     echo "Check your \"cache_from\" parameter or refer to the docs and try again: https://circleci.com/developer/orbs/orb/circleci/docker."

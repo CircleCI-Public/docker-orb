@@ -18,6 +18,8 @@ read -ra dockerfiles <<< "$PARAM_DOCKERFILES"
 IFS="$old_ifs"
 
 for dockerfile in "${dockerfiles[@]}"; do
+  printf '%s\n' "Running hadolint on ${dockerfile}..."
+
   hadolint \
     ${ignore_rules:+"$ignore_rules"} \
     ${trusted_registries:+"$trusted_registries"} \

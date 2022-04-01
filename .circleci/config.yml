@@ -47,7 +47,7 @@ parameters:
 executors:
   macos-old:
     macos:
-      xcode: 10.3.0
+      xcode: 11.7.0
   macos-latest:
     macos:
       xcode: 13.1.0

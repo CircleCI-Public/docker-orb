@@ -71,7 +71,7 @@ steps:
           --silent --show-error --location --fail --retry 3 \
           "$DOCKER_COMPOSE_SHASUM_URL"
 
-        FILENAME=$(cat docker-compose-$PLATFORM-x86_64.sha256 | awk '{ print $NF }') | sed 's/^\*//'
+        FILENAME=$(cat docker-compose-$PLATFORM-x86_64.sha256 | awk '{ print $NF }' | sed 's/^\*//')
 
         curl -O \
           --silent --show-error --location --fail --retry 3 \

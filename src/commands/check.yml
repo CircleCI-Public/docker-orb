@@ -43,7 +43,8 @@ steps:
 
   - run:
       name: Docker login
-      command: |
-        echo "$<<parameters.docker-password>>" \
-          | docker login -u "$<<parameters.docker-username>>" \
-              --password-stdin <<parameters.registry>>
+      environment:
+        PARAM_REGISTRY: <<parameters.registry>>
+        PARAM_DOCKER_USERNAME: <<parameters.docker-username>>
+        PARAM_DOCKER_PASSWORD: <<parameters.docker-password>>
+      command: <<include(scripts/check.sh)>>

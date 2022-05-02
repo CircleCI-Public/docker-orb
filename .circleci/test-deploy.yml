@@ -1,0 +1,392 @@
+version: 2.1
+
+promotion_requires: &promotion_requires
+  [
+    hadolint,
+    orb-tools/pack,
+    test-check-command-docker,
+    test-check-command-machine,
+    test-check-command-macos,
+    test-credentials-store-docker,
+    test-credentials-store-machine,
+    test-credentials-store-macos,
+    publish-machine,
+    publish-docker-cache,
+    publish-docker-cache-not-found,
+    test-pull,
+    test-install-docker-tools-docker-latest,
+    test-install-docker-tools-docker-old,
+    test-install-docker-tools-macos-latest,
+    test-install-docker-tools-macos-old,
+    test-install-docker-tools-machine-latest,
+    test-install-docker-tools-machine-old,
+    test-docker-latest,
+    test-docker-old,
+    test-macos-latest,
+    test-macos-old,
+    test-machine-latest,
+    test-machine-old,
+    test-build-command-workspace
+  ]
+
+filters: &filters
+  tags:
+    only: /.*/
+  
+orbs:
+  build-tools: circleci/build-tools@3.0.0
+  docker: circleci/docker@dev:<<pipeline.git.revision>>
+  jq: circleci/jq@2.2.0
+  node: circleci/node@4.7.0
+  orb-tools: circleci/orb-tools@11.1
+
+jobs:
+  test:
+    parameters:
+      executor:
+        type: executor
+      install-goss:
+        type: boolean
+        default: true
+    executor: << parameters.executor >>
+    steps:
+      - docker/install-docker
+      - docker/install-docker-compose
+      - docker/install-dockerize
+      - when:
+          condition: << parameters.install-goss >>
+          steps:
+            - docker/install-goss
+  test-install-docker-tools:
+    parameters:
+      executor:
+        type: executor
+      docker-version:
+        type: string
+        default: latest
+      docker-compose-version:
+        type: string
+        default: latest
+      dockerize-version:
+        type: string
+        default: latest
+      install-goss:
+        type: boolean
+        default: true
+      goss-version:
+        type: string
+        default: latest
+      debug:
+        type: boolean
+        default: false
+    executor: <<parameters.executor>>
+    steps:
+      - checkout
+      - jq/install
+      - docker/install-docker-tools:
+          install-goss-dgoss: << parameters.install-goss >>
+  test-pull:
+    executor: docker-latest
+    steps:
+      - setup_remote_docker
+      - docker/pull:
+          images: cimg/base:stable,ubuntu:18.04
+      - docker/pull:
+          images: cimg/base:stable,cimg/base:not_exists,cimg/go:stable
+          ignore-docker-pull-error: true
+  test-check-command:
+    parameters:
+      executor:
+        type: executor
+      docker-username:
+        type: env_var_name
+      docker-password:
+        type: env_var_name
+      use-docker-credentials-store:
+        type: boolean
+    executor: <<parameters.executor>>
+    steps:
+      - docker/check:
+          docker-username: <<parameters.docker-username>>
+          docker-password: <<parameters.docker-password>>
+          use-docker-credentials-store: <<parameters.use-docker-credentials-store>>
+  test-credentials-store:
+    parameters:
+      executor:
+        type: executor
+      helper-name:
+        type: enum
+        enum: ["", "pass", "osxkeychain"]
+        default: ""
+      docker-username:
+        type: env_var_name
+      docker-password:
+        type: env_var_name
+    executor: <<parameters.executor>>
+    steps:
+      - docker/install-docker-credential-helper:
+          helper-name: <<parameters.helper-name>>
+      - docker/configure-docker-credentials-store:
+          helper-name: <<parameters.helper-name>>
+      - run:
+          name: Test login
+          command: |
+            LOGIN_RESULT=$(echo "$<<parameters.docker-password>>" \
+            | docker login -u "$<<parameters.docker-username>>" --password-stdin)
+            set -x
+            echo "$LOGIN_RESULT" | grep "Login Succeeded"
+            set +x
+            if echo "$LOGIN_RESULT" | grep -q "WARNING"; then
+            echo "Error - warning found in login result"
+            exit 1
+            fi
+  test-create-workspace:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - run:
+          name: Description
+          command: |
+            echo "This step simply creates a file and saves it to a workspace. This tests the attach_at parameter in the build command."
+            echo "true" > verify.txt
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - verify.txt
+  test-build-command-workspace:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/build:
+          dockerfile: test.Dockerfile
+          image: cpeorbtesting/docker-orb-test
+          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
+          attach-at: "./"
+      - run:
+          name: Check for workspace
+          command: |-
+            echo "Ensuring workspace was attached."
+            if test -f "./verify.txt"; then
+              echo "Success"
+            else
+              echo "Error"
+              pwd
+              ls
+              exit 1
+            fi
+
+workflows:
+  test-deploy:
+    jobs:
+      - docker/hadolint:
+          name: hadolint
+          ignore-rules: DL4005,DL3008,DL3009,DL3015,DL3059
+          trusted-registries: docker.io,my-company.com:5000
+          dockerfiles: test.Dockerfile:test2.Dockerfile
+          filters: *filters
+      - test-pull:
+          filters: *filters
+      - test-create-workspace:
+          filters: *filters
+      - test-build-command-workspace:
+          requires:
+            - test-create-workspace
+          filters: *filters
+
+      # begin test-check-command
+      - test-check-command:
+          name: test-check-command-docker
+          executor: docker-latest
+          context: CPE-orb-docker-testing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: false
+          filters: *filters
+      - test-check-command:
+          name: test-check-command-machine
+          executor: machine-latest
+          context: CPE-orb-docker-testing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
+          filters: *filters
+      - test-check-command:
+          name: test-check-command-macos
+          executor: macos-latest
+          context: CPE-orb-docker-testing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
+          pre-steps:
+            - docker/install-docker
+          filters: *filters
+      # end test-check-command
+
+      # begin test-credentials-store
+      - test-credentials-store:
+          name: test-credentials-store-docker
+          executor: docker-latest
+          context: CPE-orb-docker-testing
+          helper-name: pass
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          filters: *filters
+      - test-credentials-store:
+          name: test-credentials-store-machine
+          executor: machine-latest
+          context: CPE-orb-docker-testing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          filters: *filters
+      - test-credentials-store:
+          name: test-credentials-store-macos
+          executor: macos-latest
+          context: CPE-orb-docker-testing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          pre-steps:
+            - docker/install-docker
+          filters: *filters
+      # end test-credentials-store
+
+      # begin docker/publish
+      - docker/publish:
+          name: publish-machine
+          context: CPE-orb-docker-testing
+          dockerfile: test.Dockerfile
+          image: cpeorbtesting/docker-orb-test
+          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
+          pre-steps:
+            # Test that it's OK to invoke the commands twice
+            - docker/install-docker-credential-helper
+            - docker/configure-docker-credentials-store
+          filters: *filters
+      - docker/publish:
+          name: publish-docker
+          executor: docker-latest
+          context: CPE-orb-docker-testing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: cpeorbtesting/docker-orb-test
+          tag: $CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
+          filters: *filters
+      - docker/publish:
+          name: publish-docker-cache
+          requires:
+            - publish-docker
+          executor: docker-latest
+          context: CPE-orb-docker-testing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: cpeorbtesting/docker-orb-test
+          tag: $CIRCLE_SHA1
+          cache_from: cpeorbtesting/docker-orb-test:$CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          pre-steps:
+            - docker/install-docker-credential-helper:
+                # release-tag: v0.6.3
+            - docker/configure-docker-credentials-store:
+                helper-name: pass
+          filters: *filters
+      - docker/publish:
+          name: publish-docker-cache-not-found
+          executor: docker/docker
+          context: CPE-orb-docker-testing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: cpeorbtesting/docker-orb-test
+          tag: $CIRCLE_SHA1-2
+          cache_from: cpeorbtesting/docker-orb-test:not-exists
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          filters: *filters
+      - docker/publish:
+          name: publish-docker-update-description
+          executor: docker-latest
+          context: CPE-orb-docker-testing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: cpeorbtesting/docker-orb-test
+          tag: $CIRCLE_SHA1
+          cache_from: cpeorbtesting/docker-orb-test:$CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          update-description: true
+          filters: *filters
+      # end docker/publish
+
+      # begin test-install-docker-tools
+      - test-install-docker-tools:
+          name: test-install-docker-tools-<< matrix.executor >>
+          matrix:
+            parameters:
+              executor: [docker-latest, docker-old, machine-latest, machine-old]
+          filters: *filters
+      - test-install-docker-tools:
+          name: test-install-docker-tools-<< matrix.executor >>
+          matrix:
+            parameters:
+              executor: [macos-latest, macos-old]
+          install-goss: false
+          filters: *filters
+      # end test-install-docker-tools
+      
+      # begin test
+      - test:
+          name: test-<< matrix.executor >>
+          matrix:
+            parameters:
+              executor: [docker-latest, docker-old, machine-latest, machine-old]
+          filters: *filters
+      - test:
+          name: test-<< matrix.executor >>
+          matrix:
+            parameters:
+              executor: [macos-latest, macos-old]
+          install-goss: false
+          filters: *filters
+      # end test
+
+      - orb-tools/pack:
+          filters: *filters
+      - orb-tools/publish:
+          orb-name: circleci/docker
+          vcs-type: << pipeline.project.type >>
+          pub-type: production
+          requires: *promotion_requires
+          context: orb-publisher
+          github-token: GHI_TOKEN
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+
+executors:
+  macos-old:
+    macos:
+      xcode: 10.3.0
+  macos-latest:
+    macos:
+      xcode: 13.1.0
+  docker-old:
+    docker:
+      - image: cimg/base:2020.08-20.04
+  docker-latest:
+    docker:
+      - image: cimg/base:stable
+  machine-old:
+    machine:
+      image: ubuntu-2004:202010-01
+  machine-latest:
+    machine:
+      image: ubuntu-2004:current

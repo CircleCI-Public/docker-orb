@@ -31,31 +31,8 @@ parameters:
 steps:
   - run:
       name: Lint <<parameters.dockerfiles>> with hadolint
-      command: |
-        <<#parameters.ignore-rules>>
-        IGNORE_STRING=<<parameters.ignore-rules>>
-        IGNORE_RULES=$(echo "--ignore ${IGNORE_STRING//,/ --ignore }")
-        <</parameters.ignore-rules>>
-
-        <<#parameters.trusted-registries>>
-        REGISTRIES_STRING=<<parameters.trusted-registries>>
-        TRUSTED_REGISTRIES=$(echo "--trusted-registry ${REGISTRIES_STRING//,/ --trusted-registry }")
-        <</parameters.trusted-registries>>
-
-        echo "Running hadolint with the following options..."
-        echo "$IGNORE_RULES"
-        echo "$TRUSTED_REGISTRIES"
-
-        DOCKERFILES=<<parameters.dockerfiles>>
-
-        # use colon delimiters to create array
-        arrDOCKERFILES=(${DOCKERFILES//:/ })
-        let END=${#arrDOCKERFILES[@]}
-
-        for ((i=0;i<END;i++)); do
-          DOCKERFILE="${arrDOCKERFILES[i]}"
-
-          hadolint<<#parameters.ignore-rules>> $IGNORE_RULES<</parameters.ignore-rules>> <<#parameters.trusted-registries>>$TRUSTED_REGISTRIES <</parameters.trusted-registries>>$DOCKERFILE
-
-          echo "Success! $DOCKERFILE linted; no issues found"
-        done
+      environment:
+        PARAM_DOCKERFILES: <<parameters.dockerfiles>>
+        PARAM_IGNORE_RULES: <<parameters.ignore-rules>>
+        PARAM_TRUSTED_REGISTRIES: <<parameters.trusted-registries>>
+      command: <<include(scripts/hadolint.sh)>>

@@ -26,11 +26,8 @@ parameters:
 steps:
   - run:
       name: Lint Dockerfile at <<parameters.dockerfile>>
-      command: |
-        if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
-
-        npm install -g dockerlint<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>> || \
-          $SUDO npm install -g dockerlint<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
-
-        dockerlint<<#parameters.treat-warnings-as-errors>> -p<</parameters.treat-warnings-as-errors>> \
-          <<parameters.dockerfile>>
+      environment:
+        PARAM_DEBUG: <<parameters.debug>>
+        PARAM_TREAT_WARNING_AS_ERRORS: <<parameters.treat-warnings-as-errors>>
+        PARAM_DOCKERFILE: <<parameters.dockerfile>>
+      command: <<include(scripts/dockerlint.sh)>>

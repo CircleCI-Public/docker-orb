@@ -2,6 +2,7 @@ version: 2.1
 
 promotion_requires: &promotion_requires
   [
+    dockerlint,
     hadolint,
     orb-tools/pack,
     test-check-command-docker,
@@ -176,6 +177,25 @@ jobs:
               ls
               exit 1
             fi
+  test-dockerlint:
+    docker:
+      - image: cimg/node:17.7.2
+    parameters:
+      debug:
+        type: boolean
+        default: false
+      dockerfile:
+        type: string
+        default: "test.Dockerfile"
+      treat-warnings-as-errors:
+        type: boolean
+        default: false
+    steps:
+      - checkout
+      - docker/dockerlint:
+          debug: <<parameters.debug>>
+          dockerfile: <<parameters.dockerfile>>
+          treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>
 
 workflows:
   test-deploy:
@@ -185,6 +205,11 @@ workflows:
           ignore-rules: DL4005,DL3008,DL3009,DL3015,DL3059
           trusted-registries: docker.io,my-company.com:5000
           dockerfiles: test.Dockerfile:test2.Dockerfile
+          filters: *filters
+      - test-dockerlint:
+          name: dockerlint
+          debug: true
+          treat-warnings-as-errors: false
           filters: *filters
       - test-pull:
           filters: *filters

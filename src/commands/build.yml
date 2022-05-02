@@ -105,45 +105,16 @@ steps:
         - attach_workspace:
               at: <<parameters.attach-at>>
 
-  - when:
-      condition: <<parameters.cache_from>>
-      steps:
-        - run:
-            name: <<parameters.step-name>>
-            no_output_timeout: << parameters.no_output_timeout >>
-            command: |
-              echo "<<parameters.cache_from>>" | sed -n 1'p' | tr ',' '\n' | while read image; do
-                echo "Pulling ${image}";
-                docker pull ${image} || true
-              done
-
-              docker_tag_args=""
-
-              IFS="," read -ra DOCKER_TAGS \<<< "<< parameters.tag >>"
-              for tag in "${DOCKER_TAGS[@]}"; do
-                docker_tag_args="$docker_tag_args -t <<parameters.registry>>/<<parameters.image>>:${tag}"
-              done
-
-              docker build <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
-                --cache-from <<parameters.cache_from>> \
-                -f <<parameters.path>>/<<parameters.dockerfile>> \
-                $docker_tag_args \
-                <<parameters.docker-context>>
-  - unless:
-      condition: <<parameters.cache_from>>
-      steps:
-        - run:
-            name: <<parameters.step-name>>
-            no_output_timeout: << parameters.no_output_timeout >>
-            command: |
-              docker_tag_args=""
-
-              IFS="," read -ra DOCKER_TAGS \<<< "<< parameters.tag >>"
-              for tag in "${DOCKER_TAGS[@]}"; do
-                docker_tag_args="$docker_tag_args -t <<parameters.registry>>/<<parameters.image>>:${tag}"
-              done
-
-              docker build <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
-                -f <<parameters.path>>/<<parameters.dockerfile>> \
-                $docker_tag_args \
-                <<parameters.docker-context>>
+  - run:
+      name: <<parameters.step-name>>
+      no_output_timeout: << parameters.no_output_timeout >>
+      environment:
+        PARAM_CACHE_FROM: <<parameters.cache_from>>
+        PARAM_DOCKER_CONTEXT: <<parameters.docker-context>>
+        PARAM_DOCKERFILE_NAME: <<parameters.dockerfile>>
+        PARAM_DOCKERFILE_PATH: <<parameters.path>>
+        PARAM_EXTRA_BUILD_ARGS: <<parameters.extra_build_args>>
+        PARAM_IMAGE: <<parameters.image>>
+        PARAM_REGISTRY: <<parameters.registry>>
+        PARAM_TAG: <<parameters.tag>>
+      command: <<include(scripts/build.sh)>>

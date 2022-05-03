@@ -16,8 +16,7 @@ steps:
       steps:
         - run:
             name: Docker pull
-            command: |
-              echo "<<parameters.images>>" | sed -n 1'p' | tr ',' '\n' | while read image; do
-                echo "Pulling ${image}";
-                docker pull ${image} <<#parameters.ignore-docker-pull-error>>|| true<</parameters.ignore-docker-pull-error>>
-              done
+            environment:
+              PARAM_IMAGES: <<parameters.images>>
+              PARAM_IGNORE_DOCKER_PULL_ERROR: <<parameters.ignore-docker-pull-error>>
+            command: << include(scripts/pull.sh) >>

@@ -46,10 +46,26 @@ if [ -n "$PARAM_CACHE_FROM" ]; then
   fi
 fi
 
-# http://mywiki.wooledge.org/BashFAQ/050#I_only_want_to_pass_options_if_the_runtime_data_needs_them
-docker build \
-  ${PARAM_EXTRA_BUILD_ARGS:+"$PARAM_EXTRA_BUILD_ARGS"} \
-  ${PARAM_CACHE_FROM:+--cache-from="$PARAM_CACHE_FROM"} \
-  "--file=$PARAM_DOCKERFILE_PATH/$PARAM_DOCKERFILE_NAME" \
-  "$DOCKER_TAGS_ARG" \
-  "$PARAM_DOCKER_CONTEXT"
+build_args=(
+  "--file=$PARAM_DOCKERFILE_PATH/$PARAM_DOCKERFILE_NAME" 
+  "$DOCKER_TAGS_ARG" 
+)
+
+if [ -n "$PARAM_EXTRA_BUILD_ARGS" ]; then
+  build_args+=("$PARAM_EXTRA_BUILD_ARGS")
+fi
+
+if [ -n "$PARAM_CACHE_FROM" ]; then
+  build_args+=("--cache-from=$PARAM_CACHE_FROM")
+fi
+
+if [ "$PARAM_USE_BUILDKIT" -eq 1 ]; then
+  build_args+=("--progress=plain")
+fi
+
+# The context must be the last argument.
+build_args+=("$PARAM_DOCKER_CONTEXT")
+
+set -x
+docker build "${build_args[@]}"
+set +x

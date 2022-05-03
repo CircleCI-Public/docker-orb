@@ -38,7 +38,7 @@ parameters:
     type: string
     default: .
     description: >
-      Path to the directory containing your Dockerfile and build context,
+      Path to the directory containing your Dockerfile,
       defaults to . (working directory)
 
   lint-dockerfile:

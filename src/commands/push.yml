@@ -29,6 +29,11 @@ parameters:
 steps:
   - deploy:
       name: <<parameters.step-name>>
+      environment:
+        PARAM_REGISTRY: <<parameters.registry>>
+        PARAM_IMAGE: <<parameters.image>>
+        PARAM_TAG: <<parameters.tag>>
+        PARAM_DIGEST_PATH: <<parameters.digest-path>>
       command: |
         IFS="," read -ra DOCKER_TAGS \<<< "<< parameters.tag >>"
         for tag in "${DOCKER_TAGS[@]}"; do

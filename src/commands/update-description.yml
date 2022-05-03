@@ -38,19 +38,11 @@ parameters:
 steps:
   - deploy:
       name: Update description
-      command: |
-        if [ "<<parameters.registry>>" != "docker.io" ]; then
-          echo "Registry is not set to Docker Hub. Exiting"
-          exit 1
-        fi
-        DESCRIPTION="<<parameters.path>>/<<parameters.readme>>"
-        PAYLOAD="username=$<<parameters.docker-username>>&password=$<<parameters.docker-password>>"
-        JWT=$(curl -s -d $PAYLOAD https://hub.docker.com/v2/users/login/ | jq -r .token)
-        HEADER="Authorization: JWT $JWT"
-        URL="https://hub.docker.com/v2/repositories/<<parameters.image>>/"
-        STATUS=$(curl -s -o /dev/null -w %{http_code} -X PATCH -H "$HEADER" --data-urlencode full_description@$DESCRIPTION $URL)
-        if [ $STATUS -ne 200 ]; then
-          echo "Could not update image description"
-          echo "Error code: $STATUS"
-          exit 1
-        fi
+      environment:
+        PARAM_README: <<parameters.readme>>
+        PARAM_PATH: <<parameters.path>>
+        PARAM_REGISTRY: <<parameters.registry>>
+        PARAM_IMAGE: <<parameters.image>>
+        PARAM_DOCKER_USERNAME: <<parameters.docker-username>>
+        PARAM_DOCKER_PASSWORD: <<parameters.docker-password>>
+      command: << include(scripts/update-description.sh) >>

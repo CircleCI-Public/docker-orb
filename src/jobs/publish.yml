@@ -17,6 +17,14 @@ parameters:
       Setup a remote Docker engine for Docker commands? Only required
       if using a Docker-based executor
 
+  remote-docker-version:
+    type: string
+    default: "17.09.0-ce"
+    description: >
+      Pick remote Docker engine version.
+      Available versions can be found at: https://circleci.com/docs/2.0/building-docker-images/#docker-version.
+      Must be >= 18.09 for BuildKit support.
+
   remote-docker-dlc:
     type: boolean
     default: false
@@ -143,6 +151,14 @@ parameters:
       Path to the directory containing your build context,
       defaults to . (working directory)
 
+  use-buildkit:
+    type: boolean
+    default: false
+    description: >
+      Use buildkit to build the image.
+      Available on Docker >= 18.09.0
+      https://docs.docker.com/develop/develop-images/build_enhancements/
+
 steps:
   - checkout
 
@@ -154,6 +170,7 @@ steps:
       condition: <<parameters.use-remote-docker>>
       steps:
         - setup_remote_docker:
+            version: <<parameters.remote-docker-version>>
             docker_layer_caching: <<parameters.remote-docker-dlc>>
 
   - when:
@@ -186,6 +203,7 @@ steps:
       extra_build_args: <<parameters.extra_build_args>>
       lint-dockerfile: <<parameters.lint-dockerfile>>
       treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>
+      use-buildkit: <<parameters.use-buildkit>>
 
   - when:
       condition: <<parameters.after_build>>

@@ -90,6 +90,14 @@ parameters:
       Pass through a default timeout if your Docker build does not output
       anything for more than 10 minutes.
 
+  use-buildkit:
+    type: boolean
+    default: false
+    description: >
+      Use buildkit to build the image.
+      Available on Docker >= 18.09.0
+      https://docs.docker.com/develop/develop-images/build_enhancements/
+
 steps:
   - when:
       condition: <<parameters.lint-dockerfile>>
@@ -98,6 +106,11 @@ steps:
             treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>
             dockerfile: <<parameters.path>>/<<parameters.dockerfile>>
             debug: <<parameters.debug>>
+
+  - when:
+      condition: <<parameters.use-buildkit>>
+      steps:
+        - run: echo 'export DOCKER_BUILDKIT=1' >> $BASH_ENV
 
   - when:
       condition: <<parameters.attach-at>>
@@ -117,4 +130,5 @@ steps:
         PARAM_IMAGE: <<parameters.image>>
         PARAM_REGISTRY: <<parameters.registry>>
         PARAM_TAG: <<parameters.tag>>
+        PARAM_USE_BUILDKIT: <<parameters.use-buildkit>>
       command: <<include(scripts/build.sh)>>

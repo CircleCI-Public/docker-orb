@@ -14,6 +14,7 @@ promotion_requires: &promotion_requires
     publish-machine,
     publish-docker-cache,
     publish-docker-cache-not-found,
+    publish-docker-with-buildkit,
     test-pull,
     test-install-docker-tools-docker-latest,
     test-install-docker-tools-docker-old,
@@ -296,6 +297,20 @@ workflows:
           executor: docker-latest
           context: CPE-orb-docker-testing
           use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: cpeorbtesting/docker-orb-test
+          tag: $CIRCLE_SHA1
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
+          filters: *filters
+      - docker/publish:
+          name: publish-docker-with-buildkit
+          executor: docker-latest
+          context: CPE-orb-docker-testing
+          use-remote-docker: true
+          remote-docker-version: "20.10.12"
+          use-buildkit: true
           dockerfile: test.Dockerfile
           image: cpeorbtesting/docker-orb-test
           tag: $CIRCLE_SHA1

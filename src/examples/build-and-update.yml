@@ -13,3 +13,11 @@ usage:
         - docker/publish:
             image:  $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
             update-description: true
+    build-docker-image-only-with-buildkit:
+      jobs:
+        - docker/publish:
+            image:  $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+            update-description: true
+            use-remote-docker: true
+            use-buildkit: true
+            remote-docker-version: "20.10.12"

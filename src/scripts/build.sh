@@ -66,7 +66,9 @@ fi
 # The context must be the last argument.
 build_args+=("$PARAM_DOCKER_CONTEXT")
 
+# recreate build_args array so it doesn't group multiple args as a single variable
 build_args=( $(eval echo "${build_args[@]}") )
+
 set -x
 docker build "${build_args[@]}"
 set +x

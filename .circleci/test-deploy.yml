@@ -15,6 +15,7 @@ promotion_requires: &promotion_requires
     publish-docker-cache,
     publish-docker-cache-not-found,
     publish-docker-with-buildkit,
+    publish-docker-multiple-tags,
     test-pull,
     test-install-docker-tools-docker-latest,
     test-install-docker-tools-docker-old,

@@ -362,6 +362,18 @@ workflows:
           docker-password: DOCKER_PASS
           update-description: true
           filters: *filters
+      - docker/publish:
+          name: publish-docker-multiple-tags
+          executor: docker-latest
+          context: CPE-orb-docker-testing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: cpeorbtesting/docker-orb-test
+          tag: $CIRCLE_SHA1,$CIRCLE_BUILD_NUM
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
+          filters: *filters
       # end docker/publish
 
       # begin test-install-docker-tools

@@ -66,6 +66,11 @@ fi
 # The context must be the last argument.
 build_args+=("$PARAM_DOCKER_CONTEXT")
 
+old_ifs="$IFS"
+IFS=' '
+
 set -x
-docker build "${build_args[@]}"
+docker build ${build_args[*]}
 set +x
+
+IFS="$old_ifs"

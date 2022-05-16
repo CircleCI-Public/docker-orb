@@ -19,7 +19,11 @@ parse_tags_to_docker_arg() {
     fi
   done
 
+  # Set IFS to null to stop "," from breaking bash substitution
+  local old_ifs="$IFS"
+  local IFS=
   DOCKER_TAGS_ARG="$(eval echo $docker_arg)"
+  local IFS="$old_ifs"
 }
 
 pull_images_from_cache() {

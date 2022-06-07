@@ -29,7 +29,8 @@ promotion_requires: &promotion_requires
     test-macos-old,
     test-machine-latest,
     test-machine-old,
-    test-build-command-workspace
+    test-build-command-workspace,
+    test-build-with-args
   ]
 
 filters: &filters
@@ -179,6 +180,17 @@ jobs:
               ls
               exit 1
             fi
+  test-build-with-args:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/build:
+          dockerfile: test3.Dockerfile
+          image: cpeorbtesting/docker-orb-test
+          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
+          extra_build_args: --build-arg COMMIT_HASH=$CIRCLE_SHA1
   test-dockerlint:
     docker:
       - image: cimg/node:17.7.2
@@ -220,6 +232,8 @@ workflows:
       - test-build-command-workspace:
           requires:
             - test-create-workspace
+          filters: *filters
+      - test-build-with-args:
           filters: *filters
 
       # begin test-check-command

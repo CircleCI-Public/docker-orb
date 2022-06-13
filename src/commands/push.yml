@@ -34,14 +34,4 @@ steps:
         PARAM_IMAGE: <<parameters.image>>
         PARAM_TAG: <<parameters.tag>>
         PARAM_DIGEST_PATH: <<parameters.digest-path>>
-      command: |
-        IFS="," read -ra DOCKER_TAGS \<<< "<< parameters.tag >>"
-        for tag in "${DOCKER_TAGS[@]}"; do
-          docker push <<parameters.registry>>/<< parameters.image>>:${tag}
-        done
-
-        if [ -n "<<parameters.digest-path>>" ]; then
-          mkdir -p "$(dirname <<parameters.digest-path>>)"
-          IFS="," read -ra DOCKER_TAGS \<<< "<< parameters.tag >>"
-          docker image inspect --format="{{index .RepoDigests 0}}" <<parameters.registry>>/<< parameters.image>>:"${DOCKER_TAGS[0]}" > "<<parameters.digest-path>>"
-        fi
+      command: << include(scripts/push.sh) >>

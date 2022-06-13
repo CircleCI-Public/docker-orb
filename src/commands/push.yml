@@ -27,7 +27,7 @@ parameters:
     default: ""
 
 steps:
-  - deploy:
+  - run:
       name: <<parameters.step-name>>
       environment:
         PARAM_REGISTRY: <<parameters.registry>>

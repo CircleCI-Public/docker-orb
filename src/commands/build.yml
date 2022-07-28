@@ -113,6 +113,11 @@ steps:
         - run: echo 'export DOCKER_BUILDKIT=1' >> $BASH_ENV
 
   - when:
+      condition: <<parameters.extra_build_args>>
+      steps:
+        - run: echo 'PARAM_EXTRA_BUILD_ARGS="<<parameters.extra_build_args>>"' >> $BASH_ENV
+
+  - when:
       condition: <<parameters.attach-at>>
       steps:
         - attach_workspace:
@@ -126,7 +131,6 @@ steps:
         PARAM_DOCKER_CONTEXT: <<parameters.docker-context>>
         PARAM_DOCKERFILE_NAME: <<parameters.dockerfile>>
         PARAM_DOCKERFILE_PATH: <<parameters.path>>
-        PARAM_EXTRA_BUILD_ARGS: <<parameters.extra_build_args>>
         PARAM_IMAGE: <<parameters.image>>
         PARAM_REGISTRY: <<parameters.registry>>
         PARAM_TAG: <<parameters.tag>>

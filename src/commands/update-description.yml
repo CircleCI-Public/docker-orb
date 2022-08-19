@@ -36,6 +36,7 @@ parameters:
       Name of environment variable storing your Docker password
 
 steps:
+  - jq/install
   - run:
       name: Update description
       environment:

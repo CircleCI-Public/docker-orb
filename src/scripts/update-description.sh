@@ -14,7 +14,7 @@ PAYLOAD="username=$USERNAME&password=$PASSWORD"
 JWT=$(curl -s -d "$PAYLOAD" https://hub.docker.com/v2/users/login/ | jq -r .token)
 HEADER="Authorization: JWT $JWT"
 URL="https://hub.docker.com/v2/repositories/$IMAGE/"
-STATUS=$(curl -s -o /dev/null -w '%{http_code}' -X PATCH -H "$HEADER" --data-urlencode full_description@$DESCRIPTION $URL)
+STATUS=$(curl -s -o /dev/null -w '%{http_code}' -X PATCH -H "$HEADER" -H 'Content-type: application/json' --data "{\"full_description\": $(jq -Rs '.' $DESCRIPTION)}" $URL)
 
 if [ $STATUS -ne 200 ]; then
   echo "Could not update image description"

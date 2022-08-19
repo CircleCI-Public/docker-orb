@@ -33,7 +33,7 @@ if command -v docker-compose &> /dev/null; then
   fi
 fi
 
-# get binary/shasum download URL for specified version
+# get binary download URL for specified version
 if uname -a | grep Darwin &> /dev/null; then
   PLATFORM=darwin
   HOMEBREW_NO_AUTO_UPDATE=1 brew install coreutils
@@ -41,29 +41,13 @@ else
   PLATFORM=linux
 fi
 
+FILENAME="docker-compose-$PLATFORM-x86_64"
 DOCKER_COMPOSE_BASE_URL="https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION"
-DOCKER_COMPOSE_SHASUM_URL="$DOCKER_COMPOSE_BASE_URL/docker-compose-$PLATFORM-x86_64.sha256"
 
-# download binary and shasum
-curl -O \
-  --silent --show-error --location --fail --retry 3 \
-  "$DOCKER_COMPOSE_SHASUM_URL"
-
-FILENAME=$(cat docker-compose-$PLATFORM-x86_64.sha256 | awk '{ print $NF }' | sed 's/^\*//')
-
+# download binary
 curl -O \
   --silent --show-error --location --fail --retry 3 \
   "$DOCKER_COMPOSE_BASE_URL/$FILENAME"
-
-set +e
-grep "$FILENAME" docker-compose-$PLATFORM-x86_64.sha256 | sha256sum -c -
-SHASUM_SUCCESS=$?
-set -e
-
-if [[ "$SHASUM_SUCCESS" -ne 0 ]]; then
-  echo "Checksum validation failed for $FILENAME"
-  exit 1
-fi
 
 # install docker-compose
 $SUDO mv "$FILENAME" "$PARAM_INSTALL_DIR"/docker-compose

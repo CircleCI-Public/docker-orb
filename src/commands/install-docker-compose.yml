@@ -10,7 +10,8 @@ parameters:
       Version of `docker-compose` to install, defaults to the latest stable release.
       If specifying a version other than latest, provide a full release tag,
       as listed at https://github.com/docker/compose/releases or
-      https://api.github.com/repos/docker/compose/releases, e.g., `1.23.1`.
+      https://api.github.com/repos/docker/compose/releases, e.g., `v2.10.0`.
+      Only versions equal or above v2.0.1 are supported.
 
   install-dir:
     type: string

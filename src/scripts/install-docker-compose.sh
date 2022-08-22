@@ -64,7 +64,7 @@ fi
 
 # download docker-compose binary
 curl -o "$DOCKER_COMPOSE_RELEASE" \
-  --no-progress-meter --location --retry 3 \
+  --location --retry 3 \
   "$DOCKER_COMPOSE_BASE_URL/$DOCKER_COMPOSE_RELEASE"
 
 # verify binary integrity using SHA-256 checksum

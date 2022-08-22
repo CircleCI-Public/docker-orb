@@ -16,6 +16,7 @@ promotion_requires: &promotion_requires
     publish-docker-cache-not-found,
     publish-docker-with-buildkit,
     publish-docker-multiple-tags,
+    publish-docker-env-var-image-param,
     test-pull,
     test-install-docker-tools-docker-latest,
     test-install-docker-tools-docker-old,
@@ -435,6 +436,21 @@ workflows:
           docker-password: DOCKER_PASS
           use-docker-credentials-store: true
           filters: *filters
+      - docker/publish:
+          pre-steps:
+            - run: echo 'export DOCKER_USERNAME=cpeorbtesting' >> $BASH_ENV
+            - run: echo 'export DOCKER_NAME=docker-orb-test' >> $BASH_ENV
+          name: publish-docker-env-var-image-param
+          executor: docker-latest
+          context: CPE-orb-docker-testing
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: $DOCKER_USERNAME/$DOCKER_NAME
+          tag: $CIRCLE_SHA1,$CIRCLE_BUILD_NUM
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          use-docker-credentials-store: true
+          filters: *filters
       # end docker/publish
 
       # begin test-install-docker-tools
@@ -487,10 +503,10 @@ workflows:
 executors:
   macos-old:
     macos:
-      xcode: 10.3.0
+      xcode: 11.7.0
   macos-latest:
     macos:
-      xcode: 13.1.0
+      xcode: 14.0.0
   docker-old:
     docker:
       - image: cimg/base:2020.08-20.04

@@ -23,6 +23,9 @@ promotion_requires: &promotion_requires
     test-install-docker-tools-macos-old,
     test-install-docker-tools-machine-latest,
     test-install-docker-tools-machine-old,
+    test-install-docker-compose-with-checksums,
+    test-install-docker-compose-with-sha256,
+    test-install-docker-compose-with-checksums-and-sha256,
     test-docker-latest,
     test-docker-old,
     test-macos-latest,
@@ -210,6 +213,32 @@ jobs:
           debug: <<parameters.debug>>
           dockerfile: <<parameters.dockerfile>>
           treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>
+  test-install-docker-compose:
+    parameters:
+      docker-compose-version:
+        type: string
+        default: latest
+        description: >
+          Version of `docker-compose` to install, defaults to the latest stable release.
+          If specifying a version other than latest, provide a full release tag,
+          as listed at https://github.com/docker/compose/releases or
+          https://api.github.com/repos/docker/compose/releases, e.g., `1.23.1`.
+
+      install-dir:
+        type: string
+        default: /usr/local/bin
+        description: >
+          Directory in which to install `docker-compose`
+      executor:
+        type: executor
+
+    executor: << parameters.executor >>
+
+    steps:
+      - docker/install-docker
+      - docker/install-docker-compose:
+          version: << parameters.docker-compose-version>>
+          install-dir: << parameters.install-dir>>  
 
 workflows:
   test-deploy:
@@ -235,6 +264,23 @@ workflows:
           filters: *filters
       - test-build-with-args:
           filters: *filters
+
+      # begin test-install-docker-compose
+      - test-install-docker-compose:
+          name: test-install-docker-compose-with-checksums
+          executor: docker-latest
+          filters: *filters
+      - test-install-docker-compose:
+          name: test-install-docker-compose-with-sha256
+          docker-compose-version: v2.0.1
+          executor: docker-latest
+          filters: *filters
+      - test-install-docker-compose:
+          name: test-install-docker-compose-with-checksums-and-sha256
+          docker-compose-version: v2.9.0
+          executor: docker-latest
+          filters: *filters
+      # end test-install-docker-compose
 
       # begin test-check-command
       - test-check-command:

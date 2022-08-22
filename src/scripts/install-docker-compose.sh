@@ -29,7 +29,7 @@ if command -v docker-compose &> /dev/null; then
     exit 0
   else
     echo "A different version of docker-compose is installed ($(docker-compose --version)); removing it"
-    $SUDO rm -f "$(command -v docker-compose)"1
+    $SUDO rm -f "$(command -v docker-compose)"
   fi
 fi
 
@@ -42,31 +42,44 @@ else
 fi
 
 DOCKER_COMPOSE_BASE_URL="https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION"
-DOCKER_COMPOSE_SHASUM_URL="$DOCKER_COMPOSE_BASE_URL/docker-compose-$PLATFORM-x86_64.sha256"
+DOCKER_COMPOSE_RELEASES_HTML="$(curl -Ls --fail --retry 3 "https://github.com/docker/compose/releases/tag/$DOCKER_COMPOSE_VERSION")"
+DOCKER_COMPOSE_RELEASE="docker-compose-$PLATFORM-x86_64"
+DOCKER_SHASUM_FILENAME="checksum.txt"
 
-# download binary and shasum
-curl -O \
-  --silent --show-error --location --fail --retry 3 \
-  "$DOCKER_COMPOSE_SHASUM_URL"
+# since v2.10.0, docker-compose doesn't have a ".sha256" file
+# so we need to use the "checksums.txt" file instead
+if grep --quiet "checksums.txt" <<< "$DOCKER_COMPOSE_RELEASES_HTML"; then
+  printf '%s\n' "Downloading \"checksums.txt\" to verify the binary's integrity."
 
-FILENAME=$(cat docker-compose-$PLATFORM-x86_64.sha256 | awk '{ print $NF }' | sed 's/^\*//')
+  curl -o "$DOCKER_SHASUM_FILENAME" \
+    --silent --location --retry 3 \
+    "$DOCKER_COMPOSE_BASE_URL/checksums.txt"
+else
+  printf '%s\n' "Downloading \"$DOCKER_COMPOSE_RELEASE.sha256\" to verify the binary's integrity."
 
-curl -O \
-  --silent --show-error --location --fail --retry 3 \
-  "$DOCKER_COMPOSE_BASE_URL/$FILENAME"
+  curl -o "$DOCKER_SHASUM_FILENAME" \
+    --silent --location --retry 3 \
+    "$DOCKER_COMPOSE_BASE_URL/$DOCKER_COMPOSE_RELEASE.sha256"
+fi
 
+# download docker-compose binary
+curl -o "$DOCKER_COMPOSE_RELEASE" \
+  --no-progress-meter --location --retry 3 \
+  "$DOCKER_COMPOSE_BASE_URL/$DOCKER_COMPOSE_RELEASE"
+
+# verify binary integrity using SHA-256 checksum
 set +e
-grep "$FILENAME" docker-compose-$PLATFORM-x86_64.sha256 | sha256sum -c -
+grep "$DOCKER_COMPOSE_RELEASE" "$DOCKER_SHASUM_FILENAME" | sha256sum -c -
 SHASUM_SUCCESS=$?
 set -e
 
 if [[ "$SHASUM_SUCCESS" -ne 0 ]]; then
-  echo "Checksum validation failed for $FILENAME"
+  echo "Checksum validation failed for $DOCKER_COMPOSE_RELEASE"
   exit 1
 fi
 
 # install docker-compose
-$SUDO mv "$FILENAME" "$PARAM_INSTALL_DIR"/docker-compose
+$SUDO mv "$DOCKER_COMPOSE_RELEASE" "$PARAM_INSTALL_DIR"/docker-compose
 $SUDO chmod +x "$PARAM_INSTALL_DIR"/docker-compose
 
 # verify version

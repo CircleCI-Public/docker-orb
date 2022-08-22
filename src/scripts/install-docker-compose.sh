@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+trap_exit() {
+  # clean-up
+  printf '%s\n' "Cleaning up..."
+  [ -f "$DOCKER_SHASUM_FILENAME" ] && rm -f "$DOCKER_SHASUM_FILENAME"
+}
+trap trap_exit EXIT
+
 # checking for root user
 if [[ $(id -u) -eq 0 ]]; then
   SUDO=""

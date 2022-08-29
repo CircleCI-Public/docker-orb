@@ -29,12 +29,6 @@ parameters:
       This option is only supported on Ubuntu/Debian/macOS platforms.
 
 steps:
-  - orb-tools/check-env-var-param:
-      param: <<parameters.docker-username>>
-
-  - orb-tools/check-env-var-param:
-      param: <<parameters.docker-password>>
-
   - when:
       condition: <<parameters.use-docker-credentials-store>>
       steps:

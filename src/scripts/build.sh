@@ -4,7 +4,7 @@ DOCKER_TAGS_ARG=""
 
 parse_tags_to_docker_arg() {
   # Set comma as the new delimiter for the scope of this function.
-  local IFS="," 
+  local IFS=","
 
   # Split tags into an array based on IFS delimiter.
   read -ra tags <<< "$PARAM_TAG"
@@ -47,12 +47,12 @@ if [ -n "$PARAM_CACHE_FROM" ]; then
 fi
 
 build_args=(
-  "--file=$PARAM_DOCKERFILE_PATH/$PARAM_DOCKERFILE_NAME" 
-  "$DOCKER_TAGS_ARG" 
+  "--file=$PARAM_DOCKERFILE_PATH/$PARAM_DOCKERFILE_NAME"
+  "$DOCKER_TAGS_ARG"
 )
 
 if [ -n "$PARAM_EXTRA_BUILD_ARGS" ]; then
-  build_args+=("$PARAM_EXTRA_BUILD_ARGS")
+  build_args+="$(eval echo $PARAM_EXTRA_BUILD_ARGS")"
 fi
 
 if [ -n "$PARAM_CACHE_FROM" ]; then

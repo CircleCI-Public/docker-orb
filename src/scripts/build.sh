@@ -52,7 +52,7 @@ build_args=(
 )
 
 if [ -n "$PARAM_EXTRA_BUILD_ARGS" ]; then
-  build_args+="$(eval echo $PARAM_EXTRA_BUILD_ARGS")"
+  build_args+="$(eval echo $PARAM_EXTRA_BUILD_ARGS)"
 fi
 
 if [ -n "$PARAM_CACHE_FROM" ]; then

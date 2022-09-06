@@ -25,7 +25,7 @@ workflows:
             tags:
               only: /.*/
       - orb-tools/publish:
-          orb-name: circleci/docker
+          orb-name: tte/docker
           vcs-type: << pipeline.project.type >>
           requires:
             [orb-tools/lint, orb-tools/review, orb-tools/pack, shellcheck/check]

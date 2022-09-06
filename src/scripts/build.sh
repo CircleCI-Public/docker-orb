@@ -57,7 +57,11 @@ if [ -n "$PARAM_EXTRA_BUILD_ARGS" ]; then
 fi
 
 if [ -n "$PARAM_CACHE_FROM" ]; then
-  build_args+=("--cache-from=$PARAM_CACHE_FROM")
+  cache_from="$(eval echo $PARAM_CACHE_FROM)"
+
+  echo "$cache_from" | sed -n 1'p' | tr ',' '\n' | while read -r image; do
+    build_args+=("--cache-from=${image}")
+  done
 fi
 
 if [ "$PARAM_USE_BUILDKIT" -eq 1 ]; then

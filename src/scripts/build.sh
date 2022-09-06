@@ -59,9 +59,9 @@ fi
 if [ -n "$PARAM_CACHE_FROM" ]; then
   cache_from="$(eval echo $PARAM_CACHE_FROM)"
 
-  echo "$cache_from" | sed -n 1'p' | tr ',' '\n' | while read -r image; do
+  while read -r image; do
     build_args+=("--cache-from=${image}")
-  done
+  done <<< "$(echo "$cache_from" | sed -n 1'p' | tr ',' '\n')"
 fi
 
 if [ "$PARAM_USE_BUILDKIT" -eq 1 ]; then

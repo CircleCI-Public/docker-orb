@@ -59,7 +59,12 @@ RELEASE_VERSION=$(curl -Ls --fail --retry 3 -o /dev/null -w '%{url_effective}' "
 if [ -n "${RELEASE_TAG}" ]; then
   RELEASE_VERSION="${RELEASE_TAG}"
 fi
-DOWNLOAD_URL="https://github.com/docker/docker-credential-helpers/releases/download/${RELEASE_VERSION}/${HELPER_FILENAME}-${RELEASE_VERSION}-amd64.tar.gz"
+PLATFORM_NAME="amd64"
+if [ "$(echo ${RELEASE_VERSION} | cut -d. -f2)" -gt 6 ]; then
+    # docker-credentials-helper changed platform name from architecture to OS type from 0.7.0 onward
+    PLATFORM_NAME="linux"
+fi
+DOWNLOAD_URL="https://github.com/docker/docker-credential-helpers/releases/download/${RELEASE_VERSION}/${HELPER_FILENAME}-${RELEASE_VERSION}-${PLATFORM_NAME}.tar.gz"
 
 echo "Downloading from url: $DOWNLOAD_URL"
 curl -L -o "${HELPER_FILENAME}_archive" "$DOWNLOAD_URL"

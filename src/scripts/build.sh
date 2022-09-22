@@ -71,6 +71,7 @@ old_ifs="$IFS"
 IFS=' '
 
 set -x
+# shellcheck disable=SC2048 # We want word splitting here.
 docker build ${build_args[*]}
 set +x
 

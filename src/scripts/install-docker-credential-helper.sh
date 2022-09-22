@@ -2,11 +2,14 @@
 
 HELPER_NAME="$PARAM_HELPER_NAME"
 
+if uname | grep -q "Darwin"; then platform="darwin"
+else platform="linux"
+fi
+
+# Infer helper name from the platform
 if [ -z "${HELPER_NAME}" ]; then
-  if uname | grep -q "Darwin"; then
-    HELPER_NAME="osxkeychain"
-  else
-    HELPER_NAME="pass"
+  if [ "$platform" = "darwin" ]; then HELPER_NAME="osxkeychain"
+  else HELPER_NAME="pass"
   fi
 fi
 
@@ -55,17 +58,28 @@ echo "Downloading credential helper $HELPER_FILENAME"
 BIN_PATH="/usr/local/bin"
 mkdir -p "$BIN_PATH"
 RELEASE_TAG="$PARAM_RELEASE_TAG"
-RELEASE_VERSION=$(curl -Ls --fail --retry 3 -o /dev/null -w '%{url_effective}' "https://github.com/docker/docker-credential-helpers/releases/latest" | sed 's:.*/::')
+base_url="https://github.com/docker/docker-credential-helpers/releases"
+RELEASE_VERSION=$(curl -Ls --fail --retry 3 -o /dev/null -w '%{url_effective}' "$base_url/latest" | sed 's:.*/::')
 if [ -n "${RELEASE_TAG}" ]; then
   RELEASE_VERSION="${RELEASE_TAG}"
 fi
-DOWNLOAD_URL="https://github.com/docker/docker-credential-helpers/releases/download/${RELEASE_VERSION}/${HELPER_FILENAME}-${RELEASE_VERSION}-amd64.tar.gz"
 
-echo "Downloading from url: $DOWNLOAD_URL"
-curl -L -o "${HELPER_FILENAME}_archive" "$DOWNLOAD_URL"
-tar xvf "./${HELPER_FILENAME}_archive"
+# Starting from v0.7.0, the release file name is changed to docker-credential-<helper-name>-<os>-<arch>
+minor_version="$(echo "$RELEASE_VERSION" | cut -d. -f2)"
+download_base_url="$base_url/download/${RELEASE_VERSION}/${HELPER_FILENAME}-${RELEASE_VERSION}"
+
+if [ "$minor_version" -gt 6 ]; then
+  DOWNLOAD_URL="$download_base_url.$platform-amd64"
+  echo "Downloading from url: $DOWNLOAD_URL"
+  curl -L -o "${HELPER_FILENAME}" "$DOWNLOAD_URL"
+else
+  DOWNLOAD_URL="$download_base_url-amd64.tar.gz"
+  echo "Downloading from url: $DOWNLOAD_URL"
+  curl -L -o "${HELPER_FILENAME}_archive" "$DOWNLOAD_URL"
+  tar xvf "./${HELPER_FILENAME}_archive"
+  rm "./${HELPER_FILENAME}_archive"
+fi
+
 chmod +x "./$HELPER_FILENAME"
-
 $SUDO mv "./$HELPER_FILENAME" "$BIN_PATH/$HELPER_FILENAME"
 "$BIN_PATH/$HELPER_FILENAME" version
-rm "./${HELPER_FILENAME}_archive"

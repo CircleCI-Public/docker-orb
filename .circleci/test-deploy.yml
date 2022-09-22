@@ -11,6 +11,9 @@ promotion_requires: &promotion_requires
     test-credentials-store-docker,
     test-credentials-store-machine,
     test-credentials-store-macos,
+    test-credentials-store-docker-custom-tag,
+    test-credentials-store-machine-custom-tag,
+    test-credentials-store-macos-custom-tag,
     publish-machine,
     publish-docker-cache,
     publish-docker-cache-not-found,
@@ -130,10 +133,14 @@ jobs:
         type: env_var_name
       docker-password:
         type: env_var_name
+      release-tag:
+        type: string
+        default: ""
     executor: <<parameters.executor>>
     steps:
       - docker/install-docker-credential-helper:
           helper-name: <<parameters.helper-name>>
+          release-tag: <<parameters.release-tag>>
       - docker/configure-docker-credentials-store:
           helper-name: <<parameters.helper-name>>
       - run:
@@ -334,6 +341,33 @@ workflows:
           context: CPE-orb-docker-testing
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
+          pre-steps:
+            - docker/install-docker
+          filters: *filters
+      - test-credentials-store:
+          name: test-credentials-store-docker-custom-tag
+          executor: docker-latest
+          context: CPE-orb-docker-testing
+          helper-name: pass
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          release-tag: "v0.6.4"
+          filters: *filters
+      - test-credentials-store:
+          name: test-credentials-store-machine-custom-tag
+          executor: machine-latest
+          context: CPE-orb-docker-testing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          release-tag: "v0.6.4"
+          filters: *filters
+      - test-credentials-store:
+          name: test-credentials-store-macos-custom-tag
+          executor: macos-latest
+          context: CPE-orb-docker-testing
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+          release-tag: "v0.6.4"
           pre-steps:
             - docker/install-docker
           filters: *filters

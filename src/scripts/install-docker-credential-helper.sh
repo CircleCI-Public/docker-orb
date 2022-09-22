@@ -69,8 +69,7 @@ if [ "$(echo ${RELEASE_VERSION} | cut -d. -f2)" -gt 6 ]; then
     TAR_FILE="false"
 fi
 
-DOWNLOAD_URL="https://github.com/docker/docker-credential-helpers/releases/download/${RELEASE_VERSION}/${HE
-LPER_FILENAME}-${RELEASE_VERSION}-${PLATFORM_NAME}"
+DOWNLOAD_URL="https://github.com/docker/docker-credential-helpers/releases/download/${RELEASE_VERSION}/${HELPER_FILENAME}-${RELEASE_VERSION}-${PLATFORM_NAME}"
 
 if [ "${TAR_FILE}" == 'true' ]; then
     DOWNLOAD_URL="${DOWNLOAD_URL}.tar.gz"

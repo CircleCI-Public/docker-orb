@@ -59,16 +59,28 @@ RELEASE_VERSION=$(curl -Ls --fail --retry 3 -o /dev/null -w '%{url_effective}' "
 if [ -n "${RELEASE_TAG}" ]; then
   RELEASE_VERSION="${RELEASE_TAG}"
 fi
+
 PLATFORM_NAME="amd64"
+TAR_FILE="true"
 if [ "$(echo ${RELEASE_VERSION} | cut -d. -f2)" -gt 6 ]; then
-    # docker-credentials-helper changed platform name from architecture to OS type from 0.7.0 onward
+    # docker-credentials-helper changed platform name from
+    # architecture to OS type from 0.7.0 onward and does not supply a tarfile artefact
     PLATFORM_NAME="linux"
+    TAR_FILE="false"
 fi
-DOWNLOAD_URL="https://github.com/docker/docker-credential-helpers/releases/download/${RELEASE_VERSION}/${HELPER_FILENAME}-${RELEASE_VERSION}-${PLATFORM_NAME}.tar.gz"
+
+DOWNLOAD_URL="https://github.com/docker/docker-credential-helpers/releases/download/${RELEASE_VERSION}/${HE
+LPER_FILENAME}-${RELEASE_VERSION}-${PLATFORM_NAME}"
+
+if [ "${TAR_FILE}" == 'true' ]; then
+    DOWNLOAD_URL="${DOWNLOAD_URL}.tar.gz"
+fi
 
 echo "Downloading from url: $DOWNLOAD_URL"
 curl -L -o "${HELPER_FILENAME}_archive" "$DOWNLOAD_URL"
-tar xvf "./${HELPER_FILENAME}_archive"
+if [ "${TAR_FILE}" == 'true' ]; then
+    tar xvf "./${HELPER_FILENAME}_archive"
+fi
 chmod +x "./$HELPER_FILENAME"
 
 $SUDO mv "./$HELPER_FILENAME" "$BIN_PATH/$HELPER_FILENAME"

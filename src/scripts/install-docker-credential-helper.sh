@@ -64,7 +64,9 @@ if [ -n "${RELEASE_TAG}" ]; then
   RELEASE_VERSION="${RELEASE_TAG}"
 fi
 
-# Starting from v0.7.0, the release file name is changed to docker-credential-<helper-name>-<os>-<arch>
+# Starting from v0.7.0, the release file name is changed to docker-credential-<helper-name>-<version>.<os>-<arch><variant>
+# At the moment of writing, the amd64 binary does not have a variant suffix. But this might change in the future.
+# https://github.com/CircleCI-Public/docker-orb/pull/156#discussion_r977920812
 minor_version="$(echo "$RELEASE_VERSION" | cut -d. -f2)"
 download_base_url="$base_url/download/${RELEASE_VERSION}/${HELPER_FILENAME}-${RELEASE_VERSION}"
 

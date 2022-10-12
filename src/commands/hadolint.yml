@@ -28,6 +28,18 @@ parameters:
       `docker.io,my-company.com:5000`); if set, return an error if
       Dockerfiles use any images from registries not included in this list
 
+  failure-threshold:
+    type: enum
+    default: info
+    description: threshold level to fail on
+    enum:
+      - error
+      - warning
+      - info
+      - style
+      - ignore
+      - none
+
 steps:
   - run:
       name: Lint <<parameters.dockerfiles>> with hadolint
@@ -35,4 +47,5 @@ steps:
         PARAM_DOCKERFILES: <<parameters.dockerfiles>>
         PARAM_IGNORE_RULES: <<parameters.ignore-rules>>
         PARAM_TRUSTED_REGISTRIES: <<parameters.trusted-registries>>
+        HADOLINT_FAILURE_THRESHOLD: <<parameters.failure-threshold>>
       command: <<include(scripts/hadolint.sh)>>

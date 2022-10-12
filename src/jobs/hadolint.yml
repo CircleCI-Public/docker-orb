@@ -55,6 +55,18 @@ parameters:
       will not be usable on CircleCI):
       https://hub.docker.com/r/hadolint/hadolint/tags
 
+  failure-threshold:
+    type: enum
+    default: info
+    description: threshold level to fail on
+    enum:
+      - error
+      - warning
+      - info
+      - style
+      - ignore
+      - none
+
   executor-class:
     type: enum
     default: small
@@ -89,3 +101,4 @@ steps:
       dockerfiles: <<parameters.dockerfiles>>
       ignore-rules: <<parameters.ignore-rules>>
       trusted-registries: <<parameters.trusted-registries>>
+      failure-threshold: <<parameters.failure-threshold>>

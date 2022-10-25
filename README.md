@@ -14,4 +14,3 @@ We welcome [issues](https://github.com/CircleCI-Public/docker-orb/issues) to and
 
 For further questions/comments about this or other orbs, visit [CircleCI's orbs discussion forum](https://discuss.circleci.com/c/orbs).
 
-Trying to trigger ci

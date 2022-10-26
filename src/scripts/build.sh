@@ -57,7 +57,8 @@ if [ -n "$PARAM_EXTRA_BUILD_ARGS" ]; then
 fi
 
 if [ -n "$PARAM_CACHE_FROM" ]; then
-  build_args+=("--cache-from=$PARAM_CACHE_FROM")
+  cache_from="$(eval echo "$PARAM_CACHE_FROM")"
+  build_args+=("--cache-from=$cache_from")
 fi
 
 if [ "$PARAM_USE_BUILDKIT" -eq 1 ]; then

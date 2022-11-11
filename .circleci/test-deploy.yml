@@ -27,6 +27,7 @@ promotion_requires: &promotion_requires
     test-install-docker-tools-macos-old,
     test-install-docker-tools-machine-latest,
     test-install-docker-tools-machine-old,
+    test-install-docker-tools-machine-arm,
     test-install-docker-compose-with-checksums,
     test-install-docker-compose-with-sha256,
     test-install-docker-compose-with-checksums-and-sha256,
@@ -90,12 +91,17 @@ jobs:
       debug:
         type: boolean
         default: false
+      goss-architecture:
+        type: enum
+        default: amd64
+        enum: [ amd64, arm64 ]
     executor: <<parameters.executor>>
     steps:
       - checkout
       - jq/install
       - docker/install-docker-tools:
           install-goss-dgoss: << parameters.install-goss >>
+          goss-architecture: << parameters.goss-architecture >>
   test-pull:
     executor: docker-latest
     steps:
@@ -493,6 +499,14 @@ workflows:
           matrix:
             parameters:
               executor: [docker-latest, docker-old, machine-latest, machine-old]
+              goss-architecture: [amd64]
+          filters: *filters
+      - test-install-docker-tools:
+          name: test-install-docker-tools-<< matrix.executor >>
+          matrix:
+            parameters:
+              executor: [machine-arm]
+              goss-architecture: [arm64]
           filters: *filters
       - test-install-docker-tools:
           name: test-install-docker-tools-<< matrix.executor >>
@@ -553,3 +567,7 @@ executors:
   machine-latest:
     machine:
       image: ubuntu-2004:current
+  machine-arm:
+    resource_class: arm.medium
+    machine:
+      image: ubuntu-2004:202101-01

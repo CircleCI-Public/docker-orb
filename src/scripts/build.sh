@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# Import "utils.sh".
+eval "$SCRIPT_UTILS"
+expand_env_vars_with_prefix "PARAM_"
+
 DOCKER_TAGS_ARG=""
 
 parse_tags_to_docker_arg() {

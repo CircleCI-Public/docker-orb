@@ -41,4 +41,5 @@ steps:
         PARAM_REGISTRY: <<parameters.registry>>
         PARAM_DOCKER_USERNAME: <<parameters.docker-username>>
         PARAM_DOCKER_PASSWORD: <<parameters.docker-password>>
+        SCRIPT_UTILS: <<include(scripts/utils.sh)>>
       command: <<include(scripts/check.sh)>>

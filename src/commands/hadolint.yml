@@ -35,4 +35,5 @@ steps:
         PARAM_DOCKERFILES: <<parameters.dockerfiles>>
         PARAM_IGNORE_RULES: <<parameters.ignore-rules>>
         PARAM_TRUSTED_REGISTRIES: <<parameters.trusted-registries>>
+        SCRIPT_UTILS: <<include(scripts/utils.sh)>>
       command: <<include(scripts/hadolint.sh)>>

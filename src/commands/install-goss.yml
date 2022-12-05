@@ -42,4 +42,5 @@ steps:
         PARAM_INSTALL_DIR: <<parameters.install-dir>>
         PARAM_DEBUG: <<parameters.debug>>
         PARAM_ARCHITECTURE: <<parameters.architecture>>
+        SCRIPT_UTILS: <<include(scripts/utils.sh)>>
       command: << include(scripts/install-goss.sh) >>

@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# Import "utils.sh".
+eval "$SCRIPT_UTILS"
+expand_env_vars_with_prefix "PARAM_"
+
 HELPER_NAME="$PARAM_HELPER_NAME"
 
 if uname | grep -q "Darwin"; then platform="darwin"

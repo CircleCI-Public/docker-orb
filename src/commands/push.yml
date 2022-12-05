@@ -34,4 +34,5 @@ steps:
         PARAM_IMAGE: <<parameters.image>>
         PARAM_TAG: <<parameters.tag>>
         PARAM_DIGEST_PATH: <<parameters.digest-path>>
+        SCRIPT_UTILS: <<include(scripts/utils.sh)>>
       command: << include(scripts/push.sh) >>

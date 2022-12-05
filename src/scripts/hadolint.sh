@@ -1,3 +1,7 @@
+# Import "utils.sh".
+eval "$SCRIPT_UTILS"
+expand_env_vars_with_prefix "PARAM_"
+
 if [ -n "$PARAM_IGNORE_RULES" ]; then
   ignore_rules=$(printf '%s' "--ignore ${PARAM_IGNORE_RULES//,/ --ignore }")
   readonly ignore_rules
@@ -16,7 +20,7 @@ printf '%s\n' "$trusted_registries"
 readonly old_ifs="$IFS"
 IFS=":"
 
-read -ra dockerfiles <<< "$PARAM_DOCKERFILES" 
+read -ra dockerfiles <<< "$PARAM_DOCKERFILES"
 IFS="$old_ifs"
 
 for dockerfile in "${dockerfiles[@]}"; do

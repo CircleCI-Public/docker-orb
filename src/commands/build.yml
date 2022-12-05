@@ -135,4 +135,5 @@ steps:
         PARAM_REGISTRY: <<parameters.registry>>
         PARAM_TAG: <<parameters.tag>>
         PARAM_USE_BUILDKIT: <<parameters.use-buildkit>>
+        SCRIPT_UTILS: <<include(scripts/utils.sh)>>
       command: <<include(scripts/build.sh)>>

@@ -16,13 +16,14 @@
 # Returns 0 if the expansion was successful.
 expand_env_vars_with_prefix() {
   if [ "$#" -eq 0 ]; then
-    printf '%s\n' "Please provide a prefix to filter the envinronment variables."
+    >&2 printf '%s\n' "Please provide a prefix to filter the envinronment variables."
     return 1
   fi
 
   # Fetch parameters from the environment variables.
   local prefix="$1"
-  local env_vars="$(printenv | grep "^$prefix")"
+  local env_vars
+  env_vars="$(printenv | grep "^$prefix")"
 
   if [ -z "$env_vars" ]; then
     >&2 printf '%s\n' "No environment variables found with the prefix: \"$prefix\"."

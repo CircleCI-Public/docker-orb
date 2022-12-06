@@ -16,6 +16,7 @@ workflows:
             tags:
               only: /.*/
       - orb-tools/review:
+          tag: 2022.12-18.04
           filters:
             tags:
               only: /.*/

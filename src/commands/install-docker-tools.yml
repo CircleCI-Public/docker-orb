@@ -102,6 +102,13 @@ parameters:
     description: >
       Extra output for orb developers
 
+  goss-architecture:
+    type: enum
+    default: amd64
+    enum: [ amd64, arm64 ]
+    description: >
+      Which Goss architecture to use. Supports `arm64` architecture from `v0.3.18` and newer.
+
 steps:
   - when:
       condition: <<parameters.install-docker>>
@@ -131,3 +138,4 @@ steps:
             version: <<parameters.goss-version>>
             install-dir: <<parameters.goss-install-dir>>
             debug: <<parameters.debug>>
+            architecture: <<parameters.goss-architecture>>

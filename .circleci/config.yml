@@ -1,7 +1,7 @@
 version: 2.1
 setup: true
 orbs:
-  orb-tools: circleci/orb-tools@11.1
+  orb-tools: circleci/orb-tools@11.5
   shellcheck: circleci/shellcheck@3.1
 
 workflows:
@@ -16,7 +16,7 @@ workflows:
             tags:
               only: /.*/
       - orb-tools/review:
-          tag: 2022.12-18.04
+          tag: "2022.12-18.04"
           filters:
             tags:
               only: /.*/

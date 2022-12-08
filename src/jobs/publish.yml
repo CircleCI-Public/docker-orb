@@ -19,7 +19,7 @@ parameters:
 
   remote-docker-version:
     type: string
-    default: "17.09.0-ce"
+    default: "20.10.18"
     description: >
       Pick remote Docker engine version.
       Available versions can be found at: https://circleci.com/docs/2.0/building-docker-images/#docker-version.

@@ -30,4 +30,5 @@ steps:
         PARAM_DEBUG: <<parameters.debug>>
         PARAM_TREAT_WARNING_AS_ERRORS: <<parameters.treat-warnings-as-errors>>
         PARAM_DOCKERFILE: <<parameters.dockerfile>>
+        SCRIPT_UTILS: <<include(scripts/utils.sh)>>
       command: <<include(scripts/dockerlint.sh)>>

@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# Import "utils.sh".
+eval "$SCRIPT_UTILS"
+expand_env_vars_with_prefix "PARAM_"
+
 if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
 # grab Docker version

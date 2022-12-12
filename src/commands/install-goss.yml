@@ -27,6 +27,13 @@ parameters:
     description: >
       Extra output for orb developers
 
+  architecture:
+    type: enum
+    default: amd64
+    enum: [ amd64, arm64 ]
+    description: >
+      Which Goss architecture to use. Supports `arm64` architecture from `v0.3.18` and newer.
+
 steps:
   - run:
       name: Install Goss and dgoss
@@ -34,4 +41,6 @@ steps:
         PARAM_VERSION: <<parameters.version>>
         PARAM_INSTALL_DIR: <<parameters.install-dir>>
         PARAM_DEBUG: <<parameters.debug>>
+        PARAM_ARCHITECTURE: <<parameters.architecture>>
+        SCRIPT_UTILS: <<include(scripts/utils.sh)>>
       command: << include(scripts/install-goss.sh) >>

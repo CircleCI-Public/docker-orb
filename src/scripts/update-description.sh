@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# Import "utils.sh".
+eval "$SCRIPT_UTILS"
+expand_env_vars_with_prefix "PARAM_"
+
 if [ "$PARAM_REGISTRY" != "docker.io" ]; then
   echo "Registry is not set to Docker Hub. Exiting"
   exit 1

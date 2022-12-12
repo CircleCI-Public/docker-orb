@@ -48,4 +48,5 @@ steps:
         PARAM_IGNORE_RULES: <<parameters.ignore-rules>>
         PARAM_TRUSTED_REGISTRIES: <<parameters.trusted-registries>>
         HADOLINT_FAILURE_THRESHOLD: <<parameters.failure-threshold>>
+        SCRIPT_UTILS: <<include(scripts/utils.sh)>>
       command: <<include(scripts/hadolint.sh)>>

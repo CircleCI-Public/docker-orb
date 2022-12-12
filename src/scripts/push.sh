@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# Import "utils.sh".
+eval "$SCRIPT_UTILS"
+expand_env_vars_with_prefix "PARAM_"
+
 IFS="," read -ra DOCKER_TAGS <<< "$PARAM_TAG"
 
 image="$(eval echo "$PARAM_IMAGE")"

@@ -6,6 +6,7 @@ if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
 Install_Hadolint() {
   if uname -a | grep "Darwin"; then
+    export SYS_ENV_PLATFORM="Darwin"
     brew install hadolint
   elif uname -a | grep "x86_64 GNU/Linux"; then
     export SYS_ENV_PLATFORM=Linux-x86_64
@@ -17,7 +18,7 @@ Install_Hadolint() {
     exit 1
 	fi
 	
-  if [ "${SYS_ENV_PLATFORM}" == "x86_64 GNU/Linux" ] || [ "${SYS_ENV_PLATFORM}" == "aarch64 GNU/Linux" ]; then
+  if [ "${SYS_ENV_PLATFORM}" != "Darwin" ]; then
     set -x
     $SUDO wget -O /bin/hadolint "https://github.com/hadolint/hadolint/releases/latest/download/hadolint-${SYS_ENV_PLATFORM}"
     $SUDO chmod +x /bin/hadolint

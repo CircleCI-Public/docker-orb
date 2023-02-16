@@ -581,7 +581,7 @@ executors:
       - image: cimg/base:2020.08-20.04
   docker-latest:
     docker:
-      - image: cimg/base:stable
+      - image: cimg/base:current
   machine-old:
     machine:
       image: ubuntu-2004:202010-01

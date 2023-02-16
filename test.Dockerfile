@@ -3,7 +3,7 @@
 # The Ubuntu-based CircleCI Docker Image. Only use Ubuntu Long-Term Support
 # (LTS) releases.
 
-FROM ubuntu:18.04
+FROM debian
 
 LABEL maintainer="CircleCI <support@circleci.com>"
 
@@ -20,11 +20,9 @@ RUN apt-get update && apt-get install -y \
 	gzip \
 	jq \
 	locales \
-	mercurial \
 	net-tools \
-	netcat \
+	netcat-traditional \
 	openssh-client \
-	parallel \
 	sudo \
 	tar \
 	unzip \

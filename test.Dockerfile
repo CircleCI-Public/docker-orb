@@ -1,9 +1,9 @@
 # vim:set ft=dockerfile:
 #
-# The Ubuntu-based CircleCI Docker Image. Only use Ubuntu Long-Term Support
+# The Debian-based CircleCI Docker Image. Only use Ubuntu Long-Term Support
 # (LTS) releases.
 
-FROM debian
+FROM ubuntu:18.04
 
 LABEL maintainer="CircleCI <support@circleci.com>"
 

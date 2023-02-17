@@ -107,9 +107,9 @@ jobs:
     steps:
       - setup_remote_docker
       - docker/pull:
-          images: cimg/base:stable,ubuntu:18.04
+          images: cimg/base:current,ubuntu:18.04
       - docker/pull:
-          images: cimg/base:stable,cimg/base:not_exists,cimg/go:stable
+          images: cimg/base:current,cimg/base:not_exists,cimg/go:stable
           ignore-docker-pull-error: true
   test-check-command:
     parameters:
@@ -163,7 +163,7 @@ jobs:
             fi
   test-create-workspace:
     docker:
-      - image: cimg/base:stable
+      - image: cimg/base:current
     steps:
       - run:
           name: Description
@@ -176,7 +176,7 @@ jobs:
             - verify.txt
   test-build-command-workspace:
     docker:
-      - image: cimg/base:stable
+      - image: cimg/base:current
     steps:
       - checkout
       - setup_remote_docker
@@ -199,7 +199,7 @@ jobs:
             fi
   test-build-with-args:
     docker:
-      - image: cimg/base:stable
+      - image: cimg/base:current
     steps:
       - checkout
       - setup_remote_docker
@@ -259,7 +259,7 @@ workflows:
     jobs:
       - docker/hadolint:
           name: hadolint
-          ignore-rules: DL4005,DL3008,DL3009,DL3015,DL3059
+          ignore-rules: DL4005,DL3006,DL3008,DL3009,DL3015,DL3059
           trusted-registries: docker.io,my-company.com:5000
           dockerfiles: test.Dockerfile:test2.Dockerfile
           filters: *filters

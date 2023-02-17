@@ -26,7 +26,7 @@ Install_Hadolint() {
   fi
 }
 
-if [ ! "$(command -v hadolint)" ]; then
+if ! command -v hadolint &> /dev/null; then
 	Install_Hadolint
 fi 
 

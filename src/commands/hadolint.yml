@@ -1,6 +1,6 @@
 description: >
-  Lint a given Dockerfile using a hadolint Docker image:
-  https://hub.docker.com/r/hadolint/hadolint
+  Lint a given Dockerfile using hadolint. If the hadolint docker image
+  is not used, hadolint will be installed.
 
 parameters:
   dockerfiles:

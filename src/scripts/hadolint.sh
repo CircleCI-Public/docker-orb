@@ -2,6 +2,34 @@
 eval "$SCRIPT_UTILS"
 expand_env_vars_with_prefix "PARAM_"
 
+if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
+Install_Hadolint() {
+  if uname -a | grep "Darwin"; then
+    SYS_ENV_PLATFORM="Darwin"
+    brew install hadolint
+  elif uname -a | grep "x86_64 GNU/Linux"; then
+    export SYS_ENV_PLATFORM=Linux-x86_64
+  elif uname -a | grep  "aarch64 GNU/Linux"; then
+    export SYS_ENV_PLATFORM=Linux-arm64
+	else 
+		echo "This platform appears to be unsupported."
+    uname -a
+    exit 1
+	fi
+	
+  if [ "${SYS_ENV_PLATFORM}" != "Darwin" ]; then
+    set -x
+    $SUDO wget -O /bin/hadolint "https://github.com/hadolint/hadolint/releases/latest/download/hadolint-${SYS_ENV_PLATFORM}"
+    $SUDO chmod +x /bin/hadolint
+    set +x
+  fi
+}
+
+if ! command -v hadolint &> /dev/null; then
+	Install_Hadolint
+fi 
+
 if [ -n "$PARAM_IGNORE_RULES" ]; then
   ignore_rules=$(printf '%s' "--ignore ${PARAM_IGNORE_RULES//,/ --ignore }")
   readonly ignore_rules

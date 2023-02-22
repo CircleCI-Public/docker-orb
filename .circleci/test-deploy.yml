@@ -292,6 +292,12 @@ workflows:
             parameters:
               executor: [docker-latest, machine-arm, macos-latest]      
           filters: *filters
+      - test-hadolint-install:
+          name: test-install-hadolint-<< matrix.executor >>
+          matrix:
+            parameters:
+              executor: [docker-latest, machine-arm, macos-latest]      
+          filters: *filters
       - test-dockerlint:
           name: dockerlint
           debug: true

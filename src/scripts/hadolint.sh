@@ -19,10 +19,8 @@ Install_Hadolint() {
 	fi
 	
   if [ "${SYS_ENV_PLATFORM}" != "Darwin" ]; then
-    set -x
     $SUDO wget -O /bin/hadolint "https://github.com/hadolint/hadolint/releases/latest/download/hadolint-${SYS_ENV_PLATFORM}"
     $SUDO chmod +x /bin/hadolint
-    set +x
   fi
 }
 
@@ -35,14 +33,19 @@ if [ -n "$PARAM_IGNORE_RULES" ]; then
   readonly ignore_rules
 fi
 
+
 if [ -n "$PARAM_TRUSTED_REGISTRIES" ]; then
   trusted_registries=$(printf '%s' "--trusted-registry ${PARAM_TRUSTED_REGISTRIES//,/ --trusted-registry }")
   readonly trusted_registries
 fi
 
+failure_threshold=$(printf '%s' "--failure-threshold ${PARAM_FAILURE_THRESHOLD}")
+readonly failure_threshold
+
 printf '%s\n' "Running hadolint with the following options..."
 printf '%s\n' "$ignore_rules"
 printf '%s\n' "$trusted_registries"
+printf '%s\n' "$failure_threshold"
 
 # use colon delimiters to create array
 readonly old_ifs="$IFS"
@@ -52,10 +55,12 @@ read -ra dockerfiles <<< "$PARAM_DOCKERFILES"
 IFS="$old_ifs"
 
 for dockerfile in "${dockerfiles[@]}"; do
+  set -x
   hadolint \
+    ${PARAM_FAILURE_THRESHOLD:+$failure_threshold} \
     ${PARAM_IGNORE_RULES:+$ignore_rules} \
     ${PARAM_TRUSTED_REGISTRIES:+$trusted_registries} \
     $dockerfile
-
+  set +x
   printf '%s\n' "Success! $dockerfile linted; no issues found"
 done

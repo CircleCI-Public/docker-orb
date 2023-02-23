@@ -271,7 +271,7 @@ jobs:
       - run:
           name: Verifying hadolint install
           command: |
-            if [ ! "$(command -v hadolint)"]; then
+            if ! command -v hadolint; then
               echo "hadolint not installed"
               exit 1
             else
@@ -292,13 +292,7 @@ workflows:
           name: test-install-hadolint-<< matrix.executor >>
           matrix:
             parameters:
-              executor: [docker-latest, machine-arm, macos-latest]      
-          filters: *filters
-      - test-hadolint-install:
-          name: test-install-hadolint-<< matrix.executor >>
-          matrix:
-            parameters:
-              executor: [docker-latest, machine-arm, macos-latest]      
+              executor: [docker-latest, machine-arm, macos-latest]        
           filters: *filters
       - test-dockerlint:
           name: dockerlint

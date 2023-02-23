@@ -71,6 +71,7 @@ build_args+=("$PARAM_DOCKER_CONTEXT")
 old_ifs="$IFS"
 IFS=' '
 
+# shellcheck disable=SC2048 # We want word splitting here.
 set -x
 docker build ${build_args[*]}
 set +x

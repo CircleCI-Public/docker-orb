@@ -21,6 +21,7 @@ parse_tags_to_docker_arg() {
     else
       docker_arg="$docker_arg --tag=\"$PARAM_REGISTRY/$PARAM_IMAGE:$tag\""
     fi
+    echo "DA: $docker_arg"
   done
 
   # Set IFS to null to stop "," from breaking bash substitution

@@ -11,7 +11,6 @@ ARG COMMIT_HASH
 
 # Change default shell from Dash to Bash
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-
 RUN if [[ "${COMMIT_HASH}" =~ ^[0-9a-f]{5,40}$ ]]; then \
     echo "Success: COMMIT_HASH is valid commit hash"; \
   else \

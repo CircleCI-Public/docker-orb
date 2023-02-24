@@ -19,4 +19,5 @@ steps:
             environment:
               PARAM_IMAGES: <<parameters.images>>
               PARAM_IGNORE_DOCKER_PULL_ERROR: <<parameters.ignore-docker-pull-error>>
+              SCRIPT_UTILS: <<include(scripts/utils.sh)>>
             command: << include(scripts/pull.sh) >>

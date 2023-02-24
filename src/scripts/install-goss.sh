@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# Import "utils.sh".
+eval "$SCRIPT_UTILS"
+expand_env_vars_with_prefix "PARAM_"
+
 if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
 # determine specified version
@@ -38,9 +42,9 @@ fi
 # download/install
 # goss
 curl -O --silent --show-error --location --fail --retry 3 \
-  "https://github.com/aelsabbahy/goss/releases/download/$VERSION/goss-linux-amd64"
+  "https://github.com/aelsabbahy/goss/releases/download/$VERSION/goss-linux-$PARAM_ARCHITECTURE"
 
-$SUDO mv goss-linux-amd64 "$PARAM_INSTALL_DIR"/goss
+$SUDO mv goss-linux-$PARAM_ARCHITECTURE "$PARAM_INSTALL_DIR"/goss
 $SUDO chmod +rx /usr/local/bin/goss
 
 # test/verify goss

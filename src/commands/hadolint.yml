@@ -1,6 +1,6 @@
 description: >
-  Lint a given Dockerfile using a hadolint Docker image:
-  https://hub.docker.com/r/hadolint/hadolint
+  Lint a given Dockerfile using hadolint. If the hadolint docker image
+  is not used, hadolint will be installed.
 
 parameters:
   dockerfiles:
@@ -28,6 +28,14 @@ parameters:
       `docker.io,my-company.com:5000`); if set, return an error if
       Dockerfiles use any images from registries not included in this list
 
+  failure-threshold:
+    type: enum
+    default: "info"
+    description: >
+      Hadolint threshold level to fail on. Exit with failure code only when rules
+      with a severity equal to or above THRESHOLD are violated
+    enum: [ "error", "warning", "info", "style", "ignore", "none" ]
+
 steps:
   - run:
       name: Lint <<parameters.dockerfiles>> with hadolint
@@ -35,4 +43,6 @@ steps:
         PARAM_DOCKERFILES: <<parameters.dockerfiles>>
         PARAM_IGNORE_RULES: <<parameters.ignore-rules>>
         PARAM_TRUSTED_REGISTRIES: <<parameters.trusted-registries>>
+        PARAM_FAILURE_THRESHOLD: <<parameters.failure-threshold>>
+        SCRIPT_UTILS: <<include(scripts/utils.sh)>>
       command: <<include(scripts/hadolint.sh)>>

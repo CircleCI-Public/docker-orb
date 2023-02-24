@@ -23,4 +23,5 @@ steps:
       environment:
         PARAM_VERSION: << parameters.version >>
         PARAM_INSTALL_DIR: << parameters.install-dir >>
+        SCRIPT_UTILS: <<include(scripts/utils.sh)>>
       command: << include(scripts/install-dockerize.sh) >>

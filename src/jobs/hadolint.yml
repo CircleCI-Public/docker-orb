@@ -47,6 +47,14 @@ parameters:
       `docker.io,my-company.com:5000`); if set, return an error if
       Dockerfiles use any images from registries not included in this list
 
+  failure-threshold:
+    type: enum
+    default: "info"
+    description: >
+      Hadolint threshold level to fail on. Exit with failure code only when rules
+      with a severity equal to or above THRESHOLD are violated
+    enum: [ "error", "warning", "info", "style", "ignore", "none" ]
+
   hadolint-tag:
     type: string
     default: latest-debian
@@ -89,3 +97,4 @@ steps:
       dockerfiles: <<parameters.dockerfiles>>
       ignore-rules: <<parameters.ignore-rules>>
       trusted-registries: <<parameters.trusted-registries>>
+      failure-threshold: <<parameters.failure-threshold>>

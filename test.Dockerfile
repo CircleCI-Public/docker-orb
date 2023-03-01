@@ -8,7 +8,7 @@ FROM cimg/base:2022.09
 LABEL maintainer="CircleCI <support@circleci.com>"
 
 # Change default shell from Dash to Bash
-RUN sudo rm /bin/sh && ln -s /bin/bash /bin/sh
+# RUN sudo rm /bin/sh && ln -s /bin/bash /bin/sh
 
 RUN docker run --rm -it cimg/base:2022.09 /usr/bin/curl google.com
 

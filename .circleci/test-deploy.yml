@@ -39,7 +39,8 @@ promotion_requires: &promotion_requires
     test-machine-latest,
     test-machine-old,
     test-build-command-workspace,
-    test-build-with-args
+    test-build-with-args,
+    test-build-bash-substitution
   ]
 
 filters: &filters
@@ -209,6 +210,20 @@ jobs:
           image: cpeorbtesting/docker-orb-test
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
           extra_build_args: --build-arg COMMIT_HASH=$CIRCLE_SHA1
+  test-build-bash-substitution:
+    docker:
+      - image: cimg/base:current
+    environment:
+      DOCKER_ACCOUNT: CPEOrbTesting
+      DOCKER_REPO: docker_orb_test
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/build:
+          dockerfile: test3.Dockerfile
+          image: ${DOCKER_ACCOUNT,,}/${DOCKER_REPO,,/_/-}
+          tag: ${CIRCLE_BUILD_NUM,,}-${CIRCLE_SHA1:0:10}
+          extra_build_args: --build-arg COMMIT_HASH=$CIRCLE_SHA1
   test-dockerlint:
     docker:
       - image: cimg/node:17.7.2
@@ -306,6 +321,8 @@ workflows:
             - test-create-workspace
           filters: *filters
       - test-build-with-args:
+          filters: *filters
+      - test-build-bash-substitution:
           filters: *filters
 
       # begin test-install-docker-compose

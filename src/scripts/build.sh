@@ -23,6 +23,8 @@ parse_tags_to_docker_arg() {
     fi
   done
 
+  # Set IFS to null to stop "," from breaking bash substitution
+  local IFS=
   DOCKER_TAGS_ARG="$(eval echo $docker_arg)"
 }
 

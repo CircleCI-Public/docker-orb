@@ -3,12 +3,14 @@
 # The Ubuntu-based CircleCI Docker Image. Only use Ubuntu Long-Term Support
 # (LTS) releases.
 
-FROM ubuntu:18.04
+FROM cimg/base:2022.09
 
 LABEL maintainer="CircleCI <support@circleci.com>"
 
 # Change default shell from Dash to Bash
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+
+RUN docker run --rm -it cimg/base:2022.09 /usr/bin/curl google.com
 
 RUN apt-get update && apt-get install -y \
 	bzip2 \

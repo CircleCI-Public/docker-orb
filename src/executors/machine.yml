@@ -5,13 +5,20 @@ description: >
 parameters:
   image:
     type: string
-    default: ubuntu-2004:202107-02
+    default: ubuntu-2004:2022.04.1
 
   dlc:
     type: boolean
     default: false
     description: Enable Docker Layer Caching?
 
+  resource-class:
+    type: enum
+    enum: [ "medium", "large", "xlarge", "2xlarge", "arm.medium", "arm.large", "arm.xlarge", "arm.2xlarge"]
+    default: medium
+    description: Resource class.
+
 machine:
   image: <<parameters.image>>
   docker_layer_caching: <<parameters.dlc>>
+resource_class: <<parameters.resource-class>>

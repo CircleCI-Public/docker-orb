@@ -13,6 +13,7 @@ LABEL maintainer="CircleCI <support@circleci.com>"
 # RUN docker run --rm -it cimg/base:2022.09 /usr/bin/curl google.com
 
 RUN curl google.com
+RUN wget -O /bin/hadolint "https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64"
 # && apt-get install -y \
 # 	bzip2 \
 # 	ca-certificates \

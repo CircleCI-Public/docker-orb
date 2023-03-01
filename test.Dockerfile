@@ -12,7 +12,7 @@ LABEL maintainer="CircleCI <support@circleci.com>"
 
 # RUN docker run --rm -it cimg/base:2022.09 /usr/bin/curl google.com
 
-RUN apt-get update 
+RUN sudo apt-get update 
 # && apt-get install -y \
 # 	bzip2 \
 # 	ca-certificates \

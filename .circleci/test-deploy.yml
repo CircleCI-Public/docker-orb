@@ -438,8 +438,8 @@ workflows:
           pre-steps:
             # Test that it's OK to invoke the commands twice
             - run: echo "$CIRCLE_BUILD_NUM-$CIRCLE_SHA1" >> .tags
-            - docker/install-docker-credential-helper
-            - docker/configure-docker-credentials-store
+            # - docker/install-docker-credential-helper
+            # - docker/configure-docker-credentials-store
           # filters: *filters
       # - docker/publish:
       #     name: publish-docker

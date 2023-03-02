@@ -5,7 +5,7 @@ eval "$SCRIPT_UTILS"
 expand_env_vars_with_prefix "PARAM_"
 
 DOCKER_TAGS_ARG=""
-
+echo "TAGS: ${PARAM_TAG}"
 parse_tags_to_docker_arg() {
   # Set comma as the new delimiter for the scope of this function.
   local IFS=","

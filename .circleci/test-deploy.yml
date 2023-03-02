@@ -201,14 +201,15 @@ jobs:
             fi
   test-build-with-args:
     docker:
-      - image: cimg/base:stable
+      - image: cimg/base:current
     steps:
       - checkout
       - setup_remote_docker
+      - run: echo "$CIRCLE_BUILD_NUM-$CIRCLE_SHA1" >> .tag
       - docker/build:
           dockerfile: test3.Dockerfile
           image: cpeorbtesting/docker-orb-test
-          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
+          tag: "$(cat .tag)"
           extra_build_args: --build-arg COMMIT_HASH=$CIRCLE_SHA1
   test-build-bash-substitution:
     docker:
@@ -320,8 +321,8 @@ workflows:
       #     requires:
       #       - test-create-workspace
       #     filters: *filters
-      # - test-build-with-args:
-      #     filters: *filters
+      - test-build-with-args:
+          filters: *filters
       # - test-build-bash-substitution:
       #     filters: *filters
 
@@ -426,20 +427,20 @@ workflows:
       # # end test-credentials-store
 
       # begin docker/publish
-      - docker/publish:
-          name: publish-machine
-          context: CPE-orb-docker-testing
-          dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
-          tag: "$(cat .tags)"
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          use-docker-credentials-store: true
-          pre-steps:
-            # Test that it's OK to invoke the commands twice
-            - run: echo "$CIRCLE_BUILD_NUM-$CIRCLE_SHA1" >> .tags
-            # - docker/install-docker-credential-helper
-            # - docker/configure-docker-credentials-store
+      # - docker/publish:
+      #     name: publish-machine
+      #     context: CPE-orb-docker-testing
+      #     dockerfile: test.Dockerfile
+      #     image: cpeorbtesting/docker-orb-test
+      #     tag: "$(cat .tags)"
+      #     docker-username: DOCKER_USER
+      #     docker-password: DOCKER_PASS
+      #     use-docker-credentials-store: true
+      #     pre-steps:
+      #       # Test that it's OK to invoke the commands twice
+      #       # - run: echo "$CIRCLE_BUILD_NUM-$CIRCLE_SHA1" >> .tags
+      #       # - docker/install-docker-credential-helper
+      #       # - docker/configure-docker-credentials-store
           # filters: *filters
       # - docker/publish:
       #     name: publish-docker

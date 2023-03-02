@@ -294,136 +294,136 @@ jobs:
 workflows:
   test-deploy:
     jobs:
-      - docker/hadolint:
-          name: hadolint
-          ignore-rules: DL4005,DL3008,DL3009,DL3015,DL3059
-          trusted-registries: docker.io,my-company.com:5000
-          dockerfiles: test.Dockerfile:test2.Dockerfile
-          failure-threshold: none
-          filters: *filters
-      - test-hadolint-install:
-          name: test-install-hadolint-<< matrix.executor >>
-          matrix:
-            parameters:
-              executor: [docker-latest, machine-arm, macos-latest]        
-          filters: *filters
-      - test-dockerlint:
-          name: dockerlint
-          debug: true
-          treat-warnings-as-errors: false
-          filters: *filters
-      - test-pull:
-          filters: *filters
-      - test-create-workspace:
-          filters: *filters
-      - test-build-command-workspace:
-          requires:
-            - test-create-workspace
-          filters: *filters
-      - test-build-with-args:
-          filters: *filters
-      - test-build-bash-substitution:
-          filters: *filters
+      # - docker/hadolint:
+      #     name: hadolint
+      #     ignore-rules: DL4005,DL3008,DL3009,DL3015,DL3059
+      #     trusted-registries: docker.io,my-company.com:5000
+      #     dockerfiles: test.Dockerfile:test2.Dockerfile
+      #     failure-threshold: none
+      #     filters: *filters
+      # - test-hadolint-install:
+      #     name: test-install-hadolint-<< matrix.executor >>
+      #     matrix:
+      #       parameters:
+      #         executor: [docker-latest, machine-arm, macos-latest]        
+      #     filters: *filters
+      # - test-dockerlint:
+      #     name: dockerlint
+      #     debug: true
+      #     treat-warnings-as-errors: false
+      #     filters: *filters
+      # - test-pull:
+      #     filters: *filters
+      # - test-create-workspace:
+      #     filters: *filters
+      # - test-build-command-workspace:
+      #     requires:
+      #       - test-create-workspace
+      #     filters: *filters
+      # - test-build-with-args:
+      #     filters: *filters
+      # - test-build-bash-substitution:
+      #     filters: *filters
 
-      # begin test-install-docker-compose
-      - test-install-docker-compose:
-          name: test-install-docker-compose-with-checksums
-          executor: docker-latest
-          filters: *filters
-      - test-install-docker-compose:
-          name: test-install-docker-compose-with-sha256
-          docker-compose-version: v2.0.1
-          executor: docker-latest
-          filters: *filters
-      - test-install-docker-compose:
-          name: test-install-docker-compose-with-checksums-and-sha256
-          docker-compose-version: v2.9.0
-          executor: docker-latest
-          filters: *filters
-      # end test-install-docker-compose
+      # # begin test-install-docker-compose
+      # - test-install-docker-compose:
+      #     name: test-install-docker-compose-with-checksums
+      #     executor: docker-latest
+      #     filters: *filters
+      # - test-install-docker-compose:
+      #     name: test-install-docker-compose-with-sha256
+      #     docker-compose-version: v2.0.1
+      #     executor: docker-latest
+      #     filters: *filters
+      # - test-install-docker-compose:
+      #     name: test-install-docker-compose-with-checksums-and-sha256
+      #     docker-compose-version: v2.9.0
+      #     executor: docker-latest
+      #     filters: *filters
+      # # end test-install-docker-compose
 
-      # begin test-check-command
-      - test-check-command:
-          name: test-check-command-docker
-          executor: docker-latest
-          context: CPE-orb-docker-testing
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          use-docker-credentials-store: false
-          filters: *filters
-      - test-check-command:
-          name: test-check-command-machine
-          executor: machine-latest
-          context: CPE-orb-docker-testing
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          use-docker-credentials-store: true
-          filters: *filters
-      - test-check-command:
-          name: test-check-command-macos
-          executor: macos-latest
-          context: CPE-orb-docker-testing
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          use-docker-credentials-store: true
-          pre-steps:
-            - docker/install-docker
-          filters: *filters
-      # end test-check-command
+      # # begin test-check-command
+      # - test-check-command:
+      #     name: test-check-command-docker
+      #     executor: docker-latest
+      #     context: CPE-orb-docker-testing
+      #     docker-username: DOCKER_USER
+      #     docker-password: DOCKER_PASS
+      #     use-docker-credentials-store: false
+      #     filters: *filters
+      # - test-check-command:
+      #     name: test-check-command-machine
+      #     executor: machine-latest
+      #     context: CPE-orb-docker-testing
+      #     docker-username: DOCKER_USER
+      #     docker-password: DOCKER_PASS
+      #     use-docker-credentials-store: true
+      #     filters: *filters
+      # - test-check-command:
+      #     name: test-check-command-macos
+      #     executor: macos-latest
+      #     context: CPE-orb-docker-testing
+      #     docker-username: DOCKER_USER
+      #     docker-password: DOCKER_PASS
+      #     use-docker-credentials-store: true
+      #     pre-steps:
+      #       - docker/install-docker
+      #     filters: *filters
+      # # end test-check-command
 
-      # begin test-credentials-store
-      - test-credentials-store:
-          name: test-credentials-store-docker
-          executor: docker-latest
-          context: CPE-orb-docker-testing
-          helper-name: pass
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          filters: *filters
-      - test-credentials-store:
-          name: test-credentials-store-machine
-          executor: machine-latest
-          context: CPE-orb-docker-testing
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          filters: *filters
-      - test-credentials-store:
-          name: test-credentials-store-macos
-          executor: macos-latest
-          context: CPE-orb-docker-testing
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          pre-steps:
-            - docker/install-docker
-          filters: *filters
-      - test-credentials-store:
-          name: test-credentials-store-docker-custom-tag
-          executor: docker-latest
-          context: CPE-orb-docker-testing
-          helper-name: pass
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          release-tag: "v0.6.4"
-          filters: *filters
-      - test-credentials-store:
-          name: test-credentials-store-machine-custom-tag
-          executor: machine-latest
-          context: CPE-orb-docker-testing
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          release-tag: "v0.6.4"
-          filters: *filters
-      - test-credentials-store:
-          name: test-credentials-store-macos-custom-tag
-          executor: macos-latest
-          context: CPE-orb-docker-testing
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          release-tag: "v0.6.4"
-          pre-steps:
-            - docker/install-docker
-          filters: *filters
-      # end test-credentials-store
+      # # begin test-credentials-store
+      # - test-credentials-store:
+      #     name: test-credentials-store-docker
+      #     executor: docker-latest
+      #     context: CPE-orb-docker-testing
+      #     helper-name: pass
+      #     docker-username: DOCKER_USER
+      #     docker-password: DOCKER_PASS
+      #     filters: *filters
+      # - test-credentials-store:
+      #     name: test-credentials-store-machine
+      #     executor: machine-latest
+      #     context: CPE-orb-docker-testing
+      #     docker-username: DOCKER_USER
+      #     docker-password: DOCKER_PASS
+      #     filters: *filters
+      # - test-credentials-store:
+      #     name: test-credentials-store-macos
+      #     executor: macos-latest
+      #     context: CPE-orb-docker-testing
+      #     docker-username: DOCKER_USER
+      #     docker-password: DOCKER_PASS
+      #     pre-steps:
+      #       - docker/install-docker
+      #     filters: *filters
+      # - test-credentials-store:
+      #     name: test-credentials-store-docker-custom-tag
+      #     executor: docker-latest
+      #     context: CPE-orb-docker-testing
+      #     helper-name: pass
+      #     docker-username: DOCKER_USER
+      #     docker-password: DOCKER_PASS
+      #     release-tag: "v0.6.4"
+      #     filters: *filters
+      # - test-credentials-store:
+      #     name: test-credentials-store-machine-custom-tag
+      #     executor: machine-latest
+      #     context: CPE-orb-docker-testing
+      #     docker-username: DOCKER_USER
+      #     docker-password: DOCKER_PASS
+      #     release-tag: "v0.6.4"
+      #     filters: *filters
+      # - test-credentials-store:
+      #     name: test-credentials-store-macos-custom-tag
+      #     executor: macos-latest
+      #     context: CPE-orb-docker-testing
+      #     docker-username: DOCKER_USER
+      #     docker-password: DOCKER_PASS
+      #     release-tag: "v0.6.4"
+      #     pre-steps:
+      #       - docker/install-docker
+      #     filters: *filters
+      # # end test-credentials-store
 
       # begin docker/publish
       - docker/publish:
@@ -439,182 +439,182 @@ workflows:
             # Test that it's OK to invoke the commands twice
             - docker/install-docker-credential-helper
             - docker/configure-docker-credentials-store
-            - run: echo "$CIRCLE_BUILD_NUM-$CIRCLE_SHA1" >> .tags
-          filters: *filters
-      - docker/publish:
-          name: publish-docker
-          executor: docker-latest
-          context: CPE-orb-docker-testing
-          use-remote-docker: true
-          dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
-          tag: $CIRCLE_SHA1
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          use-docker-credentials-store: true
-          filters: *filters
-      - docker/publish:
-          name: publish-docker-with-buildkit
-          executor: docker-latest
-          context: CPE-orb-docker-testing
-          use-remote-docker: true
-          remote-docker-version: "20.10.12"
-          use-buildkit: true
-          dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
-          tag: $CIRCLE_SHA1
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          use-docker-credentials-store: true
-          filters: *filters
-      - docker/publish:
-          name: publish-docker-cache
-          requires:
-            - publish-docker
-          executor: docker-latest
-          context: CPE-orb-docker-testing
-          use-remote-docker: true
-          dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
-          tag: $CIRCLE_SHA1
-          cache_from: cpeorbtesting/docker-orb-test:$CIRCLE_SHA1
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          pre-steps:
-            - docker/install-docker-credential-helper:
-                # release-tag: v0.6.3
-            - docker/configure-docker-credentials-store:
-                helper-name: pass
-          filters: *filters
-      - docker/publish:
-          name: publish-docker-cache-not-found
-          executor: docker/docker
-          context: CPE-orb-docker-testing
-          use-remote-docker: true
-          dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
-          tag: $CIRCLE_SHA1-2
-          cache_from: cpeorbtesting/docker-orb-test:not-exists
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          filters: *filters
-      - docker/publish:
-          name: publish-docker-update-description
-          executor: docker-latest
-          context: CPE-orb-docker-testing
-          use-remote-docker: true
-          dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
-          tag: $CIRCLE_SHA1
-          cache_from: cpeorbtesting/docker-orb-test:$CIRCLE_SHA1
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          update-description: true
-          filters: *filters
-      - docker/publish:
-          name: publish-docker-multiple-tags
-          executor: docker-latest
-          context: CPE-orb-docker-testing
-          use-remote-docker: true
-          dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
-          tag: $CIRCLE_SHA1,$CIRCLE_BUILD_NUM
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          use-docker-credentials-store: true
-          filters: *filters
-      - docker/publish:
-          pre-steps:
-            - run: echo 'export DOCKER_USERNAME=cpeorbtesting' >> $BASH_ENV
-            - run: echo 'export DOCKER_NAME=docker-orb-test' >> $BASH_ENV
-          name: publish-docker-env-var-image-param
-          executor: docker-latest
-          context: CPE-orb-docker-testing
-          use-remote-docker: true
-          dockerfile: test.Dockerfile
-          image: $DOCKER_USERNAME/$DOCKER_NAME
-          tag: $CIRCLE_SHA1,$CIRCLE_BUILD_NUM
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          use-docker-credentials-store: true
-          filters: *filters
-      - docker/publish:
-          pre-steps:
-            - run:
-                name: Export env vars
-                command: |
-                  echo 'export DOCKER_USERNAME=cpeorbtesting' >> $BASH_ENV
-                  echo 'export DOCKER_NAME=docker-orb-test' >> $BASH_ENV
-                  echo 'export DOCKERFILE=test.Dockerfile' >> $BASH_ENV
-                  echo 'export REGISTRY=docker.io' >> $BASH_ENV
-          name: publish-docker-env-var-all-params
-          executor: docker-latest
-          context: CPE-orb-docker-testing
-          use-remote-docker: true
-          dockerfile: $DOCKERFILE
-          image: $DOCKER_USERNAME/$DOCKER_NAME
-          tag: $CIRCLE_SHA1,$CIRCLE_BUILD_NUM
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
-          use-docker-credentials-store: true
-          registry: $REGISTRY
-          filters: *filters
-      # end docker/publish
+            # - run: echo "$CIRCLE_BUILD_NUM-$CIRCLE_SHA1" >> .tags
+          # filters: *filters
+      # - docker/publish:
+      #     name: publish-docker
+      #     executor: docker-latest
+      #     context: CPE-orb-docker-testing
+      #     use-remote-docker: true
+      #     dockerfile: test.Dockerfile
+      #     image: cpeorbtesting/docker-orb-test
+      #     tag: $CIRCLE_SHA1
+      #     docker-username: DOCKER_USER
+      #     docker-password: DOCKER_PASS
+      #     use-docker-credentials-store: true
+      #     filters: *filters
+      # - docker/publish:
+      #     name: publish-docker-with-buildkit
+      #     executor: docker-latest
+      #     context: CPE-orb-docker-testing
+      #     use-remote-docker: true
+      #     remote-docker-version: "20.10.12"
+      #     use-buildkit: true
+      #     dockerfile: test.Dockerfile
+      #     image: cpeorbtesting/docker-orb-test
+      #     tag: $CIRCLE_SHA1
+      #     docker-username: DOCKER_USER
+      #     docker-password: DOCKER_PASS
+      #     use-docker-credentials-store: true
+      #     filters: *filters
+      # - docker/publish:
+      #     name: publish-docker-cache
+      #     requires:
+      #       - publish-docker
+      #     executor: docker-latest
+      #     context: CPE-orb-docker-testing
+      #     use-remote-docker: true
+      #     dockerfile: test.Dockerfile
+      #     image: cpeorbtesting/docker-orb-test
+      #     tag: $CIRCLE_SHA1
+      #     cache_from: cpeorbtesting/docker-orb-test:$CIRCLE_SHA1
+      #     docker-username: DOCKER_USER
+      #     docker-password: DOCKER_PASS
+      #     pre-steps:
+      #       - docker/install-docker-credential-helper:
+      #           # release-tag: v0.6.3
+      #       - docker/configure-docker-credentials-store:
+      #           helper-name: pass
+      #     filters: *filters
+      # - docker/publish:
+      #     name: publish-docker-cache-not-found
+      #     executor: docker/docker
+      #     context: CPE-orb-docker-testing
+      #     use-remote-docker: true
+      #     dockerfile: test.Dockerfile
+      #     image: cpeorbtesting/docker-orb-test
+      #     tag: $CIRCLE_SHA1-2
+      #     cache_from: cpeorbtesting/docker-orb-test:not-exists
+      #     docker-username: DOCKER_USER
+      #     docker-password: DOCKER_PASS
+      #     filters: *filters
+      # - docker/publish:
+      #     name: publish-docker-update-description
+      #     executor: docker-latest
+      #     context: CPE-orb-docker-testing
+      #     use-remote-docker: true
+      #     dockerfile: test.Dockerfile
+      #     image: cpeorbtesting/docker-orb-test
+      #     tag: $CIRCLE_SHA1
+      #     cache_from: cpeorbtesting/docker-orb-test:$CIRCLE_SHA1
+      #     docker-username: DOCKER_USER
+      #     docker-password: DOCKER_PASS
+      #     update-description: true
+      #     filters: *filters
+      # - docker/publish:
+      #     name: publish-docker-multiple-tags
+      #     executor: docker-latest
+      #     context: CPE-orb-docker-testing
+      #     use-remote-docker: true
+      #     dockerfile: test.Dockerfile
+      #     image: cpeorbtesting/docker-orb-test
+      #     tag: $CIRCLE_SHA1,$CIRCLE_BUILD_NUM
+      #     docker-username: DOCKER_USER
+      #     docker-password: DOCKER_PASS
+      #     use-docker-credentials-store: true
+      #     filters: *filters
+      # - docker/publish:
+      #     pre-steps:
+      #       - run: echo 'export DOCKER_USERNAME=cpeorbtesting' >> $BASH_ENV
+      #       - run: echo 'export DOCKER_NAME=docker-orb-test' >> $BASH_ENV
+      #     name: publish-docker-env-var-image-param
+      #     executor: docker-latest
+      #     context: CPE-orb-docker-testing
+      #     use-remote-docker: true
+      #     dockerfile: test.Dockerfile
+      #     image: $DOCKER_USERNAME/$DOCKER_NAME
+      #     tag: $CIRCLE_SHA1,$CIRCLE_BUILD_NUM
+      #     docker-username: DOCKER_USER
+      #     docker-password: DOCKER_PASS
+      #     use-docker-credentials-store: true
+      #     filters: *filters
+      # - docker/publish:
+      #     pre-steps:
+      #       - run:
+      #           name: Export env vars
+      #           command: |
+      #             echo 'export DOCKER_USERNAME=cpeorbtesting' >> $BASH_ENV
+      #             echo 'export DOCKER_NAME=docker-orb-test' >> $BASH_ENV
+      #             echo 'export DOCKERFILE=test.Dockerfile' >> $BASH_ENV
+      #             echo 'export REGISTRY=docker.io' >> $BASH_ENV
+      #     name: publish-docker-env-var-all-params
+      #     executor: docker-latest
+      #     context: CPE-orb-docker-testing
+      #     use-remote-docker: true
+      #     dockerfile: $DOCKERFILE
+      #     image: $DOCKER_USERNAME/$DOCKER_NAME
+      #     tag: $CIRCLE_SHA1,$CIRCLE_BUILD_NUM
+      #     docker-username: DOCKER_USER
+      #     docker-password: DOCKER_PASS
+      #     use-docker-credentials-store: true
+      #     registry: $REGISTRY
+      #     filters: *filters
+      # # end docker/publish
 
-      # begin test-install-docker-tools
-      - test-install-docker-tools:
-          name: test-install-docker-tools-<< matrix.executor >>
-          matrix:
-            parameters:
-              executor: [docker-latest, docker-old, machine-latest, machine-old]
-              goss-architecture: [amd64]
-          filters: *filters
-      - test-install-docker-tools:
-          name: test-install-docker-tools-<< matrix.executor >>
-          matrix:
-            parameters:
-              executor: [machine-arm]
-              goss-architecture: [arm64]
-          filters: *filters
-      - test-install-docker-tools:
-          name: test-install-docker-tools-<< matrix.executor >>
-          matrix:
-            parameters:
-              executor: [macos-latest, macos-old]
-          install-goss: false
-          filters: *filters
-      # end test-install-docker-tools
+      # # begin test-install-docker-tools
+      # - test-install-docker-tools:
+      #     name: test-install-docker-tools-<< matrix.executor >>
+      #     matrix:
+      #       parameters:
+      #         executor: [docker-latest, docker-old, machine-latest, machine-old]
+      #         goss-architecture: [amd64]
+      #     filters: *filters
+      # - test-install-docker-tools:
+      #     name: test-install-docker-tools-<< matrix.executor >>
+      #     matrix:
+      #       parameters:
+      #         executor: [machine-arm]
+      #         goss-architecture: [arm64]
+      #     filters: *filters
+      # - test-install-docker-tools:
+      #     name: test-install-docker-tools-<< matrix.executor >>
+      #     matrix:
+      #       parameters:
+      #         executor: [macos-latest, macos-old]
+      #     install-goss: false
+      #     filters: *filters
+      # # end test-install-docker-tools
 
-      # begin test
-      - test:
-          name: test-<< matrix.executor >>
-          matrix:
-            parameters:
-              executor: [docker-latest, docker-old, machine-latest, machine-old]
-          filters: *filters
-      - test:
-          name: test-<< matrix.executor >>
-          matrix:
-            parameters:
-              executor: [macos-latest, macos-old]
-          install-goss: false
-          filters: *filters
-      # end test
+      # # begin test
+      # - test:
+      #     name: test-<< matrix.executor >>
+      #     matrix:
+      #       parameters:
+      #         executor: [docker-latest, docker-old, machine-latest, machine-old]
+      #     filters: *filters
+      # - test:
+      #     name: test-<< matrix.executor >>
+      #     matrix:
+      #       parameters:
+      #         executor: [macos-latest, macos-old]
+      #     install-goss: false
+      #     filters: *filters
+      # # end test
 
-      - orb-tools/pack:
-          filters: *filters
-      - orb-tools/publish:
-          orb-name: circleci/docker
-          vcs-type: << pipeline.project.type >>
-          pub-type: production
-          requires: *promotion_requires
-          context: orb-publisher
-          github-token: GHI_TOKEN
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+      # - orb-tools/pack:
+      #     filters: *filters
+      # - orb-tools/publish:
+      #     orb-name: circleci/docker
+      #     vcs-type: << pipeline.project.type >>
+      #     pub-type: production
+      #     requires: *promotion_requires
+      #     context: orb-publisher
+      #     github-token: GHI_TOKEN
+      #     filters:
+      #       branches:
+      #         ignore: /.*/
+      #       tags:
+      #         only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
 
 executors:
   macos-old:

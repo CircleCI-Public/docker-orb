@@ -211,6 +211,7 @@ jobs:
           image: cpeorbtesting/docker-orb-test
           tag: "$(cat .tag)"
           extra_build_args: --build-arg COMMIT_HASH=$CIRCLE_SHA1
+      - run: cat .tag
   test-build-bash-substitution:
     docker:
       - image: cimg/base:current

@@ -205,13 +205,11 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: echo "$CIRCLE_BUILD_NUM-$CIRCLE_SHA1" >> .tag
       - docker/build:
           dockerfile: test3.Dockerfile
           image: cpeorbtesting/docker-orb-test
-          tag: "$(cat .tag)"
+          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
           extra_build_args: --build-arg COMMIT_HASH=$CIRCLE_SHA1
-      - run: cat .tag
   test-build-bash-substitution:
     docker:
       - image: cimg/base:current

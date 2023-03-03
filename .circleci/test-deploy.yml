@@ -209,7 +209,7 @@ jobs:
           dockerfile: test3.Dockerfile
           image: cpeorbtesting/docker-orb-test
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
-          extra_build_args: --build-arg COMMIT_HASH=$CIRCLE_SHA1
+          extra_build_args: --build-arg COMMIT_HASH=$CIRCLE_SHA1 --build-arg FTP_PROXY=http://40.50.60.5:4567
   test-build-bash-substitution:
     docker:
       - image: cimg/base:current

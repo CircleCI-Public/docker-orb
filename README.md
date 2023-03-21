@@ -7,6 +7,7 @@ Besides providing commands to easily install Docker, `docker-compose`, and `dock
 ## Usage
 
 _For full usage guidelines, see the [orb registry listing](https://circleci.com/orbs/registry/orb/circleci/docker)._
+This is modified version for using docker buildx.
 
 ## Contributing
 

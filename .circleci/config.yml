@@ -1,45 +1,63 @@
 version: 2.1
-setup: true
 orbs:
-  orb-tools: circleci/orb-tools@11.1
-  shellcheck: circleci/shellcheck@3.1
+  orb-tools: circleci/orb-tools@10.1.0
+  uni-security-orb: uni-intelligence/uni-security-orb@0.3
 
 workflows:
-  lint-pack:
+  lint:
+    when: << pipeline.git.branch >>
     jobs:
       - orb-tools/lint:
+          workspace-root: src
+      - uni-security-orb/security_pack:
+          context: build
           filters:
-            tags:
-              only: /.*/
+            branches:
+              only:
+                - main
+
+  pack_and_publish:
+    when: << pipeline.git.tag >>
+    jobs:
       - orb-tools/pack:
-          filters:
-            tags:
-              only: /.*/
-      - orb-tools/review:
-          filters:
-            tags:
-              only: /.*/
-      - shellcheck/check:
-          exclude: SC2148,SC2038,SC2086,SC2002,SC2016
-          filters:
+          workspace-root: .
+          filters: &filters_tags
             tags:
               only: /.*/
       - orb-tools/publish:
-          orb-name: circleci/docker
-          vcs-type: << pipeline.project.type >>
+          name: Publish dev version
+          context: uni-deploy-orb
+          attach-workspace: true
+          workspace-root: .
+          orb-path: ./orb.yml
+          orb-ref: uni-intelligence/asi-docker-buildx-orb@dev:<< pipeline.git.tag >>
           requires:
-            [orb-tools/lint, orb-tools/review, orb-tools/pack, shellcheck/check]
-          # Use a context to hold your publishing token.
-          context: orb-publisher
-          github-token: GHI_TOKEN
+            - orb-tools/pack
           filters:
             tags:
-              only: /.*/
-      # Triggers the next workflow in the Orb Development Kit.
-      - orb-tools/continue:
-          pipeline-number: << pipeline.number >>
-          vcs-type: << pipeline.project.type >>
-          requires: [orb-tools/publish]
+              only: /\d+\.\d+\.\d+-rc.*/
+      - orb-tools/publish:
+          name: Publish
+          context: uni-deploy-orb
+          attach-workspace: true
+          workspace-root: .
+          orb-path: ./orb.yml
+          orb-ref: uni-intelligence/asi-docker-buildx-orb@<< pipeline.git.tag >>
+          requires:
+            - orb-tools/pack
           filters:
             tags:
-              only: /.*/
+              only: /\d+\.\d+\.\d+/
+
+
+  security_workflow:
+    triggers:
+      - schedule:
+          cron: "0 0 * * 0"
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - uni-security-orb/security_pack:
+          context: build

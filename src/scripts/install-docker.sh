@@ -55,7 +55,7 @@ else
   PLATFORM=linux
 fi
 
-DOCKER_BINARY_URL="https://download.docker.com/$PLATFORM/static/stable/x86_64/docker-$DOCKER_VERSION_NUMBER.tgz"
+DOCKER_BINARY_URL="https://download.docker.com/$PLATFORM/static/stable/$(uname -m)/docker-$DOCKER_VERSION_NUMBER.tgz"
 
 # download binary tarball
 DOWNLOAD_DIR="$(mktemp -d)"

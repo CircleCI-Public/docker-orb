@@ -52,9 +52,15 @@ else
   PLATFORM=linux
 fi
 
+SYS_ARCH=$(uname -m)
+
+if [ "$SYS_ARCH" == "arm64" ]; then
+  SYS_ARCH="aarch64"
+fi
+
 DOCKER_COMPOSE_BASE_URL="https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION"
 DOCKER_COMPOSE_RELEASES_HTML="$(curl -Ls --fail --retry 3 "https://github.com/docker/compose/releases/tag/$DOCKER_COMPOSE_VERSION")"
-DOCKER_COMPOSE_RELEASE="docker-compose-$PLATFORM-x86_64"
+DOCKER_COMPOSE_RELEASE="docker-compose-$PLATFORM-$SYS_ARCH"
 DOCKER_SHASUM_FILENAME="checksum.txt"
 
 # since v2.10.0, docker-compose doesn't have a ".sha256" file

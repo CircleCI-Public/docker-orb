@@ -618,10 +618,12 @@ workflows:
 executors:
   macos-old:
     macos:
-      xcode: 11.7.0
+      xcode: 14.2.0
+    resource_class: medium
   macos-latest:
     macos:
-      xcode: 14.0.0
+      xcode: 15.0.0
+      resource_class: macos.x86.medium.gen2
   docker-old:
     docker:
       - image: cimg/base:2020.08-20.04

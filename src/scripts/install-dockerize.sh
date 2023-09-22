@@ -33,7 +33,7 @@ elif cat /etc/issue | grep Alpine &> /dev/null; then
   PLATFORM=alpine-linux-amd64
   apk add --no-cache openssl
 else
-  PLATFORM=linux-amd64
+  PLATFORM=linux-$(uname -m)
 fi
 
 DOCKERIZE_BINARY_URL="https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-$PLATFORM-$DOCKERIZE_VERSION.tar.gz"

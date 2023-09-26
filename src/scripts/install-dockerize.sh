@@ -37,6 +37,8 @@ else
 
   if [[ $SYS_ARCH == "x86_64" ]]; then
     SYS_ARCH="amd64"
+  elif [[ $SYS_ARCH == "aarch64" ]]; then
+    SYS_ARCH="arm64"
   fi
 
   PLATFORM=linux-$SYS_ARCH

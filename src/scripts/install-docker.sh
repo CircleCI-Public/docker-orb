@@ -55,7 +55,13 @@ else
   PLATFORM=linux
 fi
 
-DOCKER_BINARY_URL="https://download.docker.com/$PLATFORM/static/stable/x86_64/docker-$DOCKER_VERSION_NUMBER.tgz"
+SYS_ARCH=$(uname -m)
+
+if [ "$SYS_ARCH" == "arm64" ]; then
+  SYS_ARCH="aarch64"
+fi
+
+DOCKER_BINARY_URL="https://download.docker.com/$PLATFORM/static/stable/$SYS_ARCH/docker-$DOCKER_VERSION_NUMBER.tgz"
 
 # download binary tarball
 DOWNLOAD_DIR="$(mktemp -d)"

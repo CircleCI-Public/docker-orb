@@ -5,7 +5,7 @@ description: >
   `docker-compose` in any CircleCI job.
 
 display:
-  source_url: https://github.com/CircleCI-Public/docker-orb
+  source_url: https://github.com/kanopi/docker-orb
 
 orbs:
   bt: circleci/build-tools@3.0

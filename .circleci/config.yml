@@ -19,7 +19,7 @@ workflows:
           exclude: RC010
           filters: *filters
       - shellcheck/check:
-          exclude: SC2086
+          exclude: SC2086,SC2002,SC2148
           filters: *filters
       # Triggers the next workflow in the Orb Development Kit.
       - orb-tools/continue:

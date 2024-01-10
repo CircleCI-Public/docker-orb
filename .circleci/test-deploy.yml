@@ -50,7 +50,7 @@ filters: &filters
 
 orbs:
   build-tools: circleci/build-tools@3.0.0
-  docker: circleci/docker@dev:<<pipeline.git.revision>>
+  docker: kanopi/docker@dev:<<pipeline.git.revision>>
   jq: circleci/jq@2.2.0
   node: circleci/node@4.7.0
   orb-tools: circleci/orb-tools@11.1
@@ -185,7 +185,7 @@ jobs:
       - setup_remote_docker
       - docker/build:
           dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
+          image: kanopicode/docker-orb-test
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
           attach-at: "./"
       - run:
@@ -208,14 +208,14 @@ jobs:
       - setup_remote_docker
       - docker/build:
           dockerfile: test3.Dockerfile
-          image: cpeorbtesting/docker-orb-test
+          image: kanopicode/docker-orb-test
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
           extra_build_args: --build-arg COMMIT_HASH=$CIRCLE_SHA1
   test-build-bash-substitution:
     docker:
       - image: cimg/base:current
     environment:
-      DOCKER_ACCOUNT: CPEOrbTesting
+      DOCKER_ACCOUNT: kanopicode
       DOCKER_REPO: docker_orb_test
     steps:
       - checkout
@@ -347,7 +347,7 @@ workflows:
       - test-check-command:
           name: test-check-command-docker
           executor: docker-latest
-          context: CPE-orb-docker-testing
+          context: orb-dev
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           use-docker-credentials-store: false
@@ -355,7 +355,7 @@ workflows:
       - test-check-command:
           name: test-check-command-machine
           executor: machine-latest
-          context: CPE-orb-docker-testing
+          context: orb-dev
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           use-docker-credentials-store: true
@@ -363,7 +363,7 @@ workflows:
       - test-check-command:
           name: test-check-command-macos
           executor: macos-latest
-          context: CPE-orb-docker-testing
+          context: orb-dev
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           use-docker-credentials-store: true
@@ -376,7 +376,7 @@ workflows:
       - test-credentials-store:
           name: test-credentials-store-docker
           executor: docker-latest
-          context: CPE-orb-docker-testing
+          context: orb-dev
           helper-name: pass
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
@@ -384,14 +384,14 @@ workflows:
       - test-credentials-store:
           name: test-credentials-store-machine
           executor: machine-latest
-          context: CPE-orb-docker-testing
+          context: orb-dev
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           filters: *filters
       - test-credentials-store:
           name: test-credentials-store-macos
           executor: macos-latest
-          context: CPE-orb-docker-testing
+          context: orb-dev
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           pre-steps:
@@ -400,7 +400,7 @@ workflows:
       - test-credentials-store:
           name: test-credentials-store-docker-custom-tag
           executor: docker-latest
-          context: CPE-orb-docker-testing
+          context: orb-dev
           helper-name: pass
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
@@ -409,7 +409,7 @@ workflows:
       - test-credentials-store:
           name: test-credentials-store-machine-custom-tag
           executor: machine-latest
-          context: CPE-orb-docker-testing
+          context: orb-dev
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           release-tag: "v0.6.4"
@@ -417,7 +417,7 @@ workflows:
       - test-credentials-store:
           name: test-credentials-store-macos-custom-tag
           executor: macos-latest
-          context: CPE-orb-docker-testing
+          context: orb-dev
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           release-tag: "v0.6.4"
@@ -429,9 +429,9 @@ workflows:
       # begin docker/publish
       - docker/publish:
           name: publish-machine
-          context: CPE-orb-docker-testing
+          context: orb-dev
           dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
+          image: kanopicode/docker-orb-test
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
@@ -444,10 +444,10 @@ workflows:
       - docker/publish:
           name: publish-docker
           executor: docker-latest
-          context: CPE-orb-docker-testing
+          context: orb-dev
           use-remote-docker: true
           dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
+          image: kanopicode/docker-orb-test
           tag: $CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
@@ -456,12 +456,12 @@ workflows:
       - docker/publish:
           name: publish-docker-with-buildkit
           executor: docker-latest
-          context: CPE-orb-docker-testing
+          context: orb-dev
           use-remote-docker: true
           remote-docker-version: "20.10.12"
           use-buildkit: true
           dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
+          image: kanopicode/docker-orb-test
           tag: $CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
@@ -472,12 +472,12 @@ workflows:
           requires:
             - publish-docker
           executor: docker-latest
-          context: CPE-orb-docker-testing
+          context: orb-dev
           use-remote-docker: true
           dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
+          image: kanopicode/docker-orb-test
           tag: $CIRCLE_SHA1
-          cache_from: cpeorbtesting/docker-orb-test:$CIRCLE_SHA1
+          cache_from: kanopicode/docker-orb-test:$CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           pre-steps:
@@ -489,24 +489,24 @@ workflows:
       - docker/publish:
           name: publish-docker-cache-not-found
           executor: docker/docker
-          context: CPE-orb-docker-testing
+          context: orb-dev
           use-remote-docker: true
           dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
+          image: kanopicode/docker-orb-test
           tag: $CIRCLE_SHA1-2
-          cache_from: cpeorbtesting/docker-orb-test:not-exists
+          cache_from: kanopicode/docker-orb-test:not-exists
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           filters: *filters
       - docker/publish:
           name: publish-docker-update-description
           executor: docker-latest
-          context: CPE-orb-docker-testing
+          context: orb-dev
           use-remote-docker: true
           dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
+          image: kanopicode/docker-orb-test
           tag: $CIRCLE_SHA1
-          cache_from: cpeorbtesting/docker-orb-test:$CIRCLE_SHA1
+          cache_from: kanopicode/docker-orb-test:$CIRCLE_SHA1
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
           update-description: true
@@ -514,10 +514,10 @@ workflows:
       - docker/publish:
           name: publish-docker-multiple-tags
           executor: docker-latest
-          context: CPE-orb-docker-testing
+          context: orb-dev
           use-remote-docker: true
           dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
+          image: kanopicode/docker-orb-test
           tag: $CIRCLE_SHA1,$CIRCLE_BUILD_NUM
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
@@ -525,11 +525,11 @@ workflows:
           filters: *filters
       - docker/publish:
           pre-steps:
-            - run: echo 'export DOCKER_USERNAME=cpeorbtesting' >> $BASH_ENV
+            - run: echo 'export DOCKER_USERNAME=kanopicode' >> $BASH_ENV
             - run: echo 'export DOCKER_NAME=docker-orb-test' >> $BASH_ENV
           name: publish-docker-env-var-image-param
           executor: docker-latest
-          context: CPE-orb-docker-testing
+          context: orb-dev
           use-remote-docker: true
           dockerfile: test.Dockerfile
           image: $DOCKER_USERNAME/$DOCKER_NAME
@@ -543,13 +543,13 @@ workflows:
             - run:
                 name: Export env vars
                 command: |
-                  echo 'export DOCKER_USERNAME=cpeorbtesting' >> $BASH_ENV
+                  echo 'export DOCKER_USERNAME=kanopicode' >> $BASH_ENV
                   echo 'export DOCKER_NAME=docker-orb-test' >> $BASH_ENV
                   echo 'export DOCKERFILE=test.Dockerfile' >> $BASH_ENV
                   echo 'export REGISTRY=docker.io' >> $BASH_ENV
           name: publish-docker-env-var-all-params
           executor: docker-latest
-          context: CPE-orb-docker-testing
+          context: orb-dev
           use-remote-docker: true
           dockerfile: $DOCKERFILE
           image: $DOCKER_USERNAME/$DOCKER_NAME

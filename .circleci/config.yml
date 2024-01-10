@@ -25,13 +25,12 @@ workflows:
             tags:
               only: /.*/
       - orb-tools/publish:
-          orb-name: circleci/docker
+          orb-name: kanopi/docker
           vcs-type: << pipeline.project.type >>
           requires:
             [orb-tools/lint, orb-tools/review, orb-tools/pack, shellcheck/check]
           # Use a context to hold your publishing token.
-          context: orb-publisher
-          github-token: GHI_TOKEN
+          context: kanopi-code
           filters:
             tags:
               only: /.*/

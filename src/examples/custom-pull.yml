@@ -4,7 +4,7 @@ usage:
   version: 2.1
 
   orbs:
-    docker: circleci/docker@x.y.z
+    docker: kanopi/docker@x.y.z
 
     jobs:
       pull:

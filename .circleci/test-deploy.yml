@@ -38,6 +38,7 @@ promotion_requires: &promotion_requires
     test-machine-old,
     test-machine-arm,
     test-build-command-workspace,
+    test-buildx-command-workspace,
     test-build-with-args,
     test-build-bash-substitution
   ]
@@ -198,6 +199,29 @@ jobs:
               ls
               exit 1
             fi
+  test-buildx-command-workspace:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/buildx:
+          dockerfile: test.Dockerfile
+          image: kanopicode/docker-orb-test
+          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
+          attach-at: "./"
+      - run:
+          name: Check for workspace
+          command: |-
+            echo "Ensuring workspace was attached."
+            if test -f "./verify.txt"; then
+              echo "Success"
+            else
+              echo "Error"
+              pwd
+              ls
+              exit 1
+            fi
   test-build-with-args:
     docker:
       - image: cimg/base:stable
@@ -316,6 +340,10 @@ workflows:
       - test-create-workspace:
           filters: *filters
       - test-build-command-workspace:
+          requires:
+            - test-create-workspace
+          filters: *filters
+      - test-buildx-command-workspace:
           requires:
             - test-create-workspace
           filters: *filters

@@ -606,7 +606,7 @@ workflows:
           vcs-type: << pipeline.project.type >>
           pub-type: production
           requires: *promotion_requires
-          context: orb-publisher
+          context: kanopi-code
           filters:
             branches:
               ignore: /.*/

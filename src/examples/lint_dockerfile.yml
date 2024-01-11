@@ -16,9 +16,9 @@ usage:
 
           - docker/dockerlint:
               dockerfile: path/to/and/name/of/Dockerfile
-              treat-warnings-as-errors: true
+              treat_warnings_as_errors: true
 
   workflows:
-    lint-dockerfile:
+    lint_dockerfile:
       jobs:
         - lint

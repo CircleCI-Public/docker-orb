@@ -15,7 +15,7 @@ parameters:
       or https://api.github.com/repos/aelsabbahy/goss/releases, e.g.,
       `v0.3.7`. Supports versions `v0.3.1` and newer.
 
-  install-dir:
+  install_dir:
     type: string
     default: /usr/local/bin
     description: >
@@ -39,8 +39,8 @@ steps:
       name: Install Goss and dgoss
       environment:
         PARAM_VERSION: <<parameters.version>>
-        PARAM_INSTALL_DIR: <<parameters.install-dir>>
+        PARAM_INSTALL_DIR: <<parameters.install_dir>>
         PARAM_DEBUG: <<parameters.debug>>
         PARAM_ARCHITECTURE: <<parameters.architecture>>
         SCRIPT_UTILS: <<include(scripts/utils.sh)>>
-      command: << include(scripts/install-goss.sh) >>
+      command: << include(scripts/install_goss.sh) >>

@@ -13,14 +13,14 @@ parameters:
       multiple Dockerfiles, pass a colon-separated string, e.g.,
       `~/project/app/deploy.Dockerfile:~/project/app/test.Dockerfile`.
 
-  ignore-rules:
+  ignore_rules:
     type: string
     default: ""
     description: >
       Comma-separated string list of rules to ignore (e.g.,
       `DL3000,SC1010`): https://github.com/hadolint/hadolint#rules
 
-  trusted-registries:
+  trusted_registries:
     type: string
     default: ""
     description: >
@@ -28,7 +28,7 @@ parameters:
       `docker.io,my-company.com:5000`); if set, return an error if
       Dockerfiles use any images from registries not included in this list
 
-  failure-threshold:
+  failure_threshold:
     type: enum
     default: "info"
     description: >
@@ -41,8 +41,8 @@ steps:
       name: Lint <<parameters.dockerfiles>> with hadolint
       environment:
         PARAM_DOCKERFILES: <<parameters.dockerfiles>>
-        PARAM_IGNORE_RULES: <<parameters.ignore-rules>>
-        PARAM_TRUSTED_REGISTRIES: <<parameters.trusted-registries>>
-        PARAM_FAILURE_THRESHOLD: <<parameters.failure-threshold>>
+        PARAM_IGNORE_RULES: <<parameters.ignore_rules>>
+        PARAM_TRUSTED_REGISTRIES: <<parameters.trusted_registries>>
+        PARAM_FAILURE_THRESHOLD: <<parameters.failure_threshold>>
         SCRIPT_UTILS: <<include(scripts/utils.sh)>>
       command: <<include(scripts/hadolint.sh)>>

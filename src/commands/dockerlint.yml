@@ -10,7 +10,7 @@ parameters:
       e.g., `~/project/app/deploy.Dockerfile`, defaults to a Dockerfile
       named `Dockerfile` in the working directory
 
-  treat-warnings-as-errors:
+  treat_warnings_as_errors:
     type: boolean
     default: false
     description: >
@@ -28,7 +28,7 @@ steps:
       name: Lint Dockerfile at <<parameters.dockerfile>>
       environment:
         PARAM_DEBUG: <<parameters.debug>>
-        PARAM_TREAT_WARNING_AS_ERRORS: <<parameters.treat-warnings-as-errors>>
+        PARAM_TREAT_WARNING_AS_ERRORS: <<parameters.treat_warnings_as_errors>>
         PARAM_DOCKERFILE: <<parameters.dockerfile>>
         SCRIPT_UTILS: <<include(scripts/utils.sh)>>
       command: <<include(scripts/dockerlint.sh)>>

@@ -23,13 +23,13 @@ parameters:
     type: string
     description: Name of image to push
 
-  docker-username:
+  docker_username:
     type: env_var_name
     default: DOCKER_LOGIN
     description: >
       Name of environment variable storing your Docker username
 
-  docker-password:
+  docker_password:
     type: env_var_name
     default: DOCKER_PASSWORD
     description: >
@@ -44,7 +44,7 @@ steps:
         PARAM_PATH: <<parameters.path>>
         PARAM_REGISTRY: <<parameters.registry>>
         PARAM_IMAGE: <<parameters.image>>
-        PARAM_DOCKER_USERNAME: <<parameters.docker-username>>
-        PARAM_DOCKER_PASSWORD: <<parameters.docker-password>>
+        PARAM_DOCKER_USERNAME: <<parameters.docker_username>>
+        PARAM_DOCKER_PASSWORD: <<parameters.docker_password>>
         SCRIPT_UTILS: <<include(scripts/utils.sh)>>
-      command: << include(scripts/update-description.sh) >>
+      command: << include(scripts/update_description.sh) >>

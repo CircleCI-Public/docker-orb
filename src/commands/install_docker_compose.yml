@@ -13,7 +13,7 @@ parameters:
       https://api.github.com/repos/docker/compose/releases, e.g., `v2.10.0`.
       Only versions equal or above v2.0.1 are supported.
 
-  install-dir:
+  install_dir:
     type: string
     default: /usr/local/bin
     description: >
@@ -24,6 +24,6 @@ steps:
       name: Install docker-compose
       environment:
         PARAM_DOCKER_COMPOSER_VERSION: << parameters.version >>
-        PARAM_INSTALL_DIR: <<parameters.install-dir>>
+        PARAM_INSTALL_DIR: <<parameters.install_dir>>
         SCRIPT_UTILS: <<include(scripts/utils.sh)>>
-      command: <<include(scripts/install-docker-compose.sh)>>
+      command: <<include(scripts/install_docker_compose.sh)>>

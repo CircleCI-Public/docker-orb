@@ -9,19 +9,19 @@ parameters:
     default: docker.io
     description: Name of registry to use, defaults to docker.io
 
-  docker-username:
+  docker_username:
     type: env_var_name
     default: DOCKER_LOGIN
     description: >
       Name of environment variable storing your Docker username
 
-  docker-password:
+  docker_password:
     type: env_var_name
     default: DOCKER_PASSWORD
     description: >
       Name of environment variable storing your Docker password
 
-  use-docker-credentials-store:
+  use_docker_credentials_store:
     type: boolean
     default: false
     description: >
@@ -30,16 +30,16 @@ parameters:
 
 steps:
   - when:
-      condition: <<parameters.use-docker-credentials-store>>
+      condition: <<parameters.use_docker_credentials_store>>
       steps:
-        - install-docker-credential-helper
-        - configure-docker-credentials-store
+        - install_docker_credential_helper
+        - configure_docker_credentials_store
 
   - run:
       name: Docker login
       environment:
         PARAM_REGISTRY: <<parameters.registry>>
-        PARAM_DOCKER_USERNAME: <<parameters.docker-username>>
-        PARAM_DOCKER_PASSWORD: <<parameters.docker-password>>
+        PARAM_DOCKER_USERNAME: <<parameters.docker_username>>
+        PARAM_DOCKER_PASSWORD: <<parameters.docker_password>>
         SCRIPT_UTILS: <<include(scripts/utils.sh)>>
       command: <<include(scripts/check.sh)>>

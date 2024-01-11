@@ -48,12 +48,18 @@ filters: &filters
   tags:
     only: /.*/
 
+release-filters: &release-filters
+  branches:
+    ignore: /.*/
+  tags:
+    only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+
 orbs:
   build-tools: circleci/build-tools@3.0.0
-  docker: circleci/docker@dev:<<pipeline.git.revision>>
+  docker: {}
   jq: circleci/jq@2.2.0
   node: circleci/node@4.7.0
-  orb-tools: circleci/orb-tools@11.1
+  orb-tools: circleci/orb-tools@12.0
 
 jobs:
   test:
@@ -602,28 +608,24 @@ workflows:
       # end test
 
       - orb-tools/pack:
-          filters: *filters
+          filters: *release-filters
       - orb-tools/publish:
-          orb-name: circleci/docker
-          vcs-type: << pipeline.project.type >>
-          pub-type: production
+          orb_name: circleci/docker
+          vcs_type: << pipeline.project.type >>
+          pub_type: production
           requires: *promotion_requires
           context: orb-publisher
-          github-token: GHI_TOKEN
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+          github_token: GHI_TOKEN
+          filters: *release-filters
 
 executors:
   macos-old:
     macos:
-      xcode: 14.2.0
-    resource_class: medium
+      xcode: 14.3.1
+    resource_class: macos.x86.medium.gen2
   macos-latest:
     macos:
-      xcode: 15.0.0
+      xcode: 15.2.0
       resource_class: macos.x86.medium.gen2
   docker-old:
     docker:

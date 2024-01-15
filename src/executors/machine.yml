@@ -5,7 +5,7 @@ description: >
 parameters:
   image:
     type: string
-    default: ubuntu-2204:2023.02.1
+    default: ubuntu-2204:current
 
   dlc:
     type: boolean

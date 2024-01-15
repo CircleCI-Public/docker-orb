@@ -619,11 +619,11 @@ workflows:
 executors:
   macos-old:
     macos:
-      xcode: 14.2.0
-    resource_class: medium
+      xcode: 14.3.1
+    resource_class: macos.x86.medium.gen2
   macos-latest:
     macos:
-      xcode: 15.0.0
+      xcode: 15.2.0
       resource_class: macos.x86.medium.gen2
   docker-old:
     docker:

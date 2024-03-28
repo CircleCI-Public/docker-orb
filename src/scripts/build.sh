@@ -66,10 +66,6 @@ if [ -n "$PARAM_CACHE_FROM" ]; then
   build_args+=("--cache-from=$PARAM_CACHE_FROM")
 fi
 
-if [ "$PARAM_USE_BUILDKIT" -eq 1 ]; then
-  build_args+=("--progress=plain")
-fi
-
 # The context must be the last argument.
 build_args+=("$PARAM_DOCKER_CONTEXT")
 

@@ -102,7 +102,7 @@ parameters:
     default: ""
     description: >
       Comman-separated list of images where cache will be pushed to.
-      https://docs.docker.com/reference/cli/docker/buildx/build/#cache-to    
+      https://docs.docker.com/reference/cli/docker/buildx/build/#cache-to
 
   after_checkout:
     description: Optional steps to run after checking out the code

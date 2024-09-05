@@ -635,7 +635,6 @@ executors:
   macos-latest:
     macos:
       xcode: 15.2.0
-      resource_class: macos.x86.medium.gen2
   docker-old:
     docker:
       - image: cimg/base:2020.08-20.04

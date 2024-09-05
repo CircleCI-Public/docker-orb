@@ -6,8 +6,12 @@ expand_env_vars_with_prefix "PARAM_"
 
 HELPER_NAME="$PARAM_HELPER_NAME"
 
-if uname | grep -q "Darwin"; then platform="darwin"
-else platform="linux"
+if uname | grep -q "Darwin"; then 
+  platform="darwin"
+  arch="arm64"
+else 
+  platform="linux"
+  arch="$PLATFORM"
 fi
 
 # Infer helper name from the platform
@@ -75,11 +79,11 @@ minor_version="$(echo "$RELEASE_VERSION" | cut -d. -f2)"
 download_base_url="$base_url/download/${RELEASE_VERSION}/${HELPER_FILENAME}-${RELEASE_VERSION}"
 
 if [ "$minor_version" -gt 6 ]; then
-  DOWNLOAD_URL="$download_base_url.$platform-amd64"
+  DOWNLOAD_URL="$download_base_url.$platform-$arch"
   echo "Downloading from url: $DOWNLOAD_URL"
   curl -L -o "${HELPER_FILENAME}" "$DOWNLOAD_URL"
 else
-  DOWNLOAD_URL="$download_base_url-amd64.tar.gz"
+  DOWNLOAD_URL="$download_base_url-$arch.tar.gz"
   echo "Downloading from url: $DOWNLOAD_URL"
   curl -L -o "${HELPER_FILENAME}_archive" "$DOWNLOAD_URL"
   tar xvf "./${HELPER_FILENAME}_archive"

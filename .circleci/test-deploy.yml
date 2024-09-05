@@ -8,9 +8,11 @@ promotion_requires: &promotion_requires
     test-check-command-docker,
     test-check-command-machine,
     test-check-command-macos,
+    test-check-command-machine-arm,
     test-credentials-store-docker,
     test-credentials-store-machine,
     test-credentials-store-macos,
+    test-credentials-store-machine-arm,
     test-credentials-store-docker-custom-tag,
     test-credentials-store-machine-custom-tag,
     test-credentials-store-macos-custom-tag,
@@ -122,12 +124,17 @@ jobs:
         type: env_var_name
       use-docker-credentials-store:
         type: boolean
+      platform:
+        default: amd64
+        type: enum
+        enum: [amd64, arm64]
     executor: <<parameters.executor>>
     steps:
       - docker/check:
           docker-username: <<parameters.docker-username>>
           docker-password: <<parameters.docker-password>>
           use-docker-credentials-store: <<parameters.use-docker-credentials-store>>
+          platform: <<parameters.platform>>
   test-credentials-store:
     parameters:
       executor:
@@ -143,11 +150,16 @@ jobs:
       release-tag:
         type: string
         default: ""
+      platform:
+        default: amd64
+        type: enum
+        enum: [amd64, arm64]
     executor: <<parameters.executor>>
     steps:
       - docker/install-docker-credential-helper:
           helper-name: <<parameters.helper-name>>
           release-tag: <<parameters.release-tag>>
+          platform: <<parameters.platform>>
       - docker/configure-docker-credentials-store:
           helper-name: <<parameters.helper-name>>
       - run:
@@ -359,6 +371,14 @@ workflows:
           use-docker-credentials-store: true
           filters: *filters
       - test-check-command:
+          name: test-check-command-machine-arm
+          executor: machine-arm
+          context: cimg-docker-image-building
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_TOKEN
+          use-docker-credentials-store: true
+          filters: *filters
+      - test-check-command:
           name: test-check-command-macos
           executor: macos-latest
           context: cimg-docker-image-building
@@ -385,6 +405,14 @@ workflows:
           context: cimg-docker-image-building
           docker-username: DOCKER_USER
           docker-password: DOCKER_TOKEN
+          filters: *filters
+      - test-credentials-store:
+          name: test-credentials-store-machine-arm
+          executor: machine-latest
+          context: cimg-docker-image-building
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_TOKEN
+          platform: arm64
           filters: *filters
       - test-credentials-store:
           name: test-credentials-store-macos

@@ -11,7 +11,7 @@ if uname | grep -q "Darwin"; then
   arch="arm64"
 else 
   platform="linux"
-  arch="$PLATFORM"
+  arch="$PARAM_ARCH"
 fi
 
 # Infer helper name from the platform

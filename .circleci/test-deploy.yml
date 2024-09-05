@@ -124,7 +124,7 @@ jobs:
         type: env_var_name
       use-docker-credentials-store:
         type: boolean
-      platform:
+      arch:
         default: amd64
         type: enum
         enum: [amd64, arm64]
@@ -134,7 +134,7 @@ jobs:
           docker-username: <<parameters.docker-username>>
           docker-password: <<parameters.docker-password>>
           use-docker-credentials-store: <<parameters.use-docker-credentials-store>>
-          platform: <<parameters.platform>>
+          arch: <<parameters.arch>>
   test-credentials-store:
     parameters:
       executor:
@@ -150,7 +150,7 @@ jobs:
       release-tag:
         type: string
         default: ""
-      platform:
+      arch:
         default: amd64
         type: enum
         enum: [amd64, arm64]
@@ -159,7 +159,7 @@ jobs:
       - docker/install-docker-credential-helper:
           helper-name: <<parameters.helper-name>>
           release-tag: <<parameters.release-tag>>
-          platform: <<parameters.platform>>
+          arch: <<parameters.arch>>
       - docker/configure-docker-credentials-store:
           helper-name: <<parameters.helper-name>>
       - run:
@@ -376,6 +376,7 @@ workflows:
           context: cimg-docker-image-building
           docker-username: DOCKER_USER
           docker-password: DOCKER_TOKEN
+          arch: arm64
           use-docker-credentials-store: true
           filters: *filters
       - test-check-command:
@@ -408,11 +409,11 @@ workflows:
           filters: *filters
       - test-credentials-store:
           name: test-credentials-store-machine-arm
-          executor: machine-latest
+          executor: machine-arm
           context: cimg-docker-image-building
           docker-username: DOCKER_USER
           docker-password: DOCKER_TOKEN
-          platform: arm64
+          arch: arm64
           filters: *filters
       - test-credentials-store:
           name: test-credentials-store-macos

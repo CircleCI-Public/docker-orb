@@ -9,15 +9,15 @@ parameters:
     default: docker.io
     description: Name of registry to use, defaults to docker.io
 
-  platform:
+  arch:
     type: enum
     default: amd64
     enum: [amd64, arm64]
     description: |
-      Which architecture platform is being used.
+      Which architecture is being used.
       Values accepted are amd64 and arm64. Defaults to amd64.
       When running on MacOS arm64 will be used.
-    
+
   docker-username:
     type: env_var_name
     default: DOCKER_LOGIN
@@ -42,7 +42,7 @@ steps:
       condition: <<parameters.use-docker-credentials-store>>
       steps:
         - install-docker-credential-helper:
-            platform: <<parameters.platform>>
+            arch: <<parameters.arch>>
         - configure-docker-credentials-store
 
   - run:

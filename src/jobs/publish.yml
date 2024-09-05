@@ -96,7 +96,13 @@ parameters:
     default: ""
     description: >
       Comma-separated list of images to pull before build for --cache-from
-      https://docs.docker.com/engine/reference/commandline/build/
+      https://docs.docker.com/engine/reference/commandline/build/#cache-from
+  cache_to:
+    type: string
+    default: ""
+    description: >
+      Comman-separated list of images where cache will be pushed to.
+      https://docs.docker.com/reference/cli/docker/buildx/build/#cache-to    
 
   after_checkout:
     description: Optional steps to run after checking out the code
@@ -200,6 +206,7 @@ steps:
       image: <<parameters.image>>
       tag: <<parameters.tag>>
       cache_from: <<parameters.cache_from>>
+      cache_to: <<parameters.cache_to>>
       extra_build_args: <<parameters.extra_build_args>>
       lint-dockerfile: <<parameters.lint-dockerfile>>
       treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>

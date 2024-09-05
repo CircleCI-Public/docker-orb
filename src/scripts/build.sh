@@ -66,6 +66,10 @@ if [ -n "$PARAM_CACHE_FROM" ]; then
   build_args+=("--cache-from=$PARAM_CACHE_FROM")
 fi
 
+if [ -n "$PARAM_CACHE_TO" ]; then
+  build_args+=("--cache-to=$PARAM_CACHE_TO")
+fi
+
 # The context must be the last argument.
 build_args+=("$PARAM_DOCKER_CONTEXT")
 

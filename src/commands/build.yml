@@ -59,9 +59,14 @@ parameters:
     default: ""
     description: >
       Comma-separated list of images, images will first be pulled, then
-      passed as the --cache-from build argument
-      https://docs.docker.com/engine/reference/commandline/build/
-
+      passed as the --cache-from build argument.
+      https://docs.docker.com/reference/cli/docker/buildx/build/#cache-from
+  cache_to:
+    type: string
+    default: ""
+    description: >
+      Comman-separated list of images where cache will be pushed to.
+      https://docs.docker.com/reference/cli/docker/buildx/build/#cache-to
   debug:
     type: boolean
     default: false
@@ -128,6 +133,7 @@ steps:
       no_output_timeout: << parameters.no_output_timeout >>
       environment:
         PARAM_CACHE_FROM: <<parameters.cache_from>>
+        PARAM_CACHE_TO: <<parameters.cache_to>>
         PARAM_DOCKER_CONTEXT: <<parameters.docker-context>>
         PARAM_DOCKERFILE_NAME: <<parameters.dockerfile>>
         PARAM_DOCKERFILE_PATH: <<parameters.path>>

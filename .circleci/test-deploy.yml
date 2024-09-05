@@ -468,16 +468,33 @@ workflows:
           use-docker-credentials-store: true
           filters: *filters
       - docker/publish:
-          name: publish-docker-cache
-          requires:
-            - publish-docker
+          name: publish-docker-save-cache
           executor: docker-latest
           context: cimg-docker-image-building
           use-remote-docker: true
           dockerfile: test.Dockerfile
           image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1
-          cache_from: ccitest/docker-orb-test:$CIRCLE_SHA1
+          cache_to: ccitest/docker-orb-test:cache,ccitest/docker-orb-test:cache2
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_TOKEN
+          pre-steps:
+            - docker/install-docker-credential-helper:
+                # release-tag: v0.6.3
+            - docker/configure-docker-credentials-store:
+                helper-name: pass
+          filters: *filters
+      - docker/publish:
+          name: publish-docker-cache
+          requires:
+            - publish-docker-save-cache
+          executor: docker-latest
+          context: cimg-docker-image-building
+          use-remote-docker: true
+          dockerfile: test.Dockerfile
+          image: ccitest/docker-orb-test
+          tag: $CIRCLE_SHA1
+          cache_from: ccitest/docker-orb-test:cache
           docker-username: DOCKER_USER
           docker-password: DOCKER_TOKEN
           pre-steps:

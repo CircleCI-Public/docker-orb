@@ -37,7 +37,7 @@ pull_images_from_cache() {
     docker pull ${image} || true
   done
 }
-set -x
+
 if ! parse_tags_to_docker_arg; then
   echo "Unable to parse provided tags."
   echo "Check your \"tag\" parameter or refer to the docs and try again: https://circleci.com/developer/orbs/orb/circleci/docker."
@@ -78,7 +78,7 @@ build_args+=("$PARAM_DOCKER_CONTEXT")
 old_ifs="$IFS"
 IFS=' '
 
-
+set -x
 # shellcheck disable=SC2048 # We want word splitting here.
 docker buildx build ${build_args[*]}
 set +x

@@ -502,7 +502,7 @@ workflows:
           dockerfile: test4.Dockerfile
           image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1
-          cache_to: ccitest/docker-orb-test-big:cache,ccitest/docker-orb-test-big:cache2
+          cache_to: ccitest/docker-orb-test:cache-big,ccitest/docker-orb-test:cache2-big
           docker-username: DOCKER_USER
           docker-password: DOCKER_TOKEN
           pre-steps:
@@ -521,7 +521,7 @@ workflows:
           dockerfile: test4.Dockerfile
           image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1
-          cache_from: ccitest/docker-orb-test-big:cache
+          cache_from: ccitest/docker-orb-test:cache-big
           docker-username: DOCKER_USER
           docker-password: DOCKER_TOKEN
           pre-steps:

@@ -499,10 +499,10 @@ workflows:
           executor: docker-latest
           context: cimg-docker-image-building
           use-remote-docker: true
-          dockerfile: test.Dockerfile
+          dockerfile: test4.Dockerfile
           image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1
-          cache_to: ccitest/docker-orb-test:cache,ccitest/docker-orb-test:cache2
+          cache_to: ccitest/docker-orb-test-big:cache,ccitest/docker-orb-test-big:cache2
           docker-username: DOCKER_USER
           docker-password: DOCKER_TOKEN
           pre-steps:
@@ -518,10 +518,10 @@ workflows:
           executor: docker-latest
           context: cimg-docker-image-building
           use-remote-docker: true
-          dockerfile: test.Dockerfile
+          dockerfile: test4.Dockerfile
           image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1
-          cache_from: ccitest/docker-orb-test:cache
+          cache_from: ccitest/docker-orb-test-big:cache
           docker-username: DOCKER_USER
           docker-password: DOCKER_TOKEN
           pre-steps:

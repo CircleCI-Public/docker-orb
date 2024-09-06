@@ -496,7 +496,7 @@ workflows:
           filters: *filters
       - docker/publish:
           name: publish-docker-save-cache
-          executor: machine-arm
+          executor: machine-latest
           context: cimg-docker-image-building
           dockerfile: test4.Dockerfile
           image: ccitest/docker-orb-test
@@ -515,7 +515,7 @@ workflows:
           name: publish-docker-cache
           requires:
             - publish-docker-save-cache
-          executor: machine-arm
+          executor: machine-latest
           context: cimg-docker-image-building
           dockerfile: test4.Dockerfile
           image: ccitest/docker-orb-test

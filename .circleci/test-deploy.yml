@@ -185,7 +185,7 @@ jobs:
       - setup_remote_docker
       - docker/build:
           dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
+          image: ccitest/docker-orb-test
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
           attach-at: "./"
       - run:
@@ -208,14 +208,14 @@ jobs:
       - setup_remote_docker
       - docker/build:
           dockerfile: test3.Dockerfile
-          image: cpeorbtesting/docker-orb-test
+          image: ccitest/docker-orb-test
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
           extra_build_args: --build-arg COMMIT_HASH=$CIRCLE_SHA1
   test-build-bash-substitution:
     docker:
       - image: cimg/base:current
     environment:
-      DOCKER_ACCOUNT: CPEOrbTesting
+      DOCKER_ACCOUNT: circlecipublicimagetesting
       DOCKER_REPO: docker_orb_test
     steps:
       - checkout
@@ -347,25 +347,25 @@ workflows:
       - test-check-command:
           name: test-check-command-docker
           executor: docker-latest
-          context: CPE-orb-docker-testing
+          context: cimg-docker-image-building
           docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
+          docker-password: DOCKER_TOKEN
           use-docker-credentials-store: false
           filters: *filters
       - test-check-command:
           name: test-check-command-machine
           executor: machine-latest
-          context: CPE-orb-docker-testing
+          context: cimg-docker-image-building
           docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
+          docker-password: DOCKER_TOKEN
           use-docker-credentials-store: true
           filters: *filters
       - test-check-command:
           name: test-check-command-macos
           executor: macos-latest
-          context: CPE-orb-docker-testing
+          context: cimg-docker-image-building
           docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
+          docker-password: DOCKER_TOKEN
           use-docker-credentials-store: true
           pre-steps:
             - docker/install-docker
@@ -376,50 +376,50 @@ workflows:
       - test-credentials-store:
           name: test-credentials-store-docker
           executor: docker-latest
-          context: CPE-orb-docker-testing
+          context: cimg-docker-image-building
           helper-name: pass
           docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
+          docker-password: DOCKER_TOKEN
           filters: *filters
       - test-credentials-store:
           name: test-credentials-store-machine
           executor: machine-latest
-          context: CPE-orb-docker-testing
+          context: cimg-docker-image-building
           docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
+          docker-password: DOCKER_TOKEN
           filters: *filters
       - test-credentials-store:
           name: test-credentials-store-macos
           executor: macos-latest
-          context: CPE-orb-docker-testing
+          context: cimg-docker-image-building
           docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
+          docker-password: DOCKER_TOKEN
           pre-steps:
             - docker/install-docker
           filters: *filters
       - test-credentials-store:
           name: test-credentials-store-docker-custom-tag
           executor: docker-latest
-          context: CPE-orb-docker-testing
+          context: cimg-docker-image-building
           helper-name: pass
           docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
+          docker-password: DOCKER_TOKEN
           release-tag: "v0.6.4"
           filters: *filters
       - test-credentials-store:
           name: test-credentials-store-machine-custom-tag
           executor: machine-latest
-          context: CPE-orb-docker-testing
+          context: cimg-docker-image-building
           docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
+          docker-password: DOCKER_TOKEN
           release-tag: "v0.6.4"
           filters: *filters
       - test-credentials-store:
           name: test-credentials-store-macos-custom-tag
           executor: macos-latest
-          context: CPE-orb-docker-testing
+          context: cimg-docker-image-building
           docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
+          docker-password: DOCKER_TOKEN
           release-tag: "v0.6.4"
           pre-steps:
             - docker/install-docker
@@ -429,12 +429,12 @@ workflows:
       # begin docker/publish
       - docker/publish:
           name: publish-machine
-          context: CPE-orb-docker-testing
+          context: cimg-docker-image-building
           dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
+          image: ccitest/docker-orb-test
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
           docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
+          docker-password: DOCKER_TOKEN
           use-docker-credentials-store: true
           pre-steps:
             # Test that it's OK to invoke the commands twice
@@ -444,27 +444,27 @@ workflows:
       - docker/publish:
           name: publish-docker
           executor: docker-latest
-          context: CPE-orb-docker-testing
+          context: cimg-docker-image-building
           use-remote-docker: true
           dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
+          image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1
           docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
+          docker-password: DOCKER_TOKEN
           use-docker-credentials-store: true
           filters: *filters
       - docker/publish:
           name: publish-docker-with-buildkit
           executor: docker-latest
-          context: CPE-orb-docker-testing
+          context: cimg-docker-image-building
           use-remote-docker: true
           remote-docker-version: "20.10.12"
           use-buildkit: true
           dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
+          image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1
           docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
+          docker-password: DOCKER_TOKEN
           use-docker-credentials-store: true
           filters: *filters
       - docker/publish:
@@ -472,14 +472,14 @@ workflows:
           requires:
             - publish-docker
           executor: docker-latest
-          context: CPE-orb-docker-testing
+          context: cimg-docker-image-building
           use-remote-docker: true
           dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
+          image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1
-          cache_from: cpeorbtesting/docker-orb-test:$CIRCLE_SHA1
+          cache_from: ccitest/docker-orb-test:$CIRCLE_SHA1
           docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
+          docker-password: DOCKER_TOKEN
           pre-steps:
             - docker/install-docker-credential-helper:
                 # release-tag: v0.6.3
@@ -489,53 +489,53 @@ workflows:
       - docker/publish:
           name: publish-docker-cache-not-found
           executor: docker/docker
-          context: CPE-orb-docker-testing
+          context: cimg-docker-image-building
           use-remote-docker: true
           dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
+          image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1-2
-          cache_from: cpeorbtesting/docker-orb-test:not-exists
+          cache_from: ccitest/docker-orb-test:not-exists
           docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
+          docker-password: DOCKER_TOKEN
           filters: *filters
       - docker/publish:
           name: publish-docker-update-description
           executor: docker-latest
-          context: CPE-orb-docker-testing
+          context: cimg-docker-image-building
           use-remote-docker: true
           dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
+          image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1
-          cache_from: cpeorbtesting/docker-orb-test:$CIRCLE_SHA1
+          cache_from: ccitest/docker-orb-test:$CIRCLE_SHA1
           docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
+          docker-password: DOCKER_TOKEN
           update-description: true
           filters: *filters
       - docker/publish:
           name: publish-docker-multiple-tags
           executor: docker-latest
-          context: CPE-orb-docker-testing
+          context: cimg-docker-image-building
           use-remote-docker: true
           dockerfile: test.Dockerfile
-          image: cpeorbtesting/docker-orb-test
+          image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1,$CIRCLE_BUILD_NUM
           docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
+          docker-password: DOCKER_TOKEN
           use-docker-credentials-store: true
           filters: *filters
       - docker/publish:
           pre-steps:
-            - run: echo 'export DOCKER_USERNAME=cpeorbtesting' >> $BASH_ENV
+            - run: echo 'export DOCKER_USERNAME=circlecipublicimagetesting' >> $BASH_ENV
             - run: echo 'export DOCKER_NAME=docker-orb-test' >> $BASH_ENV
           name: publish-docker-env-var-image-param
           executor: docker-latest
-          context: CPE-orb-docker-testing
+          context: cimg-docker-image-building
           use-remote-docker: true
           dockerfile: test.Dockerfile
-          image: $DOCKER_USERNAME/$DOCKER_NAME
+          image: ccitest/$DOCKER_NAME
           tag: $CIRCLE_SHA1,$CIRCLE_BUILD_NUM
           docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
+          docker-password: DOCKER_TOKEN
           use-docker-credentials-store: true
           filters: *filters
       - docker/publish:
@@ -543,19 +543,19 @@ workflows:
             - run:
                 name: Export env vars
                 command: |
-                  echo 'export DOCKER_USERNAME=cpeorbtesting' >> $BASH_ENV
+                  echo 'export DOCKER_USERNAME=circlecipublicimagetesting' >> $BASH_ENV
                   echo 'export DOCKER_NAME=docker-orb-test' >> $BASH_ENV
                   echo 'export DOCKERFILE=test.Dockerfile' >> $BASH_ENV
                   echo 'export REGISTRY=docker.io' >> $BASH_ENV
           name: publish-docker-env-var-all-params
           executor: docker-latest
-          context: CPE-orb-docker-testing
+          context: cimg-docker-image-building
           use-remote-docker: true
           dockerfile: $DOCKERFILE
-          image: $DOCKER_USERNAME/$DOCKER_NAME
+          image: ccitest/$DOCKER_NAME
           tag: $CIRCLE_SHA1,$CIRCLE_BUILD_NUM
           docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
+          docker-password: DOCKER_TOKEN
           use-docker-credentials-store: true
           registry: $REGISTRY
           filters: *filters
@@ -619,11 +619,11 @@ workflows:
 executors:
   macos-old:
     macos:
-      xcode: 14.2.0
-    resource_class: medium
+      xcode: 14.3.1
+    resource_class: macos.x86.medium.gen2
   macos-latest:
     macos:
-      xcode: 15.0.0
+      xcode: 15.2.0
       resource_class: macos.x86.medium.gen2
   docker-old:
     docker:
@@ -633,13 +633,13 @@ executors:
       - image: cimg/base:stable
   machine-old:
     machine:
-      image: ubuntu-2004:202010-01
+      image: ubuntu-2004:current
   machine-latest:
     machine:
       image: ubuntu-2004:current
   machine-arm:
     resource_class: arm.medium
     machine:
-      image: ubuntu-2004:202101-01
+      image: ubuntu-2004:current
 
 # VS Code Extension Version: 1.3.0

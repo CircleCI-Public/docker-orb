@@ -60,13 +60,17 @@ parameters:
     description: >
       Comma-separated list of images, images will first be pulled, then
       passed as the --cache-from build argument.
-      https://docs.docker.com/reference/cli/docker/buildx/build/#cache-from
+      This parameter only support registry type, the accepted syntax is:
+      cache_from: user/app:cache,user/app2:cache2
+
   cache_to:
     type: string
     default: ""
     description: >
       Comman-separated list of images where cache will be pushed to.
-      https://docs.docker.com/reference/cli/docker/buildx/build/#cache-to
+      This parameter only support registry type, the accepted syntax is:
+      cache_to: user/app:cache,user/app2:cache2
+
   debug:
     type: boolean
     default: false

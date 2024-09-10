@@ -96,13 +96,16 @@ parameters:
     default: ""
     description: >
       Comma-separated list of images to pull before build for --cache-from
-      https://docs.docker.com/engine/reference/commandline/build/#cache-from
+      This parameter only support registry type, the accepted syntax is:
+      cache_from: user/app:cache,user/app2:cache2
+
   cache_to:
     type: string
     default: ""
     description: >
       Comman-separated list of images where cache will be pushed to.
-      https://docs.docker.com/reference/cli/docker/buildx/build/#cache-to
+      This parameter only support registry type, the accepted syntax is:
+      cache_to: user/app:cache,user/app2:cache2
 
   after_checkout:
     description: Optional steps to run after checking out the code
@@ -140,7 +143,6 @@ parameters:
     default: DOCKER_PASSWORD
     description: >
       Name of environment variable storing your Docker password
-
 
   attach-at:
     type: string

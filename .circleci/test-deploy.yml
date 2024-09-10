@@ -8,9 +8,11 @@ promotion_requires: &promotion_requires
     test-check-command-docker,
     test-check-command-machine,
     test-check-command-macos,
+    test-check-command-machine-arm,
     test-credentials-store-docker,
     test-credentials-store-machine,
     test-credentials-store-macos,
+    test-credentials-store-machine-arm,
     test-credentials-store-docker-custom-tag,
     test-credentials-store-machine-custom-tag,
     test-credentials-store-macos-custom-tag,
@@ -25,7 +27,6 @@ promotion_requires: &promotion_requires
     test-install-docker-tools-docker-latest,
     test-install-docker-tools-docker-old,
     test-install-docker-tools-macos-latest,
-    test-install-docker-tools-macos-old,
     test-install-docker-tools-machine-latest,
     test-install-docker-tools-machine-old,
     test-install-docker-tools-machine-arm,
@@ -35,7 +36,6 @@ promotion_requires: &promotion_requires
     test-docker-latest,
     test-docker-old,
     test-macos-latest,
-    test-macos-old,
     test-machine-latest,
     test-machine-old,
     test-machine-arm,
@@ -124,12 +124,17 @@ jobs:
         type: env_var_name
       use-docker-credentials-store:
         type: boolean
+      arch:
+        default: amd64
+        type: enum
+        enum: [amd64, arm64]
     executor: <<parameters.executor>>
     steps:
       - docker/check:
           docker-username: <<parameters.docker-username>>
           docker-password: <<parameters.docker-password>>
           use-docker-credentials-store: <<parameters.use-docker-credentials-store>>
+          arch: <<parameters.arch>>
   test-credentials-store:
     parameters:
       executor:
@@ -145,11 +150,16 @@ jobs:
       release-tag:
         type: string
         default: ""
+      arch:
+        default: amd64
+        type: enum
+        enum: [amd64, arm64]
     executor: <<parameters.executor>>
     steps:
       - docker/install-docker-credential-helper:
           helper-name: <<parameters.helper-name>>
           release-tag: <<parameters.release-tag>>
+          arch: <<parameters.arch>>
       - docker/configure-docker-credentials-store:
           helper-name: <<parameters.helper-name>>
       - run:
@@ -361,6 +371,15 @@ workflows:
           use-docker-credentials-store: true
           filters: *filters
       - test-check-command:
+          name: test-check-command-machine-arm
+          executor: machine-arm
+          context: cimg-docker-image-building
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_TOKEN
+          arch: arm64
+          use-docker-credentials-store: true
+          filters: *filters
+      - test-check-command:
           name: test-check-command-macos
           executor: macos-latest
           context: cimg-docker-image-building
@@ -387,6 +406,14 @@ workflows:
           context: cimg-docker-image-building
           docker-username: DOCKER_USER
           docker-password: DOCKER_TOKEN
+          filters: *filters
+      - test-credentials-store:
+          name: test-credentials-store-machine-arm
+          executor: machine-arm
+          context: cimg-docker-image-building
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_TOKEN
+          arch: arm64
           filters: *filters
       - test-credentials-store:
           name: test-credentials-store-macos
@@ -468,16 +495,32 @@ workflows:
           use-docker-credentials-store: true
           filters: *filters
       - docker/publish:
-          name: publish-docker-cache
-          requires:
-            - publish-docker
-          executor: docker-latest
+          name: publish-docker-save-cache
+          executor: machine-latest
           context: cimg-docker-image-building
-          use-remote-docker: true
-          dockerfile: test.Dockerfile
+          dockerfile: test4.Dockerfile
           image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1
-          cache_from: ccitest/docker-orb-test:$CIRCLE_SHA1
+          cache_to: ccitest/docker-orb-test:cache-big,ccitest/docker-orb-test:cache2-big
+          cache_from: ccitest/docker-orb-test:cache2-big
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_TOKEN
+          pre-steps:
+            - docker/install-docker-credential-helper:
+                # release-tag: v0.6.3
+            - docker/configure-docker-credentials-store:
+                helper-name: pass
+          filters: *filters
+      - docker/publish:
+          name: publish-docker-cache
+          requires:
+            - publish-docker-save-cache
+          executor: machine-latest
+          context: cimg-docker-image-building
+          dockerfile: test4.Dockerfile
+          image: ccitest/docker-orb-test
+          tag: $CIRCLE_SHA1
+          cache_from: ccitest/docker-orb-test:cache-big
           docker-username: DOCKER_USER
           docker-password: DOCKER_TOKEN
           pre-steps:
@@ -580,7 +623,7 @@ workflows:
           name: test-install-docker-tools-<< matrix.executor >>
           matrix:
             parameters:
-              executor: [macos-latest, macos-old]
+              executor: [macos-latest]
           install-goss: false
           filters: *filters
       # end test-install-docker-tools
@@ -596,7 +639,7 @@ workflows:
           name: test-<< matrix.executor >>
           matrix:
             parameters:
-              executor: [macos-latest, macos-old, machine-arm]
+              executor: [macos-latest, machine-arm]
           install-goss: false
           filters: *filters
       # end test
@@ -617,14 +660,9 @@ workflows:
               only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
 
 executors:
-  macos-old:
-    macos:
-      xcode: 14.3.1
-    resource_class: macos.x86.medium.gen2
   macos-latest:
     macos:
       xcode: 15.2.0
-      resource_class: macos.x86.medium.gen2
   docker-old:
     docker:
       - image: cimg/base:2020.08-20.04

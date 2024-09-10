@@ -66,6 +66,12 @@ if [ -n "$PARAM_CACHE_FROM" ]; then
   build_args+=("--cache-from=$PARAM_CACHE_FROM")
 fi
 
+if [ -n "$PARAM_CACHE_TO" ]; then
+  docker buildx create --name cache --use
+  docker buildx use cache
+  build_args+=("--cache-to=$PARAM_CACHE_TO" --load)
+fi
+
 # The context must be the last argument.
 build_args+=("$PARAM_DOCKER_CONTEXT")
 
@@ -74,7 +80,7 @@ IFS=' '
 
 set -x
 # shellcheck disable=SC2048 # We want word splitting here.
-docker build ${build_args[*]}
+docker buildx build ${build_args[*]}
 set +x
 
 IFS="$old_ifs"

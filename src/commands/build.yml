@@ -52,7 +52,9 @@ parameters:
     default: ""
     description: >
       Extra flags to pass to docker build. For examples, see
-      https://docs.docker.com/engine/reference/commandline/build
+      https://docs.docker.com/engine/reference/commandline/build.
+      Pass the desired args using an equal sign (=) instead of an space.
+      For example, --build-arg=ARG1=value, instead of --build-arg ARG1=vallue.
 
   cache_from:
     type: string
@@ -117,16 +119,6 @@ steps:
             debug: <<parameters.debug>>
 
   - when:
-      condition: <<parameters.use-buildkit>>
-      steps:
-        - run: echo 'export DOCKER_BUILDKIT=1' >> $BASH_ENV
-
-  - when:
-      condition: <<parameters.extra_build_args>>
-      steps:
-        - run: echo 'PARAM_EXTRA_BUILD_ARGS="<<parameters.extra_build_args>>"' >> $BASH_ENV
-
-  - when:
       condition: <<parameters.attach-at>>
       steps:
         - attach_workspace:
@@ -136,6 +128,7 @@ steps:
       name: <<parameters.step-name>>
       no_output_timeout: << parameters.no_output_timeout >>
       environment:
+        EXTRA_BUILD_ARGS: <<parameters.extra_build_args>>
         PARAM_CACHE_FROM: <<parameters.cache_from>>
         PARAM_CACHE_TO: <<parameters.cache_to>>
         PARAM_DOCKER_CONTEXT: <<parameters.docker-context>>

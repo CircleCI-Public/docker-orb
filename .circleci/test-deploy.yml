@@ -56,6 +56,17 @@ orbs:
   orb-tools: circleci/orb-tools@11.1
 
 jobs:
+  build-multispace-args:
+    machine:
+      image: ubuntu-2004:current
+    steps:
+      - checkout
+      - docker/install-docker
+      - docker/build:
+          dockerfile: test3.Dockerfile
+          image: docker-orb-test-temporal
+          tag: tempora-test
+          extra_build_args: --build-arg=COMMIT_HASH=$CIRCLE_SHA1 --build-arg=CARG='i am a good parameter' --build-arg=DATE=$(date +%F)
   test:
     parameters:
       executor:
@@ -305,6 +316,7 @@ jobs:
 workflows:
   test-deploy:
     jobs:
+      - build-multispace-args
       - docker/hadolint:
           name: hadolint
           ignore-rules: DL4005,DL3008,DL3009,DL3015,DL3059

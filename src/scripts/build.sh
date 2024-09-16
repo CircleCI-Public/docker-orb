@@ -3,7 +3,6 @@
 # Import "utils.sh".
 eval "$SCRIPT_UTILS"
 expand_env_vars_with_prefix "PARAM_"
-
 DOCKER_TAGS_ARG=""
 
 parse_tags_to_docker_arg() {
@@ -54,12 +53,12 @@ fi
 
 build_args=(
   "--file=$PARAM_DOCKERFILE_PATH/$PARAM_DOCKERFILE_NAME"
-  "$DOCKER_TAGS_ARG"
 )
 
-if [ -n "$PARAM_EXTRA_BUILD_ARGS" ]; then
-  extra_build_args="$(eval echo "$PARAM_EXTRA_BUILD_ARGS")"
-  build_args+=("$extra_build_args")
+eval 'for t in '$DOCKER_TAGS_ARG'; do build_args+=("$t"); done'
+
+if [ -n "$EXTRA_BUILD_ARGS" ]; then
+  eval 'for p in '$EXTRA_BUILD_ARGS'; do build_args+=("$p"); done'
 fi
 
 if [ -n "$PARAM_CACHE_FROM" ]; then
@@ -79,8 +78,7 @@ old_ifs="$IFS"
 IFS=' '
 
 set -x
-# shellcheck disable=SC2048 # We want word splitting here.
-docker buildx build ${build_args[*]}
+docker buildx build "${build_args[@]}"
 set +x
 
 IFS="$old_ifs"

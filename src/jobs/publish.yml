@@ -90,6 +90,8 @@ parameters:
     description: >
       Extra flags to pass to docker build. For examples, see
       https://docs.docker.com/engine/reference/commandline/build
+      Pass the desired args using an equal sign (=) instead of an space.
+      For example, --build-arg=ARG1=value, instead of --build-arg ARG1=vallue.
 
   cache_from:
     type: string

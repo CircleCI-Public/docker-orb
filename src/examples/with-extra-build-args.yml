@@ -12,4 +12,4 @@ usage:
       jobs:
         - docker/publish:
             image:  $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
-            extra_build_args: --build-arg FOO=bar --build-arg BAZ=qux
+            extra_build_args: --build-arg=FOO=bar --build-arg=BAZ=qux

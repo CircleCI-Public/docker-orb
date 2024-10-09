@@ -497,7 +497,6 @@ workflows:
           executor: docker-latest
           context: cimg-docker-image-building
           use-remote-docker: true
-          remote-docker-version: "20.10.12"
           use-buildkit: true
           dockerfile: test.Dockerfile
           image: ccitest/docker-orb-test

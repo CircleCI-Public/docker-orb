@@ -1,11 +1,6 @@
 #syntax=docker/dockerfile:1
-FROM ubuntu:18.04
+FROM composer:latest
 
-LABEL maintainer="CircleCI <support@circleci.com>"
+WORKDIR /var/www/html
 
-# Change default shell from Dash to Bash
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-RUN --mount=type=secret,id=COMPOSER_AUTH,env=COMPOSER_AUTH echo $COMPOSER_AUTH
-RUN echo Validation
-
-WORKDIR /root/project
+RUN --mount=type=secret,id=COMPOSER_AUTH,env=COMPOSER_AUTH,required composer install --no-dev

@@ -237,7 +237,7 @@ jobs:
     executor: docker/machine
     steps:
       - checkout
-      - setup_remote_docker
+      # - setup_remote_docker
       - run: echo 'export COMPOSER_AUTH=SECRET_VALUE' >> $BASH_ENV
       - docker/build:
           dockerfile: test5.Dockerfile

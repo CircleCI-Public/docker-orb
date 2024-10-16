@@ -239,7 +239,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: echo 'export COMPOSER_AUTH=SECRET_VALUE' >> $BASH_ENV
+      # - run: echo 'export COMPOSER_AUTH=SECRET_VALUE' >> $BASH_ENV
       - docker/build:
           dockerfile: test5.Dockerfile
           image: ccitest/docker-orb-test-secret

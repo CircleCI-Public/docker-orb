@@ -245,7 +245,7 @@ jobs:
           image: ccitest/docker-orb-test-secret
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
           # use-buildkit: true
-          extra_build_args: "--secret=id=COMPOSER_AUTH,env=COMPOSER_AUTH"
+          extra_build_args: "--secret=id=COMPOSER_AUTH,env=COMPOSER_AUTH --progress=plain --no-cache"
   test-build-bash-substitution:
     docker:
       - image: cimg/base:current

@@ -5,26 +5,7 @@ LABEL maintainer="CircleCI <support@circleci.com>"
 
 # Change default shell from Dash to Bash
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-RUN --mount=type=secret,id=COMPOSER_AUTH,env=COMPOSER_AUTH  echo $COMPOSER_AUTH
-RUN apt-get update && apt-get install -y \
-	bzip2 \
-	ca-certificates \
-	curl \
-	xvfb \
-	git \
-	gnupg \
-	gzip \
-	jq \
-	locales \
-	mercurial \
-	net-tools \
-	netcat \
-	openssh-client \
-	parallel \
-	sudo \
-	tar \
-	unzip \
-	wget \
-	zip
+RUN --mount=type=secret,id=COMPOSER_AUTH,env=COMPOSER_AUTH echo $COMPOSER_AUTH
+RUN echo Validation
 
 WORKDIR /root/project

@@ -24,6 +24,7 @@ promotion_requires: &promotion_requires
     publish-docker-multiple-tags,
     publish-docker-env-var-image-param,
     test-pull,
+    integration-test-secret-args,
     test-install-docker-tools-docker-latest,
     test-install-docker-tools-docker-old,
     test-install-docker-tools-macos-latest,
@@ -232,6 +233,18 @@ jobs:
           image: ccitest/docker-orb-test
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
           extra_build_args: --build-arg COMMIT_HASH=$CIRCLE_SHA1
+  integration-test-secret-args:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/build:
+          dockerfile: test.Dockerfile
+          image: ccitest/docker-orb-test-secret
+          tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
+          use-buildkit: true
+          extra_build_args: "--secret id=COMPOSER_AUTH,env=COMPOSER_AUTH"
   test-build-bash-substitution:
     docker:
       - image: cimg/base:current
@@ -317,6 +330,7 @@ workflows:
   test-deploy:
     jobs:
       - build-multispace-args
+      - integration-test-secret-args
       - docker/hadolint:
           name: hadolint
           ignore-rules: DL4005,DL3008,DL3009,DL3015,DL3059

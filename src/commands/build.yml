@@ -117,6 +117,10 @@ steps:
             treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>
             dockerfile: <<parameters.path>>/<<parameters.dockerfile>>
             debug: <<parameters.debug>>
+  - when:
+      condition: <<parameters.use-buildkit>>
+      steps:
+        - run: echo 'export DOCKER_BUILDKIT=1' >> $BASH_ENV
 
   - when:
       condition: <<parameters.attach-at>>

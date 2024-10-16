@@ -1,16 +1,11 @@
-
-# vim:set ft=dockerfile:
-#
-# The Ubuntu-based CircleCI Docker Image. Only use Ubuntu Long-Term Support
-# (LTS) releases.
-
+#syntax=docker/dockerfile:1
 FROM ubuntu:18.04
 
 LABEL maintainer="CircleCI <support@circleci.com>"
 
 # Change default shell from Dash to Bash
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-
+RUN --mount=type=secret,id=COMPOSER_AUTH,env=COMPOSER_AUTH  echo $COMPOSER_AUTH
 RUN apt-get update && apt-get install -y \
 	bzip2 \
 	ca-certificates \

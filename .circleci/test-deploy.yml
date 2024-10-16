@@ -239,8 +239,9 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
+      - run: echo 'export COMPOSER_AUTH=SECRET_VALUE' >> $BASH_ENV
       - docker/build:
-          dockerfile: test2.Dockerfile
+          dockerfile: test5.Dockerfile
           image: ccitest/docker-orb-test-secret
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
           # use-buildkit: true

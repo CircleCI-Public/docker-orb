@@ -240,7 +240,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - docker/build:
-          dockerfile: test.Dockerfile
+          dockerfile: test2.Dockerfile
           image: ccitest/docker-orb-test-secret
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
           # use-buildkit: true

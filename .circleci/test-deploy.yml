@@ -234,10 +234,12 @@ jobs:
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
           extra_build_args: --build-arg COMMIT_HASH=$CIRCLE_SHA1
   integration-test-secret-args:
-    executor: docker/machine
+    executor:
+      name: docker/docker
+      tag: "3.8"
     steps:
       - checkout
-      # - setup_remote_docker
+      - setup_remote_docker
       - run: echo 'export COMPOSER_AUTH=SECRET_VALUE' >> $BASH_ENV
       - docker/build:
           dockerfile: test5.Dockerfile
@@ -523,7 +525,7 @@ workflows:
           name: publish-docker-save-cache
           executor: machine-latest
           context: cimg-docker-image-building
-          dockerfile: test4.Dockerfile
+          dockerfile: test2.Dockerfile
           image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1
           cache_to: ccitest/docker-orb-test:cache-big,ccitest/docker-orb-test:cache2-big
@@ -542,7 +544,7 @@ workflows:
             - publish-docker-save-cache
           executor: machine-latest
           context: cimg-docker-image-building
-          dockerfile: test4.Dockerfile
+          dockerfile: test2.Dockerfile
           image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1
           cache_from: ccitest/docker-orb-test:cache-big

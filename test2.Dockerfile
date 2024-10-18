@@ -1,4 +1,3 @@
-
 # vim:set ft=dockerfile:
 #
 # The Ubuntu-based CircleCI Docker Image. Only use Ubuntu Long-Term Support

@@ -3,6 +3,9 @@
 # Import "utils.sh".
 eval "$SCRIPT_UTILS"
 expand_env_vars_with_prefix "PARAM_"
+echo "The value of cache before substition is: $PARAM_CACHE_FROM"
+PARAM_CACHE_FROM="$(circleci env subst -- "$PARAM_CACHE_FROM")"
+echo "The value of cache after substition is: $PARAM_CACHE_FROM"
 DOCKER_TAGS_ARG=""
 
 parse_tags_to_docker_arg() {
@@ -29,7 +32,7 @@ parse_tags_to_docker_arg() {
 
 pull_images_from_cache() {
   local cache
-  cache="$(eval echo $PARAM_CACHE_FROM)"
+  cache="$PARAM_CACHE_FROM"
 
   echo "$cache" | sed -n 1'p' | tr ',' '\n' | while read -r image; do
     echo "Pulling ${image}";

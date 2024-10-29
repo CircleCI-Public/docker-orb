@@ -54,7 +54,7 @@ if [ -n "$PARAM_CACHE_TO" ]; then
 
   docker buildx create --name cache --use
   docker buildx use cache
-  build_args+=("--cache-to=$cache_to" --load)
+  build_args+=("--cache-to=$cache_to")
 fi
 
 # The context must be the last argument.

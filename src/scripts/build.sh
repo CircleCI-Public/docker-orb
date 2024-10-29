@@ -27,28 +27,10 @@ parse_tags_to_docker_arg() {
   DOCKER_TAGS_ARG="$(eval echo $docker_arg)"
 }
 
-pull_images_from_cache() {
-  local cache
-  cache="$(eval echo $PARAM_CACHE_FROM)"
-
-  echo "$cache" | sed -n 1'p' | tr ',' '\n' | while read -r image; do
-    echo "Pulling ${image}";
-    docker pull ${image} || true
-  done
-}
-
 if ! parse_tags_to_docker_arg; then
   echo "Unable to parse provided tags."
   echo "Check your \"tag\" parameter or refer to the docs and try again: https://circleci.com/developer/orbs/orb/circleci/docker."
   exit 1
-fi
-
-if [ -n "$PARAM_CACHE_FROM" ]; then
-  if ! pull_images_from_cache; then
-    echo "Unable to pull images from the cache."
-    echo "Check your \"cache_from\" parameter or refer to the docs and try again: https://circleci.com/developer/orbs/orb/circleci/docker."
-    exit 1
-  fi
 fi
 
 build_args=(
@@ -62,7 +44,9 @@ if [ -n "$EXTRA_BUILD_ARGS" ]; then
 fi
 
 if [ -n "$PARAM_CACHE_FROM" ]; then
-  build_args+=("--cache-from=$PARAM_CACHE_FROM")
+  cache_from=$(eval echo $PARAM_CACHE_FROM)
+
+  build_args+=("--cache-from=$cache_from")
 fi
 
 if [ -n "$PARAM_CACHE_TO" ]; then

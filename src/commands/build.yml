@@ -73,12 +73,6 @@ parameters:
       This parameter only support registry type, the accepted syntax is:
       cache_to: user/app:cache,user/app2:cache2
 
-  debug:
-    type: boolean
-    default: false
-    description: >
-      Extra output for orb developers
-
   attach-at:
     type: string
     default: ""
@@ -113,10 +107,8 @@ steps:
   - when:
       condition: <<parameters.lint-dockerfile>>
       steps:
-        - dockerlint:
-            treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>
-            dockerfile: <<parameters.path>>/<<parameters.dockerfile>>
-            debug: <<parameters.debug>>
+        - hadolint:
+            dockerfiles: <<parameters.path>>/<<parameters.dockerfile>>
   - when:
       condition: <<parameters.use-buildkit>>
       steps:

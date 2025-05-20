@@ -2,7 +2,6 @@ version: 2.1
 
 promotion_requires: &promotion_requires
   [
-    dockerlint,
     hadolint,
     orb-tools/pack,
     test-check-command-docker,
@@ -25,21 +24,14 @@ promotion_requires: &promotion_requires
     publish-docker-env-var-image-param,
     test-pull,
     integration-test-secret-args,
-    test-install-docker-tools-docker-latest,
-    test-install-docker-tools-docker-old,
-    test-install-docker-tools-macos-latest,
-    test-install-docker-tools-machine-latest,
-    test-install-docker-tools-machine-old,
-    test-install-docker-tools-machine-arm,
+    test-install-docker-tools,
+    test-install-docker-tools-macos,
+    test-install-docker-tools-arm64,
     test-install-docker-compose-with-checksums,
     test-install-docker-compose-with-sha256,
     test-install-docker-compose-with-checksums-and-sha256,
-    test-docker-latest,
-    test-docker-old,
-    test-macos-latest,
-    test-machine-latest,
-    test-machine-old,
-    test-machine-arm,
+    test,
+    test-arm,
     test-build-command-workspace,
     test-build-with-args,
     test-build-bash-substitution
@@ -50,10 +42,8 @@ filters: &filters
     only: /.*/
 
 orbs:
-  build-tools: circleci/build-tools@3.0.0
   docker: circleci/docker@dev:<<pipeline.git.revision>>
-  jq: circleci/jq@2.2.0
-  node: circleci/node@4.7.0
+  jq: circleci/jq@3.0.2
   orb-tools: circleci/orb-tools@11.1
 
 jobs:
@@ -259,25 +249,6 @@ jobs:
           image: ${DOCKER_ACCOUNT,,}/${DOCKER_REPO,,/_/-}
           tag: ${CIRCLE_BUILD_NUM,,}-${CIRCLE_SHA1:0:10}
           extra_build_args: --build-arg COMMIT_HASH=$CIRCLE_SHA1
-  test-dockerlint:
-    docker:
-      - image: cimg/node:17.7.2
-    parameters:
-      debug:
-        type: boolean
-        default: false
-      dockerfile:
-        type: string
-        default: "test.Dockerfile"
-      treat-warnings-as-errors:
-        type: boolean
-        default: false
-    steps:
-      - checkout
-      - docker/dockerlint:
-          debug: <<parameters.debug>>
-          dockerfile: <<parameters.dockerfile>>
-          treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>
   test-install-docker-compose:
     parameters:
       docker-compose-version:
@@ -343,11 +314,6 @@ workflows:
           matrix:
             parameters:
               executor: [docker-latest, machine-arm, macos-latest]
-          filters: *filters
-      - test-dockerlint:
-          name: dockerlint
-          debug: true
-          treat-warnings-as-errors: false
           filters: *filters
       - test-pull:
           filters: *filters
@@ -633,6 +599,7 @@ workflows:
       - test-install-docker-tools:
           name: test-install-docker-tools-<< matrix.executor >>
           matrix:
+            alias: test-install-docker-tools
             parameters:
               executor: [docker-latest, docker-old, machine-latest, machine-old]
               goss-architecture: [amd64]
@@ -640,6 +607,7 @@ workflows:
       - test-install-docker-tools:
           name: test-install-docker-tools-<< matrix.executor >>
           matrix:
+            alias: test-install-docker-tools-arm64
             parameters:
               executor: [machine-arm]
               goss-architecture: [arm64]
@@ -647,6 +615,7 @@ workflows:
       - test-install-docker-tools:
           name: test-install-docker-tools-<< matrix.executor >>
           matrix:
+            alias: test-install-docker-tools-macos
             parameters:
               executor: [macos-latest]
           install-goss: false
@@ -657,12 +626,14 @@ workflows:
       - test:
           name: test-<< matrix.executor >>
           matrix:
+            alias: test
             parameters:
               executor: [docker-latest, docker-old, machine-latest, machine-old]
           filters: *filters
       - test:
           name: test-<< matrix.executor >>
           matrix:
+            alias: test-arm
             parameters:
               executor: [macos-latest, machine-arm]
           install-goss: false

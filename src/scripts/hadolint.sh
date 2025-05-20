@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Import "utils.sh".
 eval "$SCRIPT_UTILS"
 expand_env_vars_with_prefix "PARAM_"
@@ -60,7 +62,7 @@ for dockerfile in "${dockerfiles[@]}"; do
     ${PARAM_FAILURE_THRESHOLD:+$failure_threshold} \
     ${PARAM_IGNORE_RULES:+$ignore_rules} \
     ${PARAM_TRUSTED_REGISTRIES:+$trusted_registries} \
-    $dockerfile
+    "$dockerfile"
   set +x
   printf '%s\n' "Success! $dockerfile linted; no issues found"
 done

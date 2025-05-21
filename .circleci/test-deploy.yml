@@ -475,8 +475,8 @@ workflows:
           dockerfile: test2.Dockerfile
           image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1
-          cache_to: ccitest/docker-orb-test:cache-big,ccitest/docker-orb-test:cache2-big
-          cache_from: ccitest/docker-orb-test:cache2-big
+          cache_to: type=registry,ref=ccitest/docker-orb-test:cache-big type=registry,ref=ccitest/docker-orb-test:cache2-big
+          cache_from: ccitest/docker-orb-test:cache2-big ccitest/docker-orb-test:cache-big
           docker_username: DOCKER_USER
           docker_password: DOCKER_TOKEN
           pre-steps:
@@ -493,7 +493,7 @@ workflows:
           dockerfile: test2.Dockerfile
           image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1
-          cache_from: ccitest/docker-orb-test:cache-big
+          cache_from: ccitest/docker-orb-test:cache-big ccitest/docker-orb-test:cache2-big
           docker_username: DOCKER_USER
           docker_password: DOCKER_TOKEN
           pre-steps:

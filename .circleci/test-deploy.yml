@@ -617,12 +617,12 @@ workflows:
       - orb-tools/pack:
           filters: *filters
       - orb-tools/publish:
-          orb-name: circleci/docker
-          vcs-type: << pipeline.project.type >>
-          pub-type: production
+          orb_name: circleci/docker
+          vcs_type: << pipeline.project.type >>
+          pub_type: production
           requires: *promotion_requires
           context: orb-publisher
-          github-token: GHI_TOKEN
+          github_token: GHI_TOKEN
           filters:
             branches:
               ignore: /.*/

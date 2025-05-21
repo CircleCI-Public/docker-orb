@@ -97,17 +97,17 @@ parameters:
     type: string
     default: ""
     description: >
-      Comma-separated list of images to pull before build for --cache-from
-      This parameter only support registry type, the accepted syntax is:
-      cache_from: user/app:cache,user/app2:cache2
+      A list of cache storage backends separated by space.
+      You can use the full syntax: type=registry,ref=<registry>/<cache-image>[,parameters...]
+      Or the compact syntax: ref=<registry>/<cache-image>
 
   cache_to:
     type: string
     default: ""
     description: >
-      Comman-separated list of images where cache will be pushed to.
-      This parameter only support registry type, the accepted syntax is:
-      cache_to: user/app:cache,user/app2:cache2
+      A list of cache storage backends separated by space.
+      You can use the full syntax: type=registry,ref=<registry>/<cache-image>[,parameters...]
+      Or the compact syntax: ref=<registry>/<cache-image>
 
   after_checkout:
     description: Optional steps to run after checking out the code

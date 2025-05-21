@@ -22,6 +22,7 @@ workflows:
           filters: *filters
       # Triggers the next workflow in the Orb Development Kit.
       - orb-tools/continue:
+          orb_name: docker
           pipeline_number: << pipeline.number >>
           vcs_type: << pipeline.project.type >>
           requires: [orb-tools/lint, orb-tools/review, orb-tools/pack, shellcheck/check]

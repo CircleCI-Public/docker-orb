@@ -112,7 +112,9 @@ steps:
   - when:
       condition: <<parameters.use_buildkit>>
       steps:
-        - run: echo 'export DOCKER_BUILDKIT=1' >> $BASH_ENV
+        - run: 
+            name: Enable Buildkit
+            command: echo 'export DOCKER_BUILDKIT=1' >> $BASH_ENV
 
   - when:
       condition: <<parameters.attach_at>>

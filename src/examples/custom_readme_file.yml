@@ -13,4 +13,4 @@ usage:
         - docker/publish:
             readme: my.README.md
             path: path/to/Docker/build/context
-            image:  $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+            image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME

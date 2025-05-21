@@ -12,7 +12,7 @@ parameters:
     default: false
     description: Enable Docker Layer Caching?
 
-  resource-class:
+  resource_class:
     type: enum
     enum: [ "medium", "large", "xlarge", "2xlarge", "arm.medium", "arm.large", "arm.xlarge", "arm.2xlarge"]
     default: medium
@@ -21,4 +21,4 @@ parameters:
 machine:
   image: <<parameters.image>>
   docker_layer_caching: <<parameters.dlc>>
-resource_class: <<parameters.resource-class>>
+resource_class: <<parameters.resource_class>>

@@ -24,12 +24,12 @@ promotion_requires: &promotion_requires
     publish-docker-env-var-image-param,
     test-pull,
     integration-test-secret-args,
-    test-install-docker-tools,
-    test-install-docker-tools-macos,
-    test-install-docker-tools-arm64,
-    test-install-docker-compose-with-checksums,
-    test-install-docker-compose-with-sha256,
-    test-install-docker-compose-with-checksums-and-sha256,
+    test-install_docker_tools,
+    test-install_docker_tools-macos,
+    test-install_docker_tools-arm64,
+    test-install_docker_compose-with-checksums,
+    test-install_docker_compose-with-sha256,
+    test-install_docker_compose-with-checksums-and-sha256,
     test,
     test-arm,
     test-build-command-workspace,
@@ -42,17 +42,16 @@ filters: &filters
     only: /.*/
 
 orbs:
-  docker: circleci/docker@dev:<<pipeline.git.revision>>
+  docker: {}
   jq: circleci/jq@3.0.2
-  orb-tools: circleci/orb-tools@11.1
-
+  orb-tools: circleci/orb-tools@12.3.1
 jobs:
   build-multispace-args:
     machine:
       image: ubuntu-2004:current
     steps:
       - checkout
-      - docker/install-docker
+      - docker/install_docker
       - docker/build:
           dockerfile: test3.Dockerfile
           image: docker-orb-test-temporal
@@ -62,51 +61,51 @@ jobs:
     parameters:
       executor:
         type: executor
-      install-goss:
+      install_goss:
         type: boolean
         default: true
     executor: << parameters.executor >>
     steps:
-      - docker/install-docker
-      - docker/install-docker-compose
-      - docker/install-dockerize
+      - docker/install_docker
+      - docker/install_docker_compose
+      - docker/install_dockerize
       - when:
-          condition: << parameters.install-goss >>
+          condition: << parameters.install_goss >>
           steps:
-            - docker/install-goss
-  test-install-docker-tools:
+            - docker/install_goss
+  test-install_docker_tools:
     parameters:
       executor:
         type: executor
-      docker-version:
+      docker_version:
         type: string
         default: latest
-      docker-compose-version:
+      docker_compose_version:
         type: string
         default: latest
-      dockerize-version:
+      dockerize_version:
         type: string
         default: latest
-      install-goss:
+      install_goss:
         type: boolean
         default: true
-      goss-version:
+      goss_version:
         type: string
         default: latest
       debug:
         type: boolean
         default: false
-      goss-architecture:
+      goss_architecture:
         type: enum
         default: amd64
-        enum: [ amd64, arm64 ]
+        enum: [amd64, arm64]
     executor: <<parameters.executor>>
     steps:
       - checkout
       - jq/install
-      - docker/install-docker-tools:
-          install-goss-dgoss: << parameters.install-goss >>
-          goss-architecture: << parameters.goss-architecture >>
+      - docker/install_docker_tools:
+          install_goss_dgoss: << parameters.install_goss >>
+          goss_architecture: << parameters.goss_architecture >>
   test-pull:
     executor: docker-latest
     steps:
@@ -115,16 +114,16 @@ jobs:
           images: cimg/base:stable,ubuntu:18.04
       - docker/pull:
           images: cimg/base:stable,cimg/base:not_exists,cimg/go:stable
-          ignore-docker-pull-error: true
+          ignore_docker_pull_error: true
   test-check-command:
     parameters:
       executor:
         type: executor
-      docker-username:
+      docker_username:
         type: env_var_name
-      docker-password:
+      docker_password:
         type: env_var_name
-      use-docker-credentials-store:
+      use_docker_credentials_store:
         type: boolean
       arch:
         default: amd64
@@ -133,23 +132,23 @@ jobs:
     executor: <<parameters.executor>>
     steps:
       - docker/check:
-          docker-username: <<parameters.docker-username>>
-          docker-password: <<parameters.docker-password>>
-          use-docker-credentials-store: <<parameters.use-docker-credentials-store>>
+          docker_username: <<parameters.docker_username>>
+          docker_password: <<parameters.docker_password>>
+          use_docker_credentials_store: <<parameters.use_docker_credentials_store>>
           arch: <<parameters.arch>>
   test-credentials-store:
     parameters:
       executor:
         type: executor
-      helper-name:
+      helper_name:
         type: enum
         enum: ["", "pass", "osxkeychain"]
         default: ""
-      docker-username:
+      docker_username:
         type: env_var_name
-      docker-password:
+      docker_password:
         type: env_var_name
-      release-tag:
+      release_tag:
         type: string
         default: ""
       arch:
@@ -158,17 +157,17 @@ jobs:
         enum: [amd64, arm64]
     executor: <<parameters.executor>>
     steps:
-      - docker/install-docker-credential-helper:
-          helper-name: <<parameters.helper-name>>
-          release-tag: <<parameters.release-tag>>
+      - docker/install_docker_credential_helper:
+          helper_name: <<parameters.helper_name>>
+          release_tag: <<parameters.release_tag>>
           arch: <<parameters.arch>>
-      - docker/configure-docker-credentials-store:
-          helper-name: <<parameters.helper-name>>
+      - docker/configure_docker_credentials_store:
+          helper_name: <<parameters.helper_name>>
       - run:
           name: Test login
           command: |
-            LOGIN_RESULT=$(echo "$<<parameters.docker-password>>" \
-            | docker login -u "$<<parameters.docker-username>>" --password-stdin)
+            LOGIN_RESULT=$(echo "$<<parameters.docker_password>>" \
+            | docker login -u "$<<parameters.docker_username>>" --password-stdin)
             set -x
             echo "$LOGIN_RESULT" | grep "Login Succeeded"
             set +x
@@ -199,7 +198,7 @@ jobs:
           dockerfile: test.Dockerfile
           image: ccitest/docker-orb-test
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
-          attach-at: "./"
+          attach_at: "./"
       - run:
           name: Check for workspace
           command: |-
@@ -233,7 +232,7 @@ jobs:
           dockerfile: test5.Dockerfile
           image: ccitest/docker-orb-test-secret
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
-          # use-buildkit: true
+          # use_buildkit: true
           extra_build_args: "--secret id=COMPOSER_AUTH,env=COMPOSER_AUTH --progress=plain --no-cache"
   test-build-bash-substitution:
     docker:
@@ -249,33 +248,28 @@ jobs:
           image: ${DOCKER_ACCOUNT,,}/${DOCKER_REPO,,/_/-}
           tag: ${CIRCLE_BUILD_NUM,,}-${CIRCLE_SHA1:0:10}
           extra_build_args: --build-arg COMMIT_HASH=$CIRCLE_SHA1
-  test-install-docker-compose:
+  test-install_docker_compose:
     parameters:
-      docker-compose-version:
+      docker_compose_version:
         type: string
         default: latest
         description: >
-          Version of `docker-compose` to install, defaults to the latest stable release.
-          If specifying a version other than latest, provide a full release tag,
-          as listed at https://github.com/docker/compose/releases or
-          https://api.github.com/repos/docker/compose/releases, e.g., `1.23.1`.
+          Version of `docker-compose` to install, defaults to the latest stable release. If specifying a version other than latest, provide a full release tag, as listed at https://github.com/docker/compose/releases or https://api.github.com/repos/docker/compose/releases, e.g., `1.23.1`.
 
-      install-dir:
+      install_dir:
         type: string
         default: /usr/local/bin
         description: >
           Directory in which to install `docker-compose`
+
       executor:
         type: executor
-
     executor: << parameters.executor >>
-
     steps:
-      - docker/install-docker
-      - docker/install-docker-compose:
-          version: << parameters.docker-compose-version>>
-          install-dir: << parameters.install-dir>>
-
+      - docker/install_docker
+      - docker/install_docker_compose:
+          version: << parameters.docker_compose_version>>
+          install_dir: << parameters.install_dir>>
   test-hadolint-install:
     parameters:
       executor:
@@ -285,8 +279,8 @@ jobs:
       - checkout
       - docker/hadolint:
           dockerfiles: test.Dockerfile
-          ignore-rules: DL4005,DL3008,DL3009,DL3015
-          trusted-registries: docker.io,my-company.com:5000
+          ignore_rules: DL4005,DL3008,DL3009,DL3015
+          trusted_registries: docker.io,my-company.com:5000
       - run:
           name: Verifying hadolint install
           command: |
@@ -304,10 +298,10 @@ workflows:
       - integration-test-secret-args
       - docker/hadolint:
           name: hadolint
-          ignore-rules: DL4005,DL3008,DL3009,DL3015,DL3059
-          trusted-registries: docker.io,my-company.com:5000
+          ignore_rules: DL4005,DL3008,DL3009,DL3015,DL3059
+          trusted_registries: docker.io,my-company.com:5000
           dockerfiles: test.Dockerfile:test2.Dockerfile
-          failure-threshold: none
+          failure_threshold: none
           filters: *filters
       - test-hadolint-install:
           name: test-install-hadolint-<< matrix.executor >>
@@ -327,163 +321,152 @@ workflows:
           filters: *filters
       - test-build-bash-substitution:
           filters: *filters
-
-      # begin test-install-docker-compose
-      - test-install-docker-compose:
-          name: test-install-docker-compose-with-checksums
+      - test-install_docker_compose:
+          name: test-install_docker_compose-with-checksums
           executor: docker-latest
           filters: *filters
-      - test-install-docker-compose:
-          name: test-install-docker-compose-with-sha256
-          docker-compose-version: v2.0.1
+      - test-install_docker_compose:
+          name: test-install_docker_compose-with-sha256
+          docker_compose_version: v2.0.1
           executor: docker-latest
           filters: *filters
-      - test-install-docker-compose:
-          name: test-install-docker-compose-with-checksums-and-sha256
-          docker-compose-version: v2.9.0
+      - test-install_docker_compose:
+          name: test-install_docker_compose-with-checksums-and-sha256
+          docker_compose_version: v2.9.0
           executor: docker-latest
           filters: *filters
-      # end test-install-docker-compose
-
-      # begin test-check-command
       - test-check-command:
           name: test-check-command-docker
           executor: docker-latest
           context: cimg-docker-image-building
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_TOKEN
-          use-docker-credentials-store: false
+          docker_username: DOCKER_USER
+          docker_password: DOCKER_TOKEN
+          use_docker_credentials_store: false
           filters: *filters
       - test-check-command:
           name: test-check-command-machine
           executor: machine-latest
           context: cimg-docker-image-building
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_TOKEN
-          use-docker-credentials-store: true
+          docker_username: DOCKER_USER
+          docker_password: DOCKER_TOKEN
+          use_docker_credentials_store: true
           filters: *filters
       - test-check-command:
           name: test-check-command-machine-arm
           executor: machine-arm
           context: cimg-docker-image-building
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_TOKEN
+          docker_username: DOCKER_USER
+          docker_password: DOCKER_TOKEN
           arch: arm64
-          use-docker-credentials-store: true
+          use_docker_credentials_store: true
           filters: *filters
       - test-check-command:
           name: test-check-command-macos
           executor: macos-latest
           context: cimg-docker-image-building
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_TOKEN
-          use-docker-credentials-store: true
+          docker_username: DOCKER_USER
+          docker_password: DOCKER_TOKEN
+          use_docker_credentials_store: true
           pre-steps:
-            - docker/install-docker
+            - docker/install_docker
           filters: *filters
-      # end test-check-command
-
-      # begin test-credentials-store
       - test-credentials-store:
           name: test-credentials-store-docker
           executor: docker-latest
           context: cimg-docker-image-building
-          helper-name: pass
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_TOKEN
+          helper_name: pass
+          docker_username: DOCKER_USER
+          docker_password: DOCKER_TOKEN
           filters: *filters
       - test-credentials-store:
           name: test-credentials-store-machine
           executor: machine-latest
           context: cimg-docker-image-building
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_TOKEN
+          docker_username: DOCKER_USER
+          docker_password: DOCKER_TOKEN
           filters: *filters
       - test-credentials-store:
           name: test-credentials-store-machine-arm
           executor: machine-arm
           context: cimg-docker-image-building
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_TOKEN
+          docker_username: DOCKER_USER
+          docker_password: DOCKER_TOKEN
           arch: arm64
           filters: *filters
       - test-credentials-store:
           name: test-credentials-store-macos
           executor: macos-latest
           context: cimg-docker-image-building
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_TOKEN
+          docker_username: DOCKER_USER
+          docker_password: DOCKER_TOKEN
           pre-steps:
-            - docker/install-docker
+            - docker/install_docker
           filters: *filters
       - test-credentials-store:
           name: test-credentials-store-docker-custom-tag
           executor: docker-latest
           context: cimg-docker-image-building
-          helper-name: pass
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_TOKEN
-          release-tag: "v0.6.4"
+          helper_name: pass
+          docker_username: DOCKER_USER
+          docker_password: DOCKER_TOKEN
+          release_tag: "v0.6.4"
           filters: *filters
       - test-credentials-store:
           name: test-credentials-store-machine-custom-tag
           executor: machine-latest
           context: cimg-docker-image-building
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_TOKEN
-          release-tag: "v0.6.4"
+          docker_username: DOCKER_USER
+          docker_password: DOCKER_TOKEN
+          release_tag: "v0.6.4"
           filters: *filters
       - test-credentials-store:
           name: test-credentials-store-macos-custom-tag
           executor: macos-latest
           context: cimg-docker-image-building
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_TOKEN
-          release-tag: "v0.6.4"
+          docker_username: DOCKER_USER
+          docker_password: DOCKER_TOKEN
+          release_tag: "v0.6.4"
           pre-steps:
-            - docker/install-docker
+            - docker/install_docker
           filters: *filters
-      # end test-credentials-store
-
-      # begin docker/publish
       - docker/publish:
           name: publish-machine
           context: cimg-docker-image-building
           dockerfile: test.Dockerfile
           image: ccitest/docker-orb-test
           tag: $CIRCLE_BUILD_NUM-$CIRCLE_SHA1
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_TOKEN
-          use-docker-credentials-store: true
+          docker_username: DOCKER_USER
+          docker_password: DOCKER_TOKEN
+          use_docker_credentials_store: true
           pre-steps:
             # Test that it's OK to invoke the commands twice
-            - docker/install-docker-credential-helper
-            - docker/configure-docker-credentials-store
+            - docker/install_docker_credential_helper
+            - docker/configure_docker_credentials_store
           filters: *filters
       - docker/publish:
           name: publish-docker
           executor: docker-latest
           context: cimg-docker-image-building
-          use-remote-docker: true
+          use_remote_docker: true
           dockerfile: test.Dockerfile
           image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_TOKEN
-          use-docker-credentials-store: true
+          docker_username: DOCKER_USER
+          docker_password: DOCKER_TOKEN
+          use_docker_credentials_store: true
           filters: *filters
       - docker/publish:
           name: publish-docker-with-buildkit
           executor: docker-latest
           context: cimg-docker-image-building
-          use-remote-docker: true
-          use-buildkit: true
+          use_remote_docker: true
+          use_buildkit: true
           dockerfile: test.Dockerfile
           image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_TOKEN
-          use-docker-credentials-store: true
+          docker_username: DOCKER_USER
+          docker_password: DOCKER_TOKEN
+          use_docker_credentials_store: true
           filters: *filters
       - docker/publish:
           name: publish-docker-save-cache
@@ -494,13 +477,12 @@ workflows:
           tag: $CIRCLE_SHA1
           cache_to: ccitest/docker-orb-test:cache-big,ccitest/docker-orb-test:cache2-big
           cache_from: ccitest/docker-orb-test:cache2-big
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_TOKEN
+          docker_username: DOCKER_USER
+          docker_password: DOCKER_TOKEN
           pre-steps:
-            - docker/install-docker-credential-helper:
-                # release-tag: v0.6.3
-            - docker/configure-docker-credentials-store:
-                helper-name: pass
+            - docker/install_docker_credential_helper
+            - docker/configure_docker_credentials_store:
+                helper_name: pass
           filters: *filters
       - docker/publish:
           name: publish-docker-cache
@@ -512,50 +494,50 @@ workflows:
           image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1
           cache_from: ccitest/docker-orb-test:cache-big
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_TOKEN
+          docker_username: DOCKER_USER
+          docker_password: DOCKER_TOKEN
           pre-steps:
-            - docker/install-docker-credential-helper:
-                # release-tag: v0.6.3
-            - docker/configure-docker-credentials-store:
-                helper-name: pass
+            - docker/install_docker_credential_helper:
+              # release_tag: v0.6.3
+            - docker/configure_docker_credentials_store:
+                helper_name: pass
           filters: *filters
       - docker/publish:
           name: publish-docker-cache-not-found
           executor: docker/docker
           context: cimg-docker-image-building
-          use-remote-docker: true
+          use_remote_docker: true
           dockerfile: test.Dockerfile
           image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1-2
           cache_from: ccitest/docker-orb-test:not-exists
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_TOKEN
+          docker_username: DOCKER_USER
+          docker_password: DOCKER_TOKEN
           filters: *filters
       - docker/publish:
-          name: publish-docker-update-description
+          name: publish-docker-update_description
           executor: docker-latest
           context: cimg-docker-image-building
-          use-remote-docker: true
+          use_remote_docker: true
           dockerfile: test.Dockerfile
           image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1
           cache_from: ccitest/docker-orb-test:$CIRCLE_SHA1
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_TOKEN
-          update-description: true
+          docker_username: DOCKER_USER
+          docker_password: DOCKER_TOKEN
+          update_description: true
           filters: *filters
       - docker/publish:
           name: publish-docker-multiple-tags
           executor: docker-latest
           context: cimg-docker-image-building
-          use-remote-docker: true
+          use_remote_docker: true
           dockerfile: test.Dockerfile
           image: ccitest/docker-orb-test
           tag: $CIRCLE_SHA1,$CIRCLE_BUILD_NUM
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_TOKEN
-          use-docker-credentials-store: true
+          docker_username: DOCKER_USER
+          docker_password: DOCKER_TOKEN
+          use_docker_credentials_store: true
           filters: *filters
       - docker/publish:
           pre-steps:
@@ -564,13 +546,13 @@ workflows:
           name: publish-docker-env-var-image-param
           executor: docker-latest
           context: cimg-docker-image-building
-          use-remote-docker: true
+          use_remote_docker: true
           dockerfile: test.Dockerfile
           image: ccitest/$DOCKER_NAME
           tag: $CIRCLE_SHA1,$CIRCLE_BUILD_NUM
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_TOKEN
-          use-docker-credentials-store: true
+          docker_username: DOCKER_USER
+          docker_password: DOCKER_TOKEN
+          use_docker_credentials_store: true
           filters: *filters
       - docker/publish:
           pre-steps:
@@ -584,45 +566,39 @@ workflows:
           name: publish-docker-env-var-all-params
           executor: docker-latest
           context: cimg-docker-image-building
-          use-remote-docker: true
+          use_remote_docker: true
           dockerfile: $DOCKERFILE
           image: ccitest/$DOCKER_NAME
           tag: $CIRCLE_SHA1,$CIRCLE_BUILD_NUM
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_TOKEN
-          use-docker-credentials-store: true
+          docker_username: DOCKER_USER
+          docker_password: DOCKER_TOKEN
+          use_docker_credentials_store: true
           registry: $REGISTRY
           filters: *filters
-      # end docker/publish
-
-      # begin test-install-docker-tools
-      - test-install-docker-tools:
-          name: test-install-docker-tools-<< matrix.executor >>
+      - test-install_docker_tools:
+          name: test-install_docker_tools-<< matrix.executor >>
           matrix:
-            alias: test-install-docker-tools
+            alias: test-install_docker_tools
             parameters:
               executor: [docker-latest, docker-old, machine-latest, machine-old]
-              goss-architecture: [amd64]
+              goss_architecture: [amd64]
           filters: *filters
-      - test-install-docker-tools:
-          name: test-install-docker-tools-<< matrix.executor >>
+      - test-install_docker_tools:
+          name: test-install_docker_tools-<< matrix.executor >>
           matrix:
-            alias: test-install-docker-tools-arm64
+            alias: test-install_docker_tools-arm64
             parameters:
               executor: [machine-arm]
-              goss-architecture: [arm64]
+              goss_architecture: [arm64]
           filters: *filters
-      - test-install-docker-tools:
-          name: test-install-docker-tools-<< matrix.executor >>
+      - test-install_docker_tools:
+          name: test-install_docker_tools-<< matrix.executor >>
           matrix:
-            alias: test-install-docker-tools-macos
+            alias: test-install_docker_tools-macos
             parameters:
               executor: [macos-latest]
-          install-goss: false
+          install_goss: false
           filters: *filters
-      # end test-install-docker-tools
-
-      # begin test
       - test:
           name: test-<< matrix.executor >>
           matrix:
@@ -636,44 +612,39 @@ workflows:
             alias: test-arm
             parameters:
               executor: [macos-latest, machine-arm]
-          install-goss: false
+          install_goss: false
           filters: *filters
-      # end test
-
       - orb-tools/pack:
           filters: *filters
       - orb-tools/publish:
-          orb-name: circleci/docker
-          vcs-type: << pipeline.project.type >>
-          pub-type: production
+          orb_name: circleci/docker
+          vcs_type: << pipeline.project.type >>
+          pub_type: production
           requires: *promotion_requires
           context: orb-publisher
-          github-token: GHI_TOKEN
+          github_token: GHI_TOKEN
           filters:
             branches:
               ignore: /.*/
             tags:
               only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
-
 executors:
   macos-latest:
     macos:
-      xcode: 15.2.0
+      xcode: 16.2.0
   docker-old:
     docker:
-      - image: cimg/base:2020.08-20.04
+      - image: cimg/base:edge-24.04
   docker-latest:
     docker:
       - image: cimg/base:stable
   machine-old:
     machine:
-      image: ubuntu-2004:current
+      image: ubuntu-2404:current
   machine-latest:
     machine:
-      image: ubuntu-2004:current
+      image: ubuntu-2404:current
   machine-arm:
     resource_class: arm.medium
     machine:
-      image: ubuntu-2004:current
-
-# VS Code Extension Version: 1.3.0
+      image: ubuntu-2404:current

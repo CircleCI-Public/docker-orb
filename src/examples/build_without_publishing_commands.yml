@@ -16,7 +16,7 @@ usage:
         - docker/check
 
         - docker/build:
-            image:  $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+            image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
 
   workflows:
     build-docker-image-only:

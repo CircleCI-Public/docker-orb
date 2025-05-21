@@ -11,7 +11,7 @@ parameters:
       listed at https://github.com/jwilder/dockerize/releases, e.g.,
       `v0.5.0`. Supports versions `v.0.4.0` and later.
 
-  install-dir:
+  install_dir:
     type: string
     default: /usr/local/bin
     description: >
@@ -22,6 +22,6 @@ steps:
       name: Install dockerize
       environment:
         PARAM_VERSION: << parameters.version >>
-        PARAM_INSTALL_DIR: << parameters.install-dir >>
+        PARAM_INSTALL_DIR: << parameters.install_dir >>
         SCRIPT_UTILS: <<include(scripts/utils.sh)>>
-      command: << include(scripts/install-dockerize.sh) >>
+      command: << include(scripts/install_dockerize.sh) >>

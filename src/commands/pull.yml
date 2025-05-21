@@ -5,7 +5,7 @@ parameters:
     type: string
     default: ""
     description: Comma-separated list of images to pull
-  ignore-docker-pull-error:
+  ignore_docker_pull_error:
     type: boolean
     default: false
     description: Ignores errors from docker pull command
@@ -18,6 +18,6 @@ steps:
             name: Docker pull
             environment:
               PARAM_IMAGES: <<parameters.images>>
-              PARAM_IGNORE_DOCKER_PULL_ERROR: <<parameters.ignore-docker-pull-error>>
+              PARAM_IGNORE_DOCKER_PULL_ERROR: <<parameters.ignore_docker_pull_error>>
               SCRIPT_UTILS: <<include(scripts/utils.sh)>>
             command: << include(scripts/pull.sh) >>

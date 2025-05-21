@@ -1,5 +1,6 @@
 description: >
-  Build/publish a Docker image building from a nested Dockerfile
+  Build, but don't publish, an image using the publish job
+
 usage:
   version: 2.1
 
@@ -11,5 +12,4 @@ usage:
       jobs:
         - docker/publish:
             image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
-            path: dockerfiles/prod
-            docker-context: .
+            deploy: false

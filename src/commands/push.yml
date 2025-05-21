@@ -1,7 +1,7 @@
 description: Push a Docker image to a registry
 
 parameters:
-  step-name:
+  step_name:
     type: string
     default: Docker push
     description: Specify a custom step name for this command, if desired
@@ -21,18 +21,18 @@ parameters:
     default: $CIRCLE_SHA1
     description: Comma-separated list of image tag, defaults to the value of $CIRCLE_SHA1
 
-  digest-path:
+  digest_path:
     type: string
     description: The path to save the RepoDigest of the pushed image
     default: ""
 
 steps:
   - run:
-      name: <<parameters.step-name>>
+      name: <<parameters.step_name>>
       environment:
         PARAM_REGISTRY: <<parameters.registry>>
         PARAM_IMAGE: <<parameters.image>>
         PARAM_TAG: <<parameters.tag>>
-        PARAM_DIGEST_PATH: <<parameters.digest-path>>
+        PARAM_DIGEST_PATH: <<parameters.digest_path>>
         SCRIPT_UTILS: <<include(scripts/utils.sh)>>
       command: << include(scripts/push.sh) >>

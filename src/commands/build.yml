@@ -2,7 +2,7 @@ description: >
   Build and tag a Docker image
 
 parameters:
-  step-name:
+  step_name:
     type: string
     default: Docker build
     description: Specify a custom step name for this command, if desired
@@ -19,13 +19,13 @@ parameters:
       Path to the directory containing your Dockerfile,
       defaults to . (working directory)
 
-  lint-dockerfile:
+  lint_dockerfile:
     type: boolean
     default: false
     description: >
       Lint Dockerfile before building?
 
-  treat-warnings-as-errors:
+  treat_warnings_as_errors:
     type: boolean
     default: false
     description: >
@@ -73,7 +73,7 @@ parameters:
       This parameter only support registry type, the accepted syntax is:
       cache_to: user/app:cache,user/app2:cache2
 
-  attach-at:
+  attach_at:
     type: string
     default: ""
     description: >
@@ -81,7 +81,7 @@ parameters:
       `attach_workspace` attached location - where to mount folder/files that were `persist_to_workspace` in a previous step.
       https://circleci.com/docs/2.0/configuration-reference/#attach_workspace
 
-  docker-context:
+  docker_context:
     type: string
     default: .
     description: >
@@ -95,7 +95,7 @@ parameters:
       Pass through a default timeout if your Docker build does not output
       anything for more than 10 minutes.
 
-  use-buildkit:
+  use_buildkit:
     type: boolean
     default: false
     description: >
@@ -105,34 +105,36 @@ parameters:
 
 steps:
   - when:
-      condition: <<parameters.lint-dockerfile>>
+      condition: <<parameters.lint_dockerfile>>
       steps:
         - hadolint:
             dockerfiles: <<parameters.path>>/<<parameters.dockerfile>>
   - when:
-      condition: <<parameters.use-buildkit>>
+      condition: <<parameters.use_buildkit>>
       steps:
-        - run: echo 'export DOCKER_BUILDKIT=1' >> $BASH_ENV
+        - run:
+            name: Enable Buildkit
+            command: echo 'export DOCKER_BUILDKIT=1' >> $BASH_ENV
 
   - when:
-      condition: <<parameters.attach-at>>
+      condition: <<parameters.attach_at>>
       steps:
         - attach_workspace:
-              at: <<parameters.attach-at>>
+              at: <<parameters.attach_at>>
 
   - run:
-      name: <<parameters.step-name>>
+      name: <<parameters.step_name>>
       no_output_timeout: << parameters.no_output_timeout >>
       environment:
         EXTRA_BUILD_ARGS: <<parameters.extra_build_args>>
         PARAM_CACHE_FROM: <<parameters.cache_from>>
         PARAM_CACHE_TO: <<parameters.cache_to>>
-        PARAM_DOCKER_CONTEXT: <<parameters.docker-context>>
+        PARAM_DOCKER_CONTEXT: <<parameters.docker_context>>
         PARAM_DOCKERFILE_NAME: <<parameters.dockerfile>>
         PARAM_DOCKERFILE_PATH: <<parameters.path>>
         PARAM_IMAGE: <<parameters.image>>
         PARAM_REGISTRY: <<parameters.registry>>
         PARAM_TAG: <<parameters.tag>>
-        PARAM_USE_BUILDKIT: <<parameters.use-buildkit>>
+        PARAM_USE_BUILDKIT: <<parameters.use_buildkit>>
         SCRIPT_UTILS: <<include(scripts/utils.sh)>>
       command: <<include(scripts/build.sh)>>

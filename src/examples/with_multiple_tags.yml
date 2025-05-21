@@ -1,5 +1,5 @@
 description: >
-  Build, but don't publish, an image using the publish job
+  Build/publish a Docker image with extra build arguments
 
 usage:
   version: 2.1
@@ -11,5 +11,5 @@ usage:
     build-docker-image-only:
       jobs:
         - docker/publish:
-            image:  $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
-            deploy: false
+            image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+            tag: tag1,tag2,tag3

@@ -11,8 +11,8 @@ usage:
     lint:
       jobs:
         - docker/hadolint:
-            ignore-rules: DL4005,DL3008
-            trusted-registries: docker.io,my-company.com:5000
+            ignore_rules: DL4005,DL3008
+            trusted_registries: docker.io,my-company.com:5000
             dockerfiles: path/to/Dockerfile
-            hadolint-tag: 2.2.0-debian
-            executor-class: medium
+            hadolint_tag: 2.2.0-debian
+            executor_class: medium

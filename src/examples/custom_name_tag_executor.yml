@@ -20,5 +20,5 @@ usage:
               tag: boron-browsers
             use_remote_docker: true
             remote_docker_dlc: true
-            image:  my/image
+            image: my/image
             tag: my-tag

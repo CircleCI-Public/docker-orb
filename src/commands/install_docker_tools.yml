@@ -4,7 +4,7 @@ description: >
 
 parameters:
   # docker
-  install-docker:
+  install_docker:
     type: boolean
     default: true
     description: >
@@ -12,7 +12,7 @@ parameters:
       newer, on all platforms (Linux, macOS). Requirements: curl, grep,
       jq, tar
 
-  docker-version:
+  docker_version:
     type: string
     default: latest
     description: >
@@ -21,21 +21,21 @@ parameters:
       as listed at https://api.github.com/repos/docker/cli/tags, e.g.,
       `v18.09.4`.
 
-  docker-install-dir:
+  docker_install_dir:
     type: string
     default: /usr/local/bin
     description: >
       Directory in which to install Docker binaries
 
   # docker-compose
-  install-docker-compose:
+  install_docker_compose:
     type: boolean
     default: true
     description: >
       Install the `docker-compose` CLI? Supports stable versions.
       Requirements: curl, Docker, grep, jq, sha256sum
 
-  docker-compose-version:
+  docker_compose_version:
     type: string
     default: latest
     description: >
@@ -44,21 +44,21 @@ parameters:
       as listed at https://github.com/docker/compose/releases or
       https://api.github.com/repos/docker/compose/releases, e.g., `1.23.1`.
 
-  docker-compose-install-dir:
+  docker_compose_install_dir:
     type: string
     default: /usr/local/bin
     description: >
       Directory in which to install `docker-compose`
 
   # dockerize
-  install-dockerize:
+  install_dockerize:
     type: boolean
     default: true
     description: >
       Install `dockerize`? Supports versions `v.0.4.0` and later.
       Requirements: curl, Docker
 
-  dockerize-version:
+  dockerize_version:
     type: string
     default: latest
     description: >
@@ -67,20 +67,20 @@ parameters:
       listed at https://github.com/jwilder/dockerize/releases, e.g.,
       `v0.5.0`. Supports versions `v.0.4.0` and later.
 
-  dockerize-install-dir:
+  dockerize_install_dir:
     type: string
     default: /usr/local/bin
     description: >
       Directory in which to install `dockerize`
 
   # goss/dgoss
-  install-goss-dgoss:
+  install_goss_dgoss:
     type: boolean
     default: true
     description: >
       Install Goss and `dgoss`?
 
-  goss-version:
+  goss_version:
     type: string
     default: latest
     description: >
@@ -90,7 +90,7 @@ parameters:
       or https://api.github.com/repos/aelsabbahy/goss/releases, e.g.,
       `v0.3.7`.
 
-  goss-install-dir:
+  goss_install_dir:
     type: string
     default: /usr/local/bin
     description: >
@@ -102,7 +102,7 @@ parameters:
     description: >
       Extra output for orb developers
 
-  goss-architecture:
+  goss_architecture:
     type: enum
     default: amd64
     enum: [ amd64, arm64 ]
@@ -111,31 +111,31 @@ parameters:
 
 steps:
   - when:
-      condition: <<parameters.install-docker>>
+      condition: <<parameters.install_docker>>
       steps:
-        - install-docker:
-            version: <<parameters.docker-version>>
-            install-dir: <<parameters.docker-install-dir>>
+        - install_docker:
+            version: <<parameters.docker_version>>
+            install_dir: <<parameters.docker_install_dir>>
 
   - when:
-      condition: <<parameters.install-docker-compose>>
+      condition: <<parameters.install_docker_compose>>
       steps:
-        - install-docker-compose:
-            version: <<parameters.docker-compose-version>>
-            install-dir: <<parameters.docker-compose-install-dir>>
+        - install_docker_compose:
+            version: <<parameters.docker_compose_version>>
+            install_dir: <<parameters.docker_compose_install_dir>>
 
   - when:
-      condition: <<parameters.install-dockerize>>
+      condition: <<parameters.install_dockerize>>
       steps:
-        - install-dockerize:
-            version: <<parameters.dockerize-version>>
-            install-dir: <<parameters.dockerize-install-dir>>
+        - install_dockerize:
+            version: <<parameters.dockerize_version>>
+            install_dir: <<parameters.dockerize_install_dir>>
 
   - when:
-      condition: <<parameters.install-goss-dgoss>>
+      condition: <<parameters.install_goss_dgoss>>
       steps:
-        - install-goss:
-            version: <<parameters.goss-version>>
-            install-dir: <<parameters.goss-install-dir>>
+        - install_goss:
+            version: <<parameters.goss_version>>
+            install_dir: <<parameters.goss_install_dir>>
             debug: <<parameters.debug>>
-            architecture: <<parameters.goss-architecture>>
+            architecture: <<parameters.goss_architecture>>

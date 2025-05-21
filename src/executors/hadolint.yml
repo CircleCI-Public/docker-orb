@@ -9,12 +9,12 @@ parameters:
       otherwise image will not be usable on CircleCI):
       https://hub.docker.com/r/hadolint/hadolint/tags
 
-  resource-class:
+  resource_class:
     type: enum
     default: small
     enum: [small, medium, medium+, large, xlarge]
 
-resource_class: <<parameters.resource-class>>
+resource_class: <<parameters.resource_class>>
 
 docker:
   - image: hadolint/hadolint:<<parameters.tag>>

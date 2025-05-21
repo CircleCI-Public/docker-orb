@@ -8,14 +8,14 @@ parameters:
     default: true
     description: Checkout as a first step? Default is true
 
-  attach-workspace:
+  attach_workspace:
     type: boolean
     default: false
     description: >
       Boolean for whether or not to attach to an existing workspace,
       default is false
 
-  workspace-root:
+  workspace_root:
     type: string
     default: workspace
     description: >
@@ -32,14 +32,14 @@ parameters:
       multiple Dockerfiles, pass a colon-separated string, e.g.,
       `~/project/app/deploy.Dockerfile:~/project/app/test.Dockerfile`.
 
-  ignore-rules:
+  ignore_rules:
     type: string
     default: ""
     description: >
       Comma-separated string list of rules to ignore (e.g.,
       `DL3000,SC1010`): https://github.com/hadolint/hadolint#rules
 
-  trusted-registries:
+  trusted_registries:
     type: string
     default: ""
     description: >
@@ -47,7 +47,7 @@ parameters:
       `docker.io,my-company.com:5000`); if set, return an error if
       Dockerfiles use any images from registries not included in this list
 
-  failure-threshold:
+  failure_threshold:
     type: enum
     default: "info"
     description: >
@@ -55,7 +55,7 @@ parameters:
       with a severity equal to or above THRESHOLD are violated
     enum: [ "error", "warning", "info", "style", "ignore", "none" ]
 
-  hadolint-tag:
+  hadolint_tag:
     type: string
     default: latest-debian
     description: >
@@ -63,7 +63,7 @@ parameters:
       will not be usable on CircleCI):
       https://hub.docker.com/r/hadolint/hadolint/tags
 
-  executor-class:
+  executor_class:
     type: enum
     default: small
     description: Resource class to use for the hadolint executor
@@ -76,8 +76,8 @@ parameters:
 
 executor:
   name: hadolint
-  tag: <<parameters.hadolint-tag>>
-  resource-class: <<parameters.executor-class>>
+  tag: <<parameters.hadolint_tag>>
+  resource_class: <<parameters.executor_class>>
 
 steps:
   - bt/install-ci-tools
@@ -88,13 +88,13 @@ steps:
         - checkout
 
   - when:
-      condition: <<parameters.attach-workspace>>
+      condition: <<parameters.attach_workspace>>
       steps:
         - attach_workspace:
-            at: <<parameters.workspace-root>>
+            at: <<parameters.workspace_root>>
 
   - hadolint:
       dockerfiles: <<parameters.dockerfiles>>
-      ignore-rules: <<parameters.ignore-rules>>
-      trusted-registries: <<parameters.trusted-registries>>
-      failure-threshold: <<parameters.failure-threshold>>
+      ignore_rules: <<parameters.ignore_rules>>
+      trusted_registries: <<parameters.trusted_registries>>
+      failure_threshold: <<parameters.failure_threshold>>

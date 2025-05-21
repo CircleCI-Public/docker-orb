@@ -15,7 +15,7 @@ usage:
         tag: "3.6"
       steps:
         - checkout
-        - docker/install-docker-tools
+        - docker/install_docker_tools
 
   workflows:
     your-workflow:

@@ -10,22 +10,22 @@ parameters:
       Executor to use for this job, defaults to this orb's `machine`
       executor
 
-  use-remote-docker:
+  use_remote_docker:
     type: boolean
     default: false
     description: >
       Setup a remote Docker engine for Docker commands? Only required
       if using a Docker-based executor
 
-  remote-docker-version:
+  remote_docker_version:
     type: string
     default: "default"
     description: >
       Pick remote Docker engine version.
-      Available versions can be found at: https://circleci.com/docs/2.0/building-docker-images/#docker-version.
+      Available versions can be found at: https://circleci.com/docs/2.0/building-docker-images/#docker_version.
       Must be >= 18.09 for BuildKit support.
 
-  remote-docker-dlc:
+  remote_docker_dlc:
     type: boolean
     default: false
     description: >
@@ -49,13 +49,13 @@ parameters:
       Path to the directory containing your Dockerfile,
       defaults to . (working directory)
 
-  lint-dockerfile:
+  lint_dockerfile:
     type: boolean
     default: false
     description: >
       Lint Dockerfile before building?
 
-  treat-warnings-as-errors:
+  treat_warnings_as_errors:
     type: boolean
     default: false
     description: >
@@ -77,7 +77,7 @@ parameters:
     description: >
       Name of registry to use, defaults to docker.io
 
-  use-docker-credentials-store:
+  use_docker_credentials_store:
     type: boolean
     default: false
     description: >
@@ -129,24 +129,24 @@ parameters:
     type: boolean
     default: true
 
-  update-description:
+  update_description:
     description: Update the image description on Docker Hub?
     type: boolean
     default: false # Defaults to false for backwards compatibility.
 
-  docker-username:
+  docker_username:
     type: env_var_name
     default: DOCKER_LOGIN
     description: >
       Name of environment variable storing your Docker username
 
-  docker-password:
+  docker_password:
     type: env_var_name
     default: DOCKER_PASSWORD
     description: >
       Name of environment variable storing your Docker password
 
-  attach-at:
+  attach_at:
     type: string
     default: ""
     description: >
@@ -154,14 +154,14 @@ parameters:
       `attach_workspace` attached location - where to mount folder/files that were `persist_to_workspace` in a previous step.
       https://circleci.com/docs/2.0/configuration-reference/#attach_workspace
 
-  docker-context:
+  docker_context:
     type: string
     default: .
     description: >
       Path to the directory containing your build context,
       defaults to . (working directory)
 
-  use-buildkit:
+  use_buildkit:
     type: boolean
     default: false
     description: >
@@ -177,26 +177,26 @@ steps:
       steps: <<parameters.after_checkout>>
 
   - when:
-      condition: <<parameters.use-remote-docker>>
+      condition: <<parameters.use_remote_docker>>
       steps:
         - setup_remote_docker:
-            version: <<parameters.remote-docker-version>>
-            docker_layer_caching: <<parameters.remote-docker-dlc>>
+            version: <<parameters.remote_docker_version>>
+            docker_layer_caching: <<parameters.remote_docker_dlc>>
 
   - when:
-      condition: <<parameters.attach-at>>
+      condition: <<parameters.attach_at>>
       steps:
         - attach_workspace:
-              at: <<parameters.attach-at>>
+              at: <<parameters.attach_at>>
 
   - when:
       condition: <<parameters.deploy>>
       steps:
         - check:
             registry: <<parameters.registry>>
-            docker-username: <<parameters.docker-username>>
-            docker-password: <<parameters.docker-password>>
-            use-docker-credentials-store: <<parameters.use-docker-credentials-store>>
+            docker_username: <<parameters.docker_username>>
+            docker_password: <<parameters.docker_password>>
+            use_docker_credentials_store: <<parameters.use_docker_credentials_store>>
 
   - when:
       condition: <<parameters.before_build>>
@@ -205,16 +205,16 @@ steps:
   - build:
       dockerfile: <<parameters.dockerfile>>
       path: <<parameters.path>>
-      docker-context: <<parameters.docker-context>>
+      docker_context: <<parameters.docker_context>>
       registry: <<parameters.registry>>
       image: <<parameters.image>>
       tag: <<parameters.tag>>
       cache_from: <<parameters.cache_from>>
       cache_to: <<parameters.cache_to>>
       extra_build_args: <<parameters.extra_build_args>>
-      lint-dockerfile: <<parameters.lint-dockerfile>>
-      treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>
-      use-buildkit: <<parameters.use-buildkit>>
+      lint_dockerfile: <<parameters.lint_dockerfile>>
+      treat_warnings_as_errors: <<parameters.treat_warnings_as_errors>>
+      use_buildkit: <<parameters.use_buildkit>>
 
   - when:
       condition: <<parameters.after_build>>
@@ -229,12 +229,12 @@ steps:
             tag: <<parameters.tag>>
 
   - when:
-      condition: <<parameters.update-description>>
+      condition: <<parameters.update_description>>
       steps:
-        - update-description:
+        - update_description:
             readme: <<parameters.readme>>
             path: <<parameters.path>>
             registry: <<parameters.registry>>
             image: <<parameters.image>>
-            docker-username: <<parameters.docker-username>>
-            docker-password: <<parameters.docker-password>>
+            docker_username: <<parameters.docker_username>>
+            docker_password: <<parameters.docker_password>>

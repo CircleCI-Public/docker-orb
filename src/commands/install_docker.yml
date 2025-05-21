@@ -13,7 +13,7 @@ parameters:
       as listed at https://api.github.com/repos/docker/cli/tags, e.g.,
       `v18.09.4`.
 
-  install-dir:
+  install_dir:
     type: string
     default: /usr/local/bin
     description: >
@@ -24,6 +24,6 @@ steps:
       name: Install Docker CLI
       environment:
         PARAM_VERSION: << parameters.version >>
-        PARAM_INSTALL_DIR: << parameters.install-dir >>
+        PARAM_INSTALL_DIR: << parameters.install_dir >>
         SCRIPT_UTILS: <<include(scripts/utils.sh)>>
-      command: << include(scripts/install-docker.sh) >>
+      command: << include(scripts/install_docker.sh) >>

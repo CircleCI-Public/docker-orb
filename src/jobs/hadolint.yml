@@ -80,7 +80,7 @@ executor:
   resource_class: <<parameters.executor_class>>
 
 steps:
-  - bt/install-ci-tools
+  # - bt/install-ci-tools
 
   - when:
       condition: <<parameters.checkout>>

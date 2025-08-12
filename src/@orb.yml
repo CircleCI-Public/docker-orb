@@ -8,5 +8,4 @@ display:
   source_url: https://github.com/CircleCI-Public/docker-orb
 
 orbs:
-  bt: circleci/build-tools@3.0
   jq: circleci/jq@2.2

@@ -9,27 +9,9 @@ if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 # grab Docker version
 if [[ "$PARAM_VERSION" == "latest" ]]; then
   # extract latest version from GitHub releases API
-  declare -i INDEX=0
-
-  while :
-  do
-    INDEX_VERSION=$(curl --silent --show-error --location --fail --retry 3 \
-      https://api.github.com/repos/docker/cli/tags | \
-      jq --argjson index "$INDEX" '.[$index].name')
-
-    # filter out betas & release candidates
-    # shellcheck disable=SC2143 # Doesn't apply to this case.
-    if [[ $(echo "$INDEX_VERSION" | grep -v beta | grep -v rc) ]]; then
-
-      # can't use substring expression < 0 on macOS
-      DOCKER_VERSION="${INDEX_VERSION:1:$((${#INDEX_VERSION} - 1 - 1))}"
-
-      echo "Latest stable version of Docker is $DOCKER_VERSION"
-      break
-    else
-      INDEX=$((INDEX+1))
-    fi
-  done
+    DOCKER_VERSION=$(curl -s https://github.com/docker/cli/tags | \
+                    sed -n 's/.*href="\/docker\/cli\/releases\/tag\/\(v[0-9]*\.[0-9]*\.[0-9]*\)".*/\1/p' | \
+                    head -1)
 else
   DOCKER_VERSION="$PARAM_VERSION"
   echo "Selected version of Docker is $DOCKER_VERSION"

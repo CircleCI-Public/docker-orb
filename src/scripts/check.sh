@@ -11,7 +11,7 @@ exit_code=1
 
 while [ "$attempt" -le "$max_attempts" ]; do
   echo "Attempt ${attempt}/${max_attempts}: docker login"
-  if ( set -x; echo "${!PARAM_DOCKER_PASSWORD}" | docker login -u "${!PARAM_DOCKER_USERNAME}" --password-stdin "$PARAM_REGISTRY" ); then
+  if ( echo "${!PARAM_DOCKER_PASSWORD}" | ( set -x; docker login -u "${!PARAM_DOCKER_USERNAME}" --password-stdin "$PARAM_REGISTRY" ) ); then
     exit 0
   fi
   exit_code=$?

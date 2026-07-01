@@ -37,6 +37,13 @@ parameters:
       Configure Docker to use a credentials store.
       This option is only supported on Ubuntu/Debian/macOS platforms.
 
+  retries:
+    type: integer
+    default: 3
+    description: >
+      Number of times to retry docker login after a failure. The command
+      makes up to retries + 1 attempts with an increasing delay between tries.
+
 steps:
   - when:
       condition: <<parameters.use_docker_credentials_store>>
@@ -51,5 +58,6 @@ steps:
         PARAM_REGISTRY: <<parameters.registry>>
         PARAM_DOCKER_USERNAME: <<parameters.docker_username>>
         PARAM_DOCKER_PASSWORD: <<parameters.docker_password>>
+        PARAM_RETRIES: <<parameters.retries>>
         SCRIPT_UTILS: <<include(scripts/utils.sh)>>
       command: <<include(scripts/check.sh)>>

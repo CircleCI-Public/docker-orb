@@ -9,9 +9,9 @@ parameters:
     type: string
     default: latest
     description: >
-      Version of Goss and `dgoss` to install, defaults to the latest stable
-      release. If specifying a version other than latest, provide a full
-      release tag, as listed at https://github.com/aelsabbahy/goss/releases
+      Version of Goss and `dgoss` to install. `latest` currently installs
+      `v0.4.9`, the last release that ships `goss-linux-<arch>` binaries. If
+      specifying a version other than latest, provide a full release tag, as listed at https://github.com/aelsabbahy/goss/releases
       or https://api.github.com/repos/aelsabbahy/goss/releases, e.g.,
       `v0.3.7`. Supports versions `v0.3.1` and newer.
 

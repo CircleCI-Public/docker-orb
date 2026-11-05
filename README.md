@@ -4,6 +4,8 @@ Quickly and easily install Docker, `dockerize`, and `docker-compose` in any Circ
 
 Besides providing commands to easily install Docker, `docker-compose`, and `dockerize`, this orb contains the commands/jobs/executors/examples previously published to the [`docker-publish` orb](https://circleci.com/orbs/registry/orb/circleci/docker-publish).
 
+> **Starting a new config?** Use the [`setup-docker` Function](https://github.com/circleci-functions/setup-docker#readme) instead. See the [Functions overview](https://circleci.com/docs/functions/functions-intro/) and the [Functions catalog](https://circleci.com/docs/functions/functions-catalog/). This orb is still maintained for existing pipelines.
+
 ## Usage
 
 _For full usage guidelines, see the [orb registry listing](https://circleci.com/orbs/registry/orb/circleci/docker)._

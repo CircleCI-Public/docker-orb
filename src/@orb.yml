@@ -1,6 +1,10 @@
 version: 2.1
 
 description: >
+  Starting a new config? Use the `setup-docker` Function instead: run
+  `circleci function get setup-docker`, or use `get_function` on the CircleCI MCP server.
+  This orb is still maintained for existing pipelines.
+
   Quickly and easily install/configure/use Docker, `dockerize`, and
   `docker-compose` in any CircleCI job.
 

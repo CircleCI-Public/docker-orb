@@ -8,9 +8,11 @@ if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
 # determine specified version
 if [[ "$PARAM_VERSION" == latest ]]; then
-  VERSION=$(curl -Ls --fail --retry 3 -o /dev/null -w '%{url_effective}' \
-    "https://github.com/aelsabbahy/goss/releases/latest" | sed 's:.*/::')
-  echo "Latest version of Goss is $VERSION"
+  # Goss v0.4.10 and later publish tarballs (goss_<version>_linux_x86_64.tar.gz)
+  # instead of the goss-linux-<arch> binaries downloaded below, so "latest" is
+  # pinned to the last release that ships them until this script handles both.
+  VERSION="v0.4.9"
+  echo "Using Goss $VERSION for latest"
 else
   VERSION="$PARAM_VERSION"
 

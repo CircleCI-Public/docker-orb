@@ -631,7 +631,7 @@ workflows:
 executors:
   macos-latest:
     macos:
-      xcode: 16.2.0
+      xcode: 16.4.0
   docker-old:
     docker:
       - image: cimg/base:edge-24.04
